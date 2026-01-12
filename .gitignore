@@ -1,5 +1,7 @@
-.env
+backend/.env
 .idea
+.env
+backend/.dev.env
 
 
 # Python

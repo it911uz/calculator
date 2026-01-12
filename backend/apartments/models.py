@@ -1,7 +1,21 @@
-from backend.core.base_model import BaseModel
+from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
+from sqlalchemy.orm import relationship
+
+from buildings.models import Building
+from core.base_model import BaseModel
 
 
 class Apartment(BaseModel):
-    pass
+    __tablename__ = "apartments"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    number = Column(String(256), nullable=False)
+    floor = Column(Integer, nullable=False)
+    area = Column(Numeric(precision=20, scale=2), nullable=False)
+    room_count = Column(Integer, nullable=False)
+    final_price = Column(Numeric(precision=20, scale=2), nullable=False)
+
+    building_id = Column(Integer, ForeignKey("buildings.id", ondelete="CASCADE"))
+    building = relationship(Building, back_populates="apartments", lazy="selectin")
 
 
