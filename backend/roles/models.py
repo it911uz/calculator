@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from core.base_model import BaseModel
+from role_permissions.models import role_permission
 
 
 class Role(BaseModel):
@@ -10,4 +11,4 @@ class Role(BaseModel):
     name = Column(String(256), unique=True, nullable=False)
 
     users = relationship("User", back_populates="role", lazy="selectin")
-
+    permissions = relationship("Permission", secondary=role_permission, back_populates="roles", lazy="selectin")
