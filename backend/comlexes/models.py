@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from core.base_model import BaseModel
+from buildings.models import Building
 
 
 class Complex(BaseModel):
@@ -10,5 +11,5 @@ class Complex(BaseModel):
     name = Column(String(256), nullable=False)
     description = Column(String(512), nullable=True)
 
-    buildings = relationship("Building", back_populates="complex")
+    buildings = relationship("Building", back_populates="complex", lazy="selectin")
 

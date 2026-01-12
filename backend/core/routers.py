@@ -1,3 +1,7 @@
+from comlexes.routers import router as complex_router
 
-routers = []
+
+routers = [
+    complex_router,
+]
 

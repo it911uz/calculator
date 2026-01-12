@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
 
-from comlexes.models import Complex
 from core.base_model import BaseModel
 
 
@@ -15,4 +14,4 @@ class Building(BaseModel):
     maxCoefficient = Column(Numeric(precision=20, scale=2), nullable=False)
 
     complex_id = Column(Integer, ForeignKey("complexes.id", ondelete="CASCADE"))
-    complex = relationship(Complex, back_populates="buildings", lazy="selectin")
+    complex = relationship("Complex", back_populates="buildings", lazy="selectin")
