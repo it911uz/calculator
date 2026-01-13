@@ -1,9 +1,26 @@
+from fastapi import HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
+from starlette.responses import Response
 
 
 class BaseRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
+
+    async def _get_instance_by_id(self, model, instance_id: int):
+        stmt = await self.db.execute(select(model).where(model.id == instance_id))
+        instance = stmt.scalar_one_or_none()
+
+        if not instance:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        return instance
+
+    async def get_all(self, model):
+        stmt = await self.db.execute(select(model))
+        instances = stmt.scalars().all()
+        return instances
 
     async def create(self, model, **kwargs):
         new_instance = model(**kwargs)
@@ -14,6 +31,28 @@ class BaseRepository:
 
         return new_instance
 
+    async def get(self, model, instance_id: int):
+        instance = await self._get_instance_by_id(model, instance_id)
+        return instance
+
+    async def update(self, model, instance_id, **kwargs):
+        instance = await self._get_instance_by_id(model, instance_id)
+
+        for key, value in kwargs.items():
+            if hasattr(instance, key):
+                setattr(instance, key, value)
+
+        await self.db.commit()
+        await self.db.refresh(instance)
+        return instance
+
+    async def delete(self, model, instance_id: int):
+        instance = await self._get_instance_by_id(model, instance_id)
+
+        await self.db.delete(instance)
+        await self.db.commit()
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 

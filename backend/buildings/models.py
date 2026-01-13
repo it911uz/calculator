@@ -15,3 +15,5 @@ class Building(BaseModel):
 
     complex_id = Column(Integer, ForeignKey("complexes.id", ondelete="CASCADE"))
     complex = relationship("Complex", back_populates="buildings", lazy="selectin")
+    apartments = relationship("Apartment", back_populates="building", lazy="selectin")
+    building_coefficients = relationship("BuildingCoefficient", back_populates="building", lazy="selectin")
