@@ -34,8 +34,8 @@ from permissions.models import Permission
 
 from comlexes.models import Complex
 from buildings.models import Building
-from apartments.models import Building
-from coefficients.models import BuildingCoefficient, BuildingCoefficientType
+from apartments.models import Apartment
+from coefficients.models import BuildingCoefficient, BuildingCoefficientType, apartment_coefficients
 
 target_metadata = BaseModel.metadata
 

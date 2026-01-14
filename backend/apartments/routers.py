@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apartments.repositories import ApartmentRepository
 from core.repositories import BaseRepository
 from apartments.models import Apartment
 from apartments.schemas import AddApartmentResponse, AddApartmentBody, UpdateApartmentBody
@@ -16,13 +17,13 @@ async def get_apartment_list(db: AsyncSession = Depends(get_db)):
     return await base_repo.get_all(Apartment)
 
 
-@router.post("/add/", response_model=AddApartmentResponse)
+@router.post("/add/",)
 async def add_apartment(create_apartment: AddApartmentBody, db: AsyncSession = Depends(get_db)):
-    base_repo = BaseRepository(db)
-    return await base_repo.create(Apartment, **create_apartment.model_dump())
+    apartment_repo = ApartmentRepository(db)
+    return await apartment_repo.create(**create_apartment.model_dump())
 
 
-@router.get("/{apartment_id}/", response_model=AddApartmentResponse)
+@router.get("/{apartment_id}/")
 async def get_apartment(apartment_id: int, db: AsyncSession = Depends(get_db)):
     base_repo = BaseRepository(db)
     return await base_repo.get(Apartment, apartment_id)

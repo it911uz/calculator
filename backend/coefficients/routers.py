@@ -18,7 +18,7 @@ async def get_coefficient_list(db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/add/", response_model=AddBuildingCoefficientResponse)
-async def add_coefficient(create_coefficient: AddBuildingCoefficientTypeBody, db: AsyncSession = Depends(get_db)):
+async def add_coefficient(create_coefficient: AddBuildingCoefficientBody, db: AsyncSession = Depends(get_db)):
     base_repo = BaseRepository(db)
     return await base_repo.create(BuildingCoefficient, **create_coefficient.model_dump())
 
@@ -42,7 +42,7 @@ async def delete_coefficient(coefficient_id: int, db: AsyncSession = Depends(get
 
 
 
-coefficient_types_router = APIRouter(prefix="/coefficient-types/", tags=["Coefficient Types"])
+coefficient_types_router = APIRouter(prefix="/coefficient-types", tags=["Coefficient Types"])
 
 @coefficient_types_router.get("/", response_model=list[AddBuildingCoefficientTypeResponse])
 async def get_coefficient_type_list(db: AsyncSession = Depends(get_db)):
@@ -51,7 +51,7 @@ async def get_coefficient_type_list(db: AsyncSession = Depends(get_db)):
 
 
 @coefficient_types_router.post("/add/", response_model=AddBuildingCoefficientTypeResponse)
-async def add_coefficient_type(create_coefficient_type: AddBuildingCoefficientBody, db: AsyncSession = Depends(get_db)):
+async def add_coefficient_type(create_coefficient_type: AddBuildingCoefficientTypeBody, db: AsyncSession = Depends(get_db)):
     base_repo = BaseRepository(db)
     return await base_repo.create(BuildingCoefficientType, **create_coefficient_type.model_dump())
 

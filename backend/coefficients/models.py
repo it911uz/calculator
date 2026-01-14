@@ -16,6 +16,14 @@ class BuildingCoefficient(BaseModel):
     building_coefficient_types = relationship("BuildingCoefficientType", back_populates="building_coefficient", lazy="selectin")
 
 
+apartment_coefficients = Table(
+    "apartment_coefficients",
+    BaseModel.metadata,
+    Column("apartment_id", ForeignKey("apartments.id"), primary_key=True),
+    Column("coefficient_type_id", ForeignKey("building_coefficient_types.id"), primary_key=True),
+)
+
+
 class BuildingCoefficientType(BaseModel):
     __tablename__ = "building_coefficient_types"
 
@@ -26,14 +34,6 @@ class BuildingCoefficientType(BaseModel):
     coefficient_id = Column(Integer, ForeignKey("building_coefficients.id", ondelete="CASCADE"))
     building_coefficient = relationship(BuildingCoefficient, back_populates="building_coefficient_types", lazy="selectin")
 
-
-apartment_coefficients = Table(
-    "apartment_coefficients",
-    BaseModel.metadata,
-    Column("apartment_id", ForeignKey("apartments.id"), primary_key=True),
-    Column("coefficient_type_id", ForeignKey("building_coefficient_types.id"), primary_key=True),
-)
-
-
+    apartments = relationship("Apartment", secondary=apartment_coefficients, back_populates="building_coefficient_types", lazy="selectin")
 
 
