@@ -13,7 +13,6 @@ class User(BaseModel):
     is_superuser = Column(Boolean, default=False)
 
     role_id = Column(Integer, ForeignKey('roles.id', ondelete="SET NULL"), nullable=True)
-    role = relationship(Role, back_populates="users", lazy="selectin")
 
 
 

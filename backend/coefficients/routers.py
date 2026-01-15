@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
+from starlette.responses import Response
 
+from coefficients.repositories import CoefficientsRepository
 from core.repositories import BaseRepository
 from coefficients.models import BuildingCoefficient, BuildingCoefficientType
 from coefficients.schemas import (AddBuildingCoefficientResponse, AddBuildingCoefficientBody, UpdateBuildingCoefficientBody,
@@ -44,6 +47,13 @@ async def delete_coefficient(coefficient_id: int, db: AsyncSession = Depends(get
 
 coefficient_types_router = APIRouter(prefix="/coefficient-types", tags=["Coefficient Types"])
 
+
+@coefficient_types_router.get("/by-building-id/{building_id}/", response_model=dict[str, list[AddBuildingCoefficientTypeResponse]])
+async def get_coefficient_types_by_building(building_id: int, db: AsyncSession = Depends(get_db)):
+    coefficient_repo = CoefficientsRepository(db)
+    return await coefficient_repo.get_coefficients_by_building_id(building_id)
+
+
 @coefficient_types_router.get("/", response_model=list[AddBuildingCoefficientTypeResponse])
 async def get_coefficient_type_list(db: AsyncSession = Depends(get_db)):
     base_repo = BaseRepository(db)
@@ -62,7 +72,7 @@ async def get_coefficient_type(coefficient_type_id: int, db: AsyncSession = Depe
     return await base_repo.get(BuildingCoefficientType, coefficient_type_id)
 
 
-@coefficient_types_router.put("/{coefficient_type_id}/", response_model=AddBuildingCoefficientTypeResponse)
+@coefficient_types_router.patch("/{coefficient_type_id}/", response_model=AddBuildingCoefficientTypeResponse)
 async def edit_coefficient_type(coefficient_type_id: int, update_coefficient_type: UpdateBuildingCoefficientTypeBody, db: AsyncSession = Depends(get_db)):
     base_repo = BaseRepository(db)
     return await base_repo.update(BuildingCoefficientType, coefficient_type_id, **update_coefficient_type.model_dump(exclude_unset=True))

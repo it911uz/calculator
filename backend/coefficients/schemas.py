@@ -42,6 +42,12 @@ class UpdateBuildingCoefficientTypeBody(BaseModel):
     rate: Decimal | None = Field(default=None, max_digits=20, decimal_places=2)
     coefficient_id: int | None = None
 
+""" ----------------------------------------------------------- """
+
+
+
+class GetCoefTypeByBuildingIdResponse(BaseModel):
+    name: str
 
 
 

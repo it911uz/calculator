@@ -10,5 +10,4 @@ class Role(BaseModel):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(256), unique=True, nullable=False)
 
-    users = relationship("User", back_populates="role", lazy="selectin")
     permissions = relationship("Permission", secondary=role_permission, back_populates="roles", lazy="selectin")

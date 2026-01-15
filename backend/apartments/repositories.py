@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from sqlalchemy import select
 
 from apartments.models import Apartment
@@ -7,39 +6,71 @@ from core.repositories import BaseRepository
 
 
 class ApartmentRepository(BaseRepository):
-    async def create(self, **kwargs):
+    async def get_apartment_list(self):
+        response = await super().get_all(Apartment)
+        for apartment in response:
+            apartment.bct_ids = [i.id for i in apartment.building_coefficient_types]
+
+        print(response)
+        return response
+
+    async def create_apartment(self, **kwargs):
+        bct_ids = kwargs.pop("btc_ids")
         new_apartment = Apartment(
             number=kwargs.get("number"),
             floor=kwargs.get("floor"),
             area=kwargs.get("area"),
             room_count=kwargs.get("room_count"),
-            final_price=kwargs.get("final_price"),
             building_id=kwargs.get("building_id"),
         )
-        self.db.add(new_apartment)
-        await self.db.flush()
 
-        coefficient_type_ids = kwargs.get("coefficient_type_ids")
-
-        if coefficient_type_ids:
+        if bct_ids:
             stmt = (
                 select(BuildingCoefficientType)
-                .where(BuildingCoefficientType.id.in_(coefficient_type_ids))
+                .where(BuildingCoefficientType.id.in_(bct_ids))
             )
             result = await self.db.execute(stmt)
-            coefficients = result.scalars().all()
+            bcts = result.scalars().all()
 
-            # if len(coefficients) != len(coefficient_type_ids):
-            #     raise HTTPException(
-            #         status_code=400,
-            #         detail="One or more coefficient types not found",
-            #     )
+            new_apartment.building_coefficient_types.extend(bcts)
 
-            new_apartment.building_coefficient_types.extend(coefficients)
+        self.db.add(new_apartment)
+        await self.db.commit()
+        await self.db.refresh(new_apartment)
+
+        new_apartment.bct_ids = bct_ids
+        return new_apartment
+
+    async def get_apartment(self, apartment_id: int):
+        response = await super().get(Apartment, apartment_id)
+        response.bct_ids = [i.id for i in response.building_coefficient_types]
+        return response
+
+    async def update_apartment(self, instance_id, **kwargs):
+        btc_ids = kwargs.pop("btc_ids", None)
+        instance = await self._get_instance_by_id(Apartment, instance_id)
+
+        for key, value in kwargs.items():
+            if hasattr(instance, key):
+                setattr(instance, key, value)
+
+        if btc_ids is not None:
+            result = await self.db.execute(
+                select(BuildingCoefficientType)
+                .where(BuildingCoefficientType.id.in_(btc_ids))
+            )
+            btc_objects = result.scalars().all()
+
+            instance.building_coefficient_types.clear()
+            instance.building_coefficient_types.extend(btc_objects)
 
 
         await self.db.commit()
-        return new_apartment
+        await self.db.refresh(instance)
+
+        instance.bct_ids = btc_ids
+        return instance
+
 
 
 
