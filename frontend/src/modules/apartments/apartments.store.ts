@@ -6,7 +6,7 @@ export const useApartmentsStore = create<IApartmentsState>((set, get) => ({
     currentApartments:null,
     loading: false,
     err: null,
-    //get
+    //get all
     fetchAllApartments: async () => {
         set({loading: true});
         try{
