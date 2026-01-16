@@ -10,11 +10,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { FC, useState } from "react";
 import { toast } from "sonner";
 import { useApartmentsStore } from "@/modules/apartments/apartments.store";
 
-export function ModalAddedApartments() {
+type ModalProps = {
+  onSuccess?: () => Promise<void>; 
+};
+export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
   const { creteApartments } = useApartmentsStore();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,7 +27,7 @@ export function ModalAddedApartments() {
     room_count: "",
     final_price: "",
     building_id: "",
-    coefficient_ids: "",
+    btc_ids: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,6 +36,7 @@ export function ModalAddedApartments() {
     if (!formData.number.trim()) {
       return;
     }
+    if (onSuccess) await onSuccess();
 
     setLoading(true);
     try {
@@ -42,8 +46,8 @@ export function ModalAddedApartments() {
         room_count: formData.room_count || "",
         final_price: formData.final_price || "",
         building_id: formData.building_id || "",
-        coefficient_ids: Array.isArray(formData.coefficient_ids)
-          ? formData.coefficient_ids.map(Number)
+        btc_ids: Array.isArray(formData.btc_ids)
+          ? formData.btc_ids.map(Number)
           : [],
       });
 
@@ -53,7 +57,7 @@ export function ModalAddedApartments() {
         room_count: "",
         final_price: "",
         building_id: "",
-        coefficient_ids: "",
+        btc_ids: "",
       });
       setOpen(false);
       toast.success("Добавлено успешно");
@@ -161,7 +165,7 @@ export function ModalAddedApartments() {
               name="coefficient_ids"
               type="number"
               placeholder="Максимальный коэффициент"
-              value={formData.coefficient_ids}
+              value={formData.btc_ids}
               onChange={handleChange}
               required
               disabled={loading}

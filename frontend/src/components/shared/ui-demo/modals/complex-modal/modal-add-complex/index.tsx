@@ -10,11 +10,15 @@ import {
   DialogFooter 
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { FC, useState } from "react";
 import { useComplexStore } from "@/modules/complex/complex.store";
 import { toast } from "sonner";
 
-export function ModalAddedComplex() {
+
+type ModalProps = {
+  onSuccess?: () => Promise<void>; 
+};
+export const ModalAddedComplex:FC<ModalProps> = ({ onSuccess }) => {
   const { createComplex } = useComplexStore();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,7 +34,7 @@ export function ModalAddedComplex() {
       alert("Имя комплексни киритинг");
       return;
     }
-
+     if (onSuccess) await onSuccess();
     setLoading(true);
     try {
       await createComplex({

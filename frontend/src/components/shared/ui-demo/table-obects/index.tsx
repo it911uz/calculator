@@ -8,24 +8,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useComplexStore } from "@/modules/complex/complex.store";
+import { BASE_URL_COMPLEX, useComplexStore } from "@/modules/complex/complex.store";
 import { TbExternalLink } from "react-icons/tb";
 import { SpinnerDemo } from "../spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { ModalAddedComplex } from "../modals/complex-modal/modal-add-complex";
+import { IComplex } from "@/modules/complex/complex.types";
 
 const ITEMS_PER_PAGE = 12;
 const MAX_VISIBLE_PAGES = 5;
 
-const TableObjects: React.FC = () => {
-  const { complex, fetchAllComplex, loading, err } = useComplexStore();
-const router = useRouter();
-  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    fetchAllComplex();
-  }, [fetchAllComplex]);
+interface TableComplexProps {
+  initialComplex: IComplex[];
+}
+const TableObjects: React.FC <TableComplexProps> = ({initialComplex}) => {
+  const {   err } = useComplexStore();
+  const router = useRouter();
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false); 
+  const [ complex, setComplex] = useState(initialComplex)
+  const refreshData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(BASE_URL_COMPLEX);
+        const data = await res.json();
+        setComplex(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const totalPages = Math.ceil(complex.length / ITEMS_PER_PAGE);
 
@@ -70,7 +85,7 @@ const router = useRouter();
   return (
     <section>
       <div className="flex w-full justify-between items-center pb-4">
-        <ModalAddedComplex/>
+        <ModalAddedComplex onSuccess={refreshData}/>
 
         <div className="flex items-center">
           <button

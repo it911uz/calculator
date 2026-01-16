@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useBuildingsStore } from "@/modules/buildings/buildings.store";
 import { useComplexStore } from "@/modules/complex/complex.store";
@@ -18,8 +18,10 @@ import { useCoefficientTypeStore } from "@/modules/coefficients-types/coefficien
 import type { ICoefficientType } from "@/modules/coefficients-types/coefficients-types.types";
 import { useCoefficientStore } from "@/modules/coefficients/coefficients.store";
 type PriceUnit = "UZS" | "USD";
-
-export function ModalAddedBuilding() {
+type ModalProps = {
+  onSuccess?: () => Promise<void>; 
+};
+export const ModalAddedBuilding:FC<ModalProps> =({ onSuccess }) => {
   const { createBuildings } = useBuildingsStore();
   const { complex, fetchAllComplex } = useComplexStore();
   const {
@@ -62,7 +64,7 @@ export function ModalAddedBuilding() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-
+    if (onSuccess)  onSuccess();
     if (name === "floor_count" || name === "base_price" || name === "max_coefficient") {
       if (value === "") {
         setFormData((prev) => ({ ...prev, [name]: "" }));
