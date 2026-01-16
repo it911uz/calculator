@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { IComplex, IComplexState } from "./complex.types";
 
-const BASE_URL_COMPLEX = 'http://192.168.1.120:8000/complexes'
+export const BASE_URL_COMPLEX = 'http://192.168.1.120:8000/complexes'
 
 export const useComplexStore = create<IComplexState>((set, get) => ({
     complex: [] as IComplex[], 

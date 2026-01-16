@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { IBuildings, IBuildingsState } from "./buildings.types";
 
-const BASE_URL_BUILDINGS = 'http://192.168.1.120:8000/buildings'
+export const BASE_URL_BUILDINGS = 'http://192.168.1.120:8000/buildings'
 
 export const useBuildingsStore = create<IBuildingsState>((set, get) => ({
     buildings: [] as IBuildings[], 

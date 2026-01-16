@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import  { FC, useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,24 +11,40 @@ import {
 import { TbExternalLink } from "react-icons/tb";
 import { SpinnerDemo } from "../spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
-import { useBuildingsStore } from "@/modules/buildings/buildings.store";
+import { BASE_URL_BUILDINGS, useBuildingsStore } from "@/modules/buildings/buildings.store";
 import { useRouter } from "next/navigation";
 import { ModalAddedBuilding } from "../modals/building-modals/modal-add-building";
+import type { IBuildings } from "@/modules/buildings/buildings.types";
 
 const ITEMS_PER_PAGE = 12;
 const MAX_VISIBLE_PAGES = 5;
 
-const TableBuildings: React.FC = () => {
-  const { buildings, fetchAllBuildings, loading, err } = useBuildingsStore();
+type TableBuildingProps = {
+  initialBuilding: IBuildings; 
+};
+
+const TableBuildings: FC<TableBuildingProps> =  ({initialBuilding}) => {
   const router = useRouter();
   const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    fetchAllBuildings();
-  }, [fetchAllBuildings]);
+  const [loading, setLoading] = useState(false); 
+  const [buildingss, setBuildingss] = useState(initialBuilding)
+  const { buildings, err} = useBuildingsStore()
+ const refreshData = async () => {
+     setLoading(true);
+     try {
+       const res = await fetch(`${BASE_URL_BUILDINGS}/add`);
+       const data = await res.json();
+       console.log(data);
+       
+       setBuildingss(data);
+     } catch (error) {
+       console.error(error);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   const totalPages = Math.ceil(buildings.length / ITEMS_PER_PAGE);
-
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
   const currentItems = buildings.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
@@ -58,7 +74,7 @@ const TableBuildings: React.FC = () => {
           </div>
         )}
 
-        {err && (
+        {!buildingss && (
           <div className="text-center">
             <p>Информация не найдена</p>
             <ImFileEmpty size={30} className="mx-auto" />
@@ -71,7 +87,7 @@ const TableBuildings: React.FC = () => {
     <section>
       
       <div className="flex w-full justify-between items-center pb-4">
-       <ModalAddedBuilding/>
+       <ModalAddedBuilding onSuccess={refreshData}/>
 
         <div className="flex items-center">
           <button

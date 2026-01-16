@@ -17,6 +17,6 @@ export interface IApartment {
     room_count: number | string;
     final_price: string;
     building_id: number | string;
-    coefficient_ids: number[] | undefined
+    btc_ids: number[] | undefined
 
 }

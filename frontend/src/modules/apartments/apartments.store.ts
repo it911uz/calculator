@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { IApartment, IApartmentsState } from "./apartments.types";
-const BASE_URL_APARTMENTS = 'http://192.168.1.120:8000/apartments'
+export const BASE_URL_APARTMENTS = 'http://192.168.1.120:8000/apartments'
 export const useApartmentsStore = create<IApartmentsState>((set, get) => ({
     apartment: [] as IApartment[],
     currentApartments:null,
