@@ -4,10 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
+from core.validations import BaseValidator
+
 
 class BaseRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
+        self.base_validator = BaseValidator(db)
 
     async def _get_instance_by_id(self, model, instance_id: int):
         stmt = await self.db.execute(select(model).where(model.id == instance_id))

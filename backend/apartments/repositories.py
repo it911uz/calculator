@@ -1,27 +1,35 @@
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from apartments.models import Apartment
+from apartments.validations import ApartmentValidator
 from coefficients.models import BuildingCoefficientType
 from core.repositories import BaseRepository
 
 
 class ApartmentRepository(BaseRepository):
+    def __init__(self, db: AsyncSession):
+        super().__init__(db)
+        self.apartment_validator = ApartmentValidator(db)
+
     async def get_apartment_list(self):
         response = await super().get_all(Apartment)
         for apartment in response:
             apartment.bct_ids = [i.id for i in apartment.building_coefficient_types]
 
-        print(response)
         return response
 
     async def create_apartment(self, **kwargs):
+        building_id = kwargs.get("building_id")
+        await self.apartment_validator.validate_building_fk(building_id)
+
         bct_ids = kwargs.pop("btc_ids")
         new_apartment = Apartment(
             number=kwargs.get("number"),
             floor=kwargs.get("floor"),
             area=kwargs.get("area"),
             room_count=kwargs.get("room_count"),
-            building_id=kwargs.get("building_id"),
+            building_id=building_id,
         )
 
         if bct_ids:
@@ -71,7 +79,8 @@ class ApartmentRepository(BaseRepository):
         instance.bct_ids = btc_ids
         return instance
 
-
+    async def delete_apartment(self, apartment_id: int):
+        return await super().delete(Apartment, apartment_id)
 
 
 

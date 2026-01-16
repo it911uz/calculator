@@ -37,8 +37,8 @@ async def edit_apartment(apartment_id: int, update_apartment: UpdateApartmentBod
 
 @router.delete("/{apartment_id}/")
 async def delete_apartment(apartment_id: int, db: AsyncSession = Depends(get_db)):
-    base_repo = BaseRepository(db)
-    return await base_repo.delete(Apartment, apartment_id)
+    apartment_repo = ApartmentRepository(db)
+    return await apartment_repo.delete_apartment(apartment_id)
 
 
 

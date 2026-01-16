@@ -1,16 +1,29 @@
 from fastapi import HTTPException
-from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from buildings.models import Building
+from coefficients.models import BuildingCoefficient, BuildingCoefficientType
+from core.repositories import BaseRepository
 
 
-class CoefficientsRepository:
-    def __init__(self, db: AsyncSession):
-        self.db = db
+class CoefficientRepository(BaseRepository):
+    async def get_coefficient_list(self):
+        return await super().get_all(BuildingCoefficient)
+
+    async def create_coefficient(self, **kwargs):
+        return await super().create(BuildingCoefficient, **kwargs)
+
+    async def get_coefficient(self, coefficient_id: int):
+        return await super().get(BuildingCoefficient, coefficient_id)
+
+    async def update_coefficient(self, coefficient_id: int, **kwargs):
+        return await super().update(BuildingCoefficient, coefficient_id, **kwargs)
+
+    async def delete_coefficient(self, coefficient_id: int):
+        return await super().delete(BuildingCoefficient, coefficient_id)
 
 
-    async def get_coefficients_by_building_id(self, building_id: int):
+class CoefficientTypeRepository(BaseRepository):
+    async def get_coefficient_types_by_building_id(self, building_id: int):
         building_instance = await self.db.get(Building, building_id)
 
         if not building_instance:
@@ -22,6 +35,20 @@ class CoefficientsRepository:
 
         return response
 
+    async def get_coefficient_type_list(self):
+        return await super().get_all(BuildingCoefficientType)
+
+    async def create_coefficient_type(self, **kwargs):
+        return await super().create(BuildingCoefficientType, **kwargs)
+
+    async def get_coefficient_type(self, coefficient_type_id: int):
+        return await super().get(BuildingCoefficientType, coefficient_type_id)
+
+    async def update_coefficient_type(self, coefficient_type_id: int, **kwargs):
+        return await super().update(BuildingCoefficientType, coefficient_type_id, **kwargs)
+
+    async def delete_coefficient_type(self, coefficient_type_id: int):
+        return await super().delete(BuildingCoefficientType, coefficient_type_id)
 
 """
 
