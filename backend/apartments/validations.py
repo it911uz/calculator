@@ -18,7 +18,7 @@ class ApartmentValidator(BaseValidator):
 
         bct_ids = kwargs.get("bct_ids")
         if bct_ids:
-            await self.validate_bct_ids(bct_ids)
+            await self.validate_bct_ids(kwargs.get("building_id"), bct_ids)
 
     async def validate_apartment_update(self, **kwargs):
         building_id = kwargs.get('building_id')
@@ -31,15 +31,21 @@ class ApartmentValidator(BaseValidator):
 
         bct_ids = kwargs.get("bct_ids")
         if bct_ids:
-            await self.validate_bct_ids(bct_ids)
+            await self.validate_bct_ids(kwargs.get("building_id"), bct_ids)
 
     async def validate_bct_ids(self, building_id: int, bct_ids: list[int]):
+        for bct_id in bct_ids:
+            await self.validate_foreign_key(BuildingCoefficientType, bct_id)
+
         building_repository = BuildingRepository(self.db)
         building = await building_repository.get_building(building_id)
 
-        actual_bct_ids = [i.id for i in building.building_coefficients]
+        actual_bct_ids = []
+        for bc in building.building_coefficients:
+            for bct in bc.building_coefficient_types:
+                actual_bct_ids.append(bct.id)
 
-        if not bct_ids in actual_bct_ids:
+        if not set(bct_ids).issubset(set(actual_bct_ids)):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Некоторые коэффициенты здания не относятся к данному зданию."
@@ -76,10 +82,6 @@ class ApartmentValidator(BaseValidator):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Расположение квартиры на этом этаже ({floor}) не может превышать количество этажей в здании ({floor_count})."
             )
-
-    async def validate_bct_ids(self, bct_ids: list[int]):
-        for bct_id in bct_ids:
-            await self.validate_foreign_key(BuildingCoefficientType, bct_id)
 
 
 
