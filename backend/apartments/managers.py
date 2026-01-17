@@ -20,11 +20,6 @@ class ApartmentManager:
         final_price = await recalculate_final_price(self.db, kwargs.get("building_id"), kwargs.get("bct_ids"))
         kwargs["final_price"] = final_price
 
-
-        print("-------------------------------------------------------")
-        print(kwargs)
-        print("-------------------------------------------------------")
-
         return await self.apartment_repository.create_apartment(**kwargs)
 
     async def get_apartment(self, apartment_id: int):
@@ -33,6 +28,9 @@ class ApartmentManager:
     async def update_apartment(self, apartment_id, **kwargs):
         # FIELDS VALIDATIONS
         await self.apartment_validator.validate_apartment_update(**kwargs)
+
+        final_price = await recalculate_final_price(self.db, kwargs.get("building_id"), kwargs.get("bct_ids"))
+        kwargs["final_price"] = final_price
 
         return await self.apartment_repository.update_apartment(apartment_id, **kwargs)
 

@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+from sqlalchemy import select
 from starlette import status
 
 from buildings.models import Building
@@ -31,6 +32,35 @@ class ApartmentValidator(BaseValidator):
         bct_ids = kwargs.get("bct_ids")
         if bct_ids:
             await self.validate_bct_ids(bct_ids)
+
+    async def validate_bct_ids(self, building_id: int, bct_ids: list[int]):
+        building_repository = BuildingRepository(self.db)
+        building = await building_repository.get_building(building_id)
+
+        actual_bct_ids = [i.id for i in building.building_coefficients]
+
+        if not bct_ids in actual_bct_ids:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Некоторые коэффициенты здания не относятся к данному зданию."
+            )
+
+        await self._validate_bct_ids_does_not_belong_to_the_same_bc(bct_ids)
+
+
+    async def _validate_bct_ids_does_not_belong_to_the_same_bc(self, bct_ids: list[int]):
+        bcts_stmt = await self.db.execute(
+            select(BuildingCoefficientType)
+            .where(BuildingCoefficientType.id.in_(bct_ids))
+        )
+        bcts = bcts_stmt.scalars().all()
+
+        bc_ids = []
+        for bct in bcts:
+            bc_id = bct.building_coefficient.id
+            if bc_id in bc_ids:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Для каждого коэффициента здания можно выбрать один тип коэффициента здания!")
+            bc_ids.append(bct.building_coefficient.id)
 
 
     async def validate_building_fk(self, fk):
