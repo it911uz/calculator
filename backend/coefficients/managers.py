@@ -3,7 +3,7 @@ from keyword import kwlist
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from coefficients.repositories import CoefficientRepository, CoefficientTypeRepository
-from coefficients.validations import BuildingCoefficientValidator
+from coefficients.validations import BuildingCoefficientValidator, BuildingCoefficientTypeValidator
 
 
 class BuildingCoefficientManager:
@@ -34,7 +34,7 @@ class BuildingCoefficientTypeManager:
     def __init__(self, db: AsyncSession):
         self.db = db
         self.bct_repository = CoefficientTypeRepository(db)
-        self.bct_validator = BuildingCoefficientValidator(db)
+        self.bct_validator = BuildingCoefficientTypeValidator(db)
 
     async def get_coefficient_types_by_building_id(self, building_id: int):
         await self.bct_validator.validate_building_fk(building_id)
@@ -45,7 +45,7 @@ class BuildingCoefficientTypeManager:
         return await self.bct_repository.get_coefficient_type_list()
 
     async def create_coefficient_type(self, **kwargs):
-        await self.bct_validator.validate_building_fk(kwargs.get("coefficient_id"))
+        await self.bct_validator.validate_coefficient_fk(kwargs.get("coefficient_id"))
         return await self.bct_repository.create_coefficient_type(**kwargs)
 
     async def get_coefficient_type(self, coefficient_type_id: int):

@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apartments.repositories import ApartmentRepository
+from apartments.services import recalculate_final_price
 from apartments.validations import ApartmentValidator
 
 
@@ -16,6 +17,13 @@ class ApartmentManager:
     async def create_apartment(self, **kwargs):
         # FIELDS VALIDATIONS
         await self.apartment_validator.validate_apartment_create(**kwargs)
+        final_price = await recalculate_final_price(self.db, kwargs.get("building_id"), kwargs.get("bct_ids"))
+        kwargs["final_price"] = final_price
+
+
+        print("-------------------------------------------------------")
+        print(kwargs)
+        print("-------------------------------------------------------")
 
         return await self.apartment_repository.create_apartment(**kwargs)
 

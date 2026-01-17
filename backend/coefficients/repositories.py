@@ -26,9 +26,6 @@ class CoefficientTypeRepository(BaseRepository):
     async def get_coefficient_types_by_building_id(self, building_id: int):
         building_instance = await self.db.get(Building, building_id)
 
-        if not building_instance:
-            raise HTTPException(status_code=404, detail="Building not found")
-
         response = {}
         for i in building_instance.building_coefficients:
             response[i.name] = i.building_coefficient_types
