@@ -7,19 +7,19 @@ from core.repositories import BaseRepository
 
 class CoefficientRepository(BaseRepository):
     async def get_coefficient_list(self):
-        return await super().get_all(BuildingCoefficient)
+        return await self.get_all(BuildingCoefficient)
 
     async def create_coefficient(self, **kwargs):
-        return await super().create(BuildingCoefficient, **kwargs)
+        return await self.create(BuildingCoefficient, **kwargs)
 
     async def get_coefficient(self, coefficient_id: int):
-        return await super().get(BuildingCoefficient, coefficient_id)
+        return await self.get(BuildingCoefficient, coefficient_id)
 
     async def update_coefficient(self, coefficient_id: int, **kwargs):
-        return await super().update(BuildingCoefficient, coefficient_id, **kwargs)
+        return await self.update(BuildingCoefficient, coefficient_id, **kwargs)
 
     async def delete_coefficient(self, coefficient_id: int):
-        return await super().delete(BuildingCoefficient, coefficient_id)
+        return await self.delete(BuildingCoefficient, coefficient_id)
 
 
 class CoefficientTypeRepository(BaseRepository):
@@ -36,51 +36,20 @@ class CoefficientTypeRepository(BaseRepository):
         return response
 
     async def get_coefficient_type_list(self):
-        return await super().get_all(BuildingCoefficientType)
+        return await self.get_all(BuildingCoefficientType)
 
     async def create_coefficient_type(self, **kwargs):
-        return await super().create(BuildingCoefficientType, **kwargs)
+        return await self.create(BuildingCoefficientType, **kwargs)
 
     async def get_coefficient_type(self, coefficient_type_id: int):
-        return await super().get(BuildingCoefficientType, coefficient_type_id)
+        return await self.get(BuildingCoefficientType, coefficient_type_id)
 
     async def update_coefficient_type(self, coefficient_type_id: int, **kwargs):
-        return await super().update(BuildingCoefficientType, coefficient_type_id, **kwargs)
+        return await self.update(BuildingCoefficientType, coefficient_type_id, **kwargs)
 
     async def delete_coefficient_type(self, coefficient_type_id: int):
-        return await super().delete(BuildingCoefficientType, coefficient_type_id)
+        return await self.delete(BuildingCoefficientType, coefficient_type_id)
 
-"""
-
-{
-    'bc1': [
-        {
-            'id': 4, 
-            'name': 'bct1', 
-            'rate': Decimal('5.00')
-        },
-        {
-            'id': 5, 
-            'name': 'bct2', 
-            'rate': Decimal('15.00')
-        }
-    ],
-    'bc2': [
-        {
-            'id': 5, 
-            'name': 'bct3', 
-            'rate': Decimal('5.00')
-        },
-        {
-            'id': 6, 
-            'name': 'bct4', 
-            'rate': Decimal('15.00')
-        }
-    ]    
-}
-
-
-"""
 
 
 

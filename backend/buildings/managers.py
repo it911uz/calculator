@@ -14,17 +14,17 @@ class BuildingManager:
 
     async def create_building(self, **kwargs):
         await self.building_validator.validate_complex_fk(kwargs.get("complex_id"))
-        await self.building_repository.create_building(**kwargs)
+        return await self.building_repository.create_building(**kwargs)
 
     async def get_building(self, building_id: int):
         return await self.building_repository.get_building(building_id)
 
     async def update_building(self, building_id: int, **kwargs):
         await self.building_validator.validate_complex_fk(kwargs.get("complex_id"))
-        await self.building_repository.update_building(building_id, **kwargs)
+        return await self.building_repository.update_building(building_id, **kwargs)
 
     async def delete_building(self, building_id: int):
-        return self.building_repository.delete_building(building_id)
+        return await self.building_repository.delete_building(building_id)
 
 
 
