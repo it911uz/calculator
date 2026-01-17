@@ -26,11 +26,23 @@ def upgrade() -> None:
         "floor_count > 0",
     )
 
+    op.create_check_constraint(
+        "ck_buildings_max_coefficient_positive",
+        "buildings",
+        "max_coefficient > 0",
+    )
+
 
 def downgrade() -> None:
     """Downgrade schema."""
     op.drop_constraint(
         "ck_buildings_floor_count_positive",
+        "buildings",
+        type_="check",
+    )
+
+    op.drop_constraint(
+        "ck_buildings_max_coefficient_positive",
         "buildings",
         type_="check",
     )

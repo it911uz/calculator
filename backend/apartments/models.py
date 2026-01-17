@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
+from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, CheckConstraint
 from sqlalchemy.orm import relationship
 
 from buildings.models import Building
@@ -19,5 +19,8 @@ class Apartment(BaseModel):
     building_id = Column(Integer, ForeignKey("buildings.id", ondelete="CASCADE"), nullable=False)
     building_coefficient_types = relationship("BuildingCoefficientType", secondary=apartment_coefficients, back_populates="apartments", lazy="selectin")
 
-
+    __table_args__ = (
+        CheckConstraint("area > 0", name="ck_apartments_area_positive"),
+        CheckConstraint("room_count > 0", name="ck_apartments_room_count_positive"),
+    )
 

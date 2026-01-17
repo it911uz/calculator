@@ -41,12 +41,14 @@ class BaseRepository:
     async def update(self, model, instance_id, **kwargs):
         instance = await self._get_instance_by_id(model, instance_id)
 
-        for key, value in kwargs.items():
-            if hasattr(instance, key):
-                setattr(instance, key, value)
+        if kwargs:
+            for key, value in kwargs.items():
+                if value is not None:
+                    setattr(instance, key, value)
 
-        await self.db.commit()
-        await self.db.refresh(instance)
+            await self.db.commit()
+            await self.db.refresh(instance)
+
         return instance
 
     async def delete(self, model, instance_id: int):

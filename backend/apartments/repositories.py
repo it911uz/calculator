@@ -10,7 +10,6 @@ from core.repositories import BaseRepository
 class ApartmentRepository(BaseRepository):
     def __init__(self, db: AsyncSession):
         super().__init__(db)
-        self.apartment_validator = ApartmentValidator(db)
 
     async def get_apartment_list(self):
         response = await super().get_all(Apartment)
@@ -21,8 +20,6 @@ class ApartmentRepository(BaseRepository):
 
     async def create_apartment(self, **kwargs):
         building_id = kwargs.get("building_id")
-        await self.apartment_validator.validate_building_fk(building_id)
-
         bct_ids = kwargs.pop("btc_ids")
         new_apartment = Apartment(
             number=kwargs.get("number"),
@@ -55,28 +52,29 @@ class ApartmentRepository(BaseRepository):
         return response
 
     async def update_apartment(self, instance_id, **kwargs):
-        btc_ids = kwargs.pop("btc_ids", None)
         instance = await self._get_instance_by_id(Apartment, instance_id)
 
-        for key, value in kwargs.items():
-            if hasattr(instance, key):
-                setattr(instance, key, value)
+        if kwargs:
+            bct_ids = kwargs.pop("bct_ids", None)
 
-        if btc_ids is not None:
-            result = await self.db.execute(
-                select(BuildingCoefficientType)
-                .where(BuildingCoefficientType.id.in_(btc_ids))
-            )
-            btc_objects = result.scalars().all()
+            for key, value in kwargs.items():
+                if hasattr(instance, key) and value is not None:
+                    setattr(instance, key, value)
 
-            instance.building_coefficient_types.clear()
-            instance.building_coefficient_types.extend(btc_objects)
+            if bct_ids is not None:
+                result = await self.db.execute(
+                    select(BuildingCoefficientType)
+                    .where(BuildingCoefficientType.id.in_(bct_ids))
+                )
+                btc_objects = result.scalars().all()
 
+                instance.building_coefficient_types.clear()
+                instance.building_coefficient_types.extend(btc_objects)
+                instance.bct_ids = bct_ids
 
-        await self.db.commit()
-        await self.db.refresh(instance)
+            await self.db.commit()
+            await self.db.refresh(instance)
 
-        instance.bct_ids = btc_ids
         return instance
 
     async def delete_apartment(self, apartment_id: int):
