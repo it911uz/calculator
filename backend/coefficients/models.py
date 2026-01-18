@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Table, Numeric
 from sqlalchemy.orm import relationship
 
-from buildings.models import Building
-from core.base_model import BaseModel
+from core.db.base_model import BaseModel
 
 
 class BuildingCoefficient(BaseModel):

@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from coefficients.repositories import CoefficientRepository, CoefficientTypeRepository
 from coefficients.managers import BuildingCoefficientManager, BuildingCoefficientTypeManager
 from coefficients.schemas import (AddCoefficientResponse, AddCoefficientBody, UpdateCoefficientBody,
                                   AddCoefficientTypeResponse, AddCoefficientTypeBody, UpdateCoefficientTypeBody)
-from core.dependencies import get_db
+from core.db.session import get_db
 
 
 router = APIRouter(prefix="/coefficients", tags=["Coefficients"])

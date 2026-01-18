@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from core.base_model import BaseModel
+from core.db.base_model import BaseModel
 from role_permissions.models import role_permission
 
 

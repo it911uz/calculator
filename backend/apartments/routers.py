@@ -2,11 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apartments.managers import ApartmentManager
-from apartments.repositories import ApartmentRepository
-from core.repositories import BaseRepository
-from apartments.models import Apartment
 from apartments.schemas import AddApartmentResponse, AddApartmentBody, UpdateApartmentBody
-from core.dependencies import get_db
+from core.db.session import get_db
 
 
 router = APIRouter(prefix="/apartments", tags=["Apartments"])

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from comlexes.repositories import ComplexRepository
-from comlexes.schemas import AddComplexResponse, AddComplexBody, UpdateComplexBody
-from core.dependencies import get_db
+from complexes.repositories import ComplexRepository
+from complexes.schemas import AddComplexResponse, AddComplexBody, UpdateComplexBody
+from core.db.session import get_db
 
 router = APIRouter(prefix="/complexes", tags=["Complexes"])
 

@@ -1,4 +1,4 @@
-from comlexes.models import Complex
+from complexes.models import Complex
 from core.repositories import BaseRepository
 
 

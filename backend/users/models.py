@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
 
-from core.base_model import BaseModel
-from roles.models import Role
+from core.db.base_model import BaseModel
 
 
 class User(BaseModel):

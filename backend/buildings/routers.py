@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from buildings.managers import BuildingManager
-from buildings.repositories import BuildingRepository
 from buildings.schemas import AddBuildingResponse, AddBuildingBody, UpdateBuildingBody
-from core.dependencies import get_db
+from core.db.session import get_db
 
 
 router = APIRouter(prefix="/buildings", tags=["Buildings"])

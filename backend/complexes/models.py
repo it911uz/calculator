@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
 
-from core.base_model import BaseModel
-from buildings.models import Building
+from core.db.base_model import BaseModel
 
 
 class Complex(BaseModel):

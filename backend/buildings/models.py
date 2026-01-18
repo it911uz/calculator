@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, CheckConstraint
 from sqlalchemy.orm import relationship
 
-from core.base_model import BaseModel
+from core.db.base_model import BaseModel
 
 
 class Building(BaseModel):
