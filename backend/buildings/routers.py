@@ -28,7 +28,7 @@ async def get_building(building_id: int, db: AsyncSession = Depends(get_db)):
     return await building_manager.get_building(building_id)
 
 
-@router.put("/{building_id}/", response_model=AddBuildingResponse)
+@router.patch("/{building_id}/", response_model=AddBuildingResponse)
 async def edit_building(building_id: int, update_building: UpdateBuildingBody, db: AsyncSession = Depends(get_db)):
     building_manager = BuildingManager(db)
     return await building_manager.update_building(building_id, **update_building.model_dump(exclude_unset=True))

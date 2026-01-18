@@ -29,7 +29,7 @@ async def get_coefficient(coefficient_id: int, db: AsyncSession = Depends(get_db
     return await coefficient_manager.get_coefficient(coefficient_id)
 
 
-@router.put("/{coefficient_id}/", response_model=AddCoefficientResponse)
+@router.patch("/{coefficient_id}/", response_model=AddCoefficientResponse)
 async def edit_coefficient(coefficient_id: int, update_coefficient: UpdateCoefficientBody, db: AsyncSession = Depends(get_db)):
     coefficient_manager = BuildingCoefficientManager(db)
     return await coefficient_manager.update_coefficient(coefficient_id, **update_coefficient.model_dump(exclude_unset=True))

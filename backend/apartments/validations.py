@@ -11,29 +11,29 @@ from core.validations import BaseValidator
 class ApartmentValidator(BaseValidator):
     async def validate_apartment_create(self, **kwargs):
         building_id = kwargs.get('building_id')
-        await self.validate_building_fk(building_id)
+        await self._validate_building_fk(building_id)
 
         floor = kwargs.get('floor')
-        await self.validate_floor(building_id, floor)
+        await self._validate_floor(building_id, floor)
 
         bct_ids = kwargs.get("bct_ids")
         if bct_ids:
-            await self.validate_bct_ids(kwargs.get("building_id"), bct_ids)
+            await self._validate_bct_ids(kwargs.get("building_id"), bct_ids)
 
     async def validate_apartment_update(self, **kwargs):
         building_id = kwargs.get('building_id')
         if building_id:
-            await self.validate_building_fk(building_id)
+            await self._validate_building_fk(building_id)
 
         floor = kwargs.get('floor')
         if floor:
-            await self.validate_floor(building_id, floor)
+            await self._validate_floor(building_id, floor)
 
         bct_ids = kwargs.get("bct_ids")
         if bct_ids:
-            await self.validate_bct_ids(kwargs.get("building_id"), bct_ids)
+            await self._validate_bct_ids(kwargs.get("building_id"), bct_ids)
 
-    async def validate_bct_ids(self, building_id: int, bct_ids: list[int]):
+    async def _validate_bct_ids(self, building_id: int, bct_ids: list[int]):
         for bct_id in bct_ids:
             await self.validate_foreign_key(BuildingCoefficientType, bct_id)
 
@@ -69,10 +69,10 @@ class ApartmentValidator(BaseValidator):
             bc_ids.append(bct.building_coefficient.id)
 
 
-    async def validate_building_fk(self, fk):
+    async def _validate_building_fk(self, fk):
         await self.validate_foreign_key(Building, fk)
 
-    async def validate_floor(self, building_id: int, floor: int):
+    async def _validate_floor(self, building_id: int, floor: int):
         building_repository = BuildingRepository(self.db)
         building = await building_repository.get_building(building_id)
         floor_count = building.floor_count

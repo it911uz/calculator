@@ -30,7 +30,7 @@ async def get_apartment(apartment_id: int, db: AsyncSession = Depends(get_db)):
     return await apartment_manager.get_apartment(apartment_id)
 
 
-@router.put("/{apartment_id}/", response_model=AddApartmentResponse)
+@router.patch("/{apartment_id}/", response_model=AddApartmentResponse)
 async def edit_apartment(apartment_id: int, update_apartment: UpdateApartmentBody, db: AsyncSession = Depends(get_db)):
     apartment_manager = ApartmentManager(db)
     return await apartment_manager.update_apartment(apartment_id, **update_apartment.model_dump())

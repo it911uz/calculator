@@ -26,7 +26,7 @@ async def get_complex(complex_id: int, db: AsyncSession = Depends(get_db)):
     return await complex_repo.get_complex(complex_id)
 
 
-@router.put("/{complex_id}/", response_model=AddComplexResponse)
+@router.patch("/{complex_id}/", response_model=AddComplexResponse)
 async def edit_complex(complex_id: int, update_complex: UpdateComplexBody, db: AsyncSession = Depends(get_db)):
     complex_repo = ComplexRepository(db)
     return await complex_repo.update_complex(complex_id, **update_complex.model_dump(exclude_unset=True))
