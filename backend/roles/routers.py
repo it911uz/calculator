@@ -1,12 +1,36 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from roles.schemas import CreateRoleBody, CreateRoleResponse
+from core.db.session import get_db
+from roles.managers import RoleManager
+from roles.schemas import RoleCreateBody, RoleCreateResponse, RoleListResponse, RoleGetResponse, RoleUpdateResponse, \
+    RoleUpdateBody
 
-api_router = APIRouter(prefix="/roles", tags=["Roles"])
+router = APIRouter(prefix="/roles", tags=["Roles"])
 
 
-@api_router.post("", response_model=CreateRoleResponse, status_code=status.HTTP_201_CREATED)
-async def create_role(create_role_body: CreateRoleBody):
-    pass
+@router.get("/", response_model=list[RoleListResponse])
+async def get_role_list(db: AsyncSession = Depends(get_db)):
+    role_manager = RoleManager(db)
+    return await role_manager.get_role_list()
 
+@router.post("/create/", response_model=RoleCreateResponse)
+async def create_role(create_role_body: RoleCreateBody, db: AsyncSession = Depends(get_db)):
+    role_manager = RoleManager(db)
+    return await role_manager.create_role(**create_role_body.model_dump())
+
+@router.get("/{role_id}", response_model=RoleGetResponse)
+async def get_role(role_id: int, db: AsyncSession = Depends(get_db)):
+    role_manager = RoleManager(db)
+    return await role_manager.get_role(role_id)
+
+@router.patch("/{role_id}", response_model=RoleUpdateResponse)
+async def update_role(role_id: int, update_role_body: RoleUpdateBody, db: AsyncSession = Depends(get_db)):
+    role_manager = RoleManager(db)
+    return await role_manager.update_role(role_id, **update_role_body.model_dump())
+
+@router.delete("/{role_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_role(role_id: int, db: AsyncSession = Depends(get_db)):
+    role_manager = RoleManager(db)
+    return await role_manager.delete_role(role_id)

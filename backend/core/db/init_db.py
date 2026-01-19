@@ -7,12 +7,9 @@ from permissions.models import Permission
 
 async def init_permissions(db: AsyncSession):
     actions = ["create", "view", "update", "delete"]
-
     existing_permission_codenames = (await db.execute(select(Permission.codename))).scalars().all()
-
     tables = BaseModel.metadata.tables.keys()
 
-    print(BaseModel.metadata.tables.keys())
     permissions = []
     for table in tables:
         for action in actions:

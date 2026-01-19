@@ -47,7 +47,6 @@ class BaseRepository:
                     setattr(instance, key, value)
 
             await self.db.commit()
-            await self.db.refresh(instance)
 
         return instance
 
