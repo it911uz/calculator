@@ -1,6 +1,8 @@
+from fastapi import HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.utils.services import PasswordService
+from auth.utils.password_service import PasswordService
 from core.repositories import BaseRepository
 from users.models import User
 
@@ -9,6 +11,15 @@ class UserRepository(BaseRepository):
     def __init__(self, db: AsyncSession):
         super().__init__(db)
         self.password_service = PasswordService()
+
+    async def get_user_by_username(self, username: str):
+        result = await self.db.execute(
+            select(User).where(User.username == username)
+        )
+        user = result.scalar_one_or_none()
+        if user is None:
+            return None
+        return user
 
     async def get_user_list(self):
         return await self.get_all(User)

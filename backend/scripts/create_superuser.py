@@ -3,7 +3,7 @@ from getpass import getpass
 
 from core.db.session import async_session
 from users.models import User
-from auth.utils.services import PasswordService
+from auth.utils.password_service import PasswordService
 
 
 async def main():
