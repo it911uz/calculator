@@ -10,11 +10,11 @@ from coefficients.schemas import (AddCoefficientResponse, AddCoefficientBody, Up
 from core.db.session import get_db
 
 
-router = APIRouter(prefix="/coefficients", tags=["Coefficients"])
+coefficients_router = APIRouter(prefix="/coefficients", tags=["Coefficients"])
 
 "-------------------------------------------------------------------------------------------"
 
-@router.get(
+@coefficients_router.get(
     "/",
     response_model=list[AddCoefficientResponse],
     dependencies=[Depends(has_permission("view_building_coefficients"))]
@@ -25,7 +25,7 @@ async def get_coefficient_list(db: AsyncSession = Depends(get_db)):
 
 "-------------------------------------------------------------------------------------------"
 
-@router.post(
+@coefficients_router.post(
     "/add/",
     response_model=AddCoefficientResponse,
     dependencies=[Depends(has_permission("create_building_coefficients"))]
@@ -36,7 +36,7 @@ async def add_coefficient(create_coefficient: AddCoefficientBody, db: AsyncSessi
 
 "-------------------------------------------------------------------------------------------"
 
-@router.get(
+@coefficients_router.get(
     "/{coefficient_id}/",
     response_model=AddCoefficientResponse,
     dependencies=[Depends(has_permission("view_building_coefficients"))]
@@ -47,7 +47,7 @@ async def get_coefficient(coefficient_id: int, db: AsyncSession = Depends(get_db
 
 "-------------------------------------------------------------------------------------------"
 
-@router.patch(
+@coefficients_router.patch(
     "/{coefficient_id}/",
     response_model=AddCoefficientResponse,
     dependencies=[Depends(has_permission("update_building_coefficients"))]
@@ -58,7 +58,7 @@ async def edit_coefficient(coefficient_id: int, update_coefficient: UpdateCoeffi
 
 "-------------------------------------------------------------------------------------------"
 
-@router.delete(
+@coefficients_router.delete(
     "/{coefficient_id}/",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(has_permission("delete_building_coefficients"))]
@@ -74,17 +74,6 @@ async def delete_coefficient(coefficient_id: int, db: AsyncSession = Depends(get
 """ -------------------------------------------------------------------------------------------------- """
 
 coefficient_types_router = APIRouter(prefix="/coefficient-types", tags=["Coefficient Types"])
-
-"-------------------------------------------------------------------------------------------"
-
-@coefficient_types_router.get(
-    "/by-building-id/{building_id}/",
-    response_model=list[GetBCsWithBCTs],
-    dependencies=[Depends(has_permission("view_building_coefficient_types"))]
-)
-async def get_coefficient_types_by_building(building_id: int, db: AsyncSession = Depends(get_db)):
-    coefficient_type_manager = BuildingCoefficientTypeManager(db)
-    return await coefficient_type_manager.get_coefficient_types_by_building_id(building_id)
 
 "-------------------------------------------------------------------------------------------"
 
@@ -140,6 +129,22 @@ async def edit_coefficient_type(coefficient_type_id: int, update_coefficient_typ
 async def delete_coefficient_type(coefficient_id: int, db: AsyncSession = Depends(get_db)):
     coefficient_type_manager = BuildingCoefficientTypeManager(db)
     return await coefficient_type_manager.delete_coefficient_type(coefficient_id)
+
+"-------------------------------------------------------------------------------------------"
+
+
+coefficients_common_router = APIRouter(prefix="/coefficients-common", tags=["Coefficients Common"])
+
+"-------------------------------------------------------------------------------------------"
+
+@coefficients_common_router.get(
+    "/bcs-with-bcts-by-building-id/{building_id}/",
+    response_model=list[GetBCsWithBCTs],
+    dependencies=[Depends(has_permission("view_building_coefficient_types"))]
+)
+async def get_bcs_with_bcts_by_building(building_id: int, db: AsyncSession = Depends(get_db)):
+    coefficient_type_manager = BuildingCoefficientTypeManager(db)
+    return await coefficient_type_manager.get_coefficient_types_by_building_id(building_id)
 
 "-------------------------------------------------------------------------------------------"
 
