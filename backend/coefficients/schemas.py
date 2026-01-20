@@ -19,11 +19,20 @@ class UpdateCoefficientBody(BaseModel):
     building_id: int | None = None
 
 
+class GetBCTs(BaseModel):
+    id: int
+    name: str
+    rate: Decimal = Field(max_digits=20, decimal_places=2)
+
+class GetBCsWithBCTs(BaseModel):
+    id: int
+    name: str
+    bcts: list[GetBCTs]
+
+
 
 
 """ ---------------------------------------------- """
-
-
 class AddCoefficientTypeResponse(BaseModel):
     id: int
     name: str
@@ -48,7 +57,6 @@ class UpdateCoefficientTypeBody(BaseModel):
 
 class GetCoefTypeByBuildingId(BaseModel):
     name: str
-
 
 
 

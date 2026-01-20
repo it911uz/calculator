@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 
 from core.db.base_model import BaseModel
 
@@ -11,6 +12,7 @@ class User(BaseModel):
     is_superuser = Column(Boolean, default=False)
 
     role_id = Column(Integer, ForeignKey('roles.id', ondelete="SET NULL"), nullable=True)
+    role = relationship("Role", back_populates="users", lazy="selectin")
 
 
 

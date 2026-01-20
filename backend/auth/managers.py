@@ -2,12 +2,13 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from auth.utils.password_service import PasswordService
-from auth.utils.token_service import TokenService
+from auth.services.password_service import PasswordService
+from auth.services.token_service import TokenService
+from core.exceptions import InvalidToken
 from users.repositories import UserRepository
 
 
-class AuthService:
+class AuthManager:
     def __init__(self, db: AsyncSession):
         self.user_repository = UserRepository(db)
         self.password_service = PasswordService()
@@ -33,6 +34,16 @@ class AuthService:
         new_payload = await self.token_service.get_token(user)
         return new_payload
 
+    async def get_me(self, token: str):
+        payload = await self.token_service.decode_token(token)
+        username = payload.get("username")
+
+        user = await self.user_repository.get_user_by_username(username)
+
+        if not user:
+            raise InvalidToken("Invalid credentials.")
+
+        return user
 
 
 

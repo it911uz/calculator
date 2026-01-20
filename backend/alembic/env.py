@@ -26,18 +26,6 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-# from core.base_model import BaseModel
-# from users.models import User
-# from roles.models import Role
-# from permissions.models import Permission
-# from role_permissions.models import role_permission
-#
-# from complexes.models import Complex
-# from buildings.models import Building
-# from apartments.models import Apartment
-# from coefficients.models import BuildingCoefficient, BuildingCoefficientType, apartment_coefficients
-#
-# target_metadata = BaseModel.metadata
 from core.models import target_metadata
 
 

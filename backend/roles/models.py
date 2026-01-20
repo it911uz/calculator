@@ -11,3 +11,4 @@ class Role(BaseModel):
     name = Column(String(256), unique=True, nullable=False)
 
     permissions = relationship("Permission", secondary=role_permission, back_populates="roles", lazy="selectin")
+    users = relationship("User", back_populates="role", lazy="selectin")

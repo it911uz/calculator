@@ -3,7 +3,9 @@ from getpass import getpass
 
 from core.db.session import async_session
 from users.models import User
-from auth.utils.password_service import PasswordService
+from auth.services.password_service import PasswordService
+
+import core.models
 
 
 async def main():
@@ -18,7 +20,7 @@ async def main():
     async with async_session() as session:
         user = User(
             username=username,
-            hashed_password=PasswordService.hash_password(password=password),
+            hashed_password=await PasswordService.hash_password(password=password),
             is_superuser=True,
         )
 
