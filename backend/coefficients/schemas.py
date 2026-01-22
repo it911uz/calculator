@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 class AddCoefficientResponse(BaseModel):
     id: int
     name: str
-    building_id: int
+    building_id: int | None
 
 
 class AddCoefficientBody(BaseModel):

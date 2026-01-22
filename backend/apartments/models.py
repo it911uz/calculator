@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, CheckConstraint
 from sqlalchemy.orm import relationship
 
@@ -13,10 +15,11 @@ class Apartment(BaseModel):
     floor = Column(Integer, nullable=False)
     area = Column(Numeric(precision=20, scale=2), nullable=False)
     room_count = Column(Integer, nullable=False)
-    final_price = Column(Numeric(precision=20, scale=2), nullable=False, default=0)
+    final_price = Column(Numeric(precision=20, scale=2), nullable=False, default=Decimal("0.00"))
 
     building_id = Column(Integer, ForeignKey("buildings.id", ondelete="CASCADE"), nullable=False)
     building_coefficient_types = relationship("BuildingCoefficientType", secondary=apartment_coefficients, back_populates="apartments", lazy="selectin")
+    building = relationship("Building", back_populates="apartments", lazy="selectin")
 
     __table_args__ = (
         CheckConstraint("area > 0", name="ck_apartments_area_positive"),

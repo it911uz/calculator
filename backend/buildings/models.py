@@ -16,6 +16,8 @@ class Building(BaseModel):
     complex_id = Column(Integer, ForeignKey("complexes.id", ondelete="CASCADE"), nullable=False)
 
     building_coefficients = relationship("BuildingCoefficient", back_populates="building", lazy="selectin")
+    apartments = relationship("Apartment", back_populates="building", lazy="selectin")
+
 
     __table_args__ = (
         CheckConstraint("floor_count > 0", name="ck_buildings_floor_count_positive"),
