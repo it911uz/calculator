@@ -57,7 +57,7 @@ export const useBuildingsStore = create<IBuildingsState>((set, get) => ({
             
             set((state) => ({
       buildings: state.buildings.filter((c) => c.id !== buildings_id),
-      currentBuildings: null, // 🔥 MUHIM
+      currentBuildings: null, 
     }));
         } catch(errr){
             set({ 

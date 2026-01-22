@@ -9,6 +9,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  
   const [isOpen, setIsOpen] = useState(true);
 
   return (

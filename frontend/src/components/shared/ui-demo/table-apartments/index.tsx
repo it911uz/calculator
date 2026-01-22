@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react"; // 🔥 useEffect olib tashlandi
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,10 +13,12 @@ import { SpinnerDemo } from "../spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { ModalAddedApartments } from "../modals/apartments-modals/modal-add-apartments";
-import { IApartment } from "@/modules/apartments/apartments.types";
-import { BASE_URL_APARTMENTS } from "@/modules/apartments/apartments.store";
+import { IApartment } from "@/types";
+import { useApartments, useDeleteApartment } from "@/hooks/useApartments";
+import { toast } from "sonner";
+import { ModalDeleteApartments } from "../modals/apartments-modals/modal-delete-apartments";
 
-const ITEMS_PER_PAGE = 14;
+const ITEMS_PER_PAGE = 10;
 const MAX_VISIBLE_PAGES = 5;
 
 interface TableApartmentsProps {
@@ -26,20 +28,30 @@ interface TableApartmentsProps {
 const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) => {
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const [apartments, setApartments] = useState(initialApartments); 
-  const [loading, setLoading] = useState(false); 
+  console.log(initialApartments);
+  
+  const {
+    data: apartments = initialApartments,
+    isLoading,
+    error,
+    refetch,
+  } = useApartments();
+
+  const deleteMutation = useDeleteApartment();
+
+  const handleDelete = async (apartmentId: number) => {
+    if (window.confirm("Вы уверены, что хотите удалить эту квартиру?")) {
+      try {
+        await deleteMutation.mutateAsync(apartmentId);
+        toast.success("Квартира успешно удалена");
+      } catch {
+        toast.error("Ошибка при удалении квартиры");
+      }
+    }
+  };
 
   const refreshData = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(BASE_URL_APARTMENTS);
-      const data = await res.json();
-      setApartments(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    await refetch();
   };
 
   const totalPages = Math.ceil(apartments.length / ITEMS_PER_PAGE);
@@ -60,23 +72,40 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
 
   const pages = getPages();
 
-  const handleViewApartments = (apartmentsId: string | number) => {
-    router.push(`apartments/${apartmentsId}`);
+  const handleViewApartment = (apartmentId: number) => {
+    router.push(`/apartments/${apartmentId}`);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div>
+      <div className="flex justify-center items-center min-h-[400px]">
         <SpinnerDemo />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-8">
+        <p className="text-red-500 mb-4">Ошибка загрузки данных</p>
+        <button
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Попробовать снова
+        </button>
       </div>
     );
   }
 
   if (apartments.length === 0) {
     return (
-      <div className="text-center">
-        <p>Информация не найдена</p>
-        <ImFileEmpty size={30} className="mx-auto" />
+      <div className="text-center ">
+        <div className="flex flex-1">
+          <ModalAddedApartments onSuccess={refreshData} />
+        </div>
+        <p className="text-gray-500 mb-4">Информация не найдена</p>
+        <ImFileEmpty size={48} className="mx-auto text-gray-300" />
       </div>
     );
   }
@@ -86,11 +115,12 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
       <div className="flex w-full justify-between items-center pb-4">
         <ModalAddedApartments onSuccess={refreshData} />
 
+        {/* Pagination */}
         <div className="flex items-center">
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-2 py-1 text-gray-400 disabled:opacity-30"
+            className="px-2 py-1 text-gray-400 disabled:opacity-30 hover:text-gray-600"
           >
             ‹
           </button>
@@ -137,53 +167,86 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
           <button
             disabled={page === totalPages || totalPages === 0}
             onClick={() => setPage((p) => p + 1)}
-            className="px-2 py-1 text-gray-400 disabled:opacity-30"
+            className="px-2 py-1 text-gray-400 disabled:opacity-30 hover:text-gray-600"
           >
             ›
           </button>
         </div>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>№</TableHead>
-            <TableHead>ИД</TableHead>
-            <TableHead>Номер</TableHead>
-            <TableHead>Этаж</TableHead> 
-            <TableHead>Площадь</TableHead>
-            <TableHead>Комнат</TableHead> 
-            <TableHead>Цена</TableHead> 
-            <TableHead>Здание</TableHead> 
-            <TableHead>Действия</TableHead>
-          </TableRow>
-        </TableHeader>
 
-        <TableBody>
-          {currentItems.map((item, i) => (
-            <TableRow key={item.id}>
-              <TableCell className="font-medium">
-                {startIndex + i + 1}
-              </TableCell>
-              <TableCell>{item.id}</TableCell>
-              <TableCell>{item.number}</TableCell>
-              <TableCell>{item.floor}</TableCell>
-              <TableCell>{item.area} м²</TableCell>
-              <TableCell>{item.room_count}</TableCell>
-              <TableCell>{item.final_price} ₽</TableCell>
-              <TableCell>{item.building_id}</TableCell>
-              <TableCell className="text-right">
-                <button
-                  onClick={() => handleViewApartments(item.id)}
-                  className="p-1 hover:bg-gray-100 rounded"
-                  title="Просмотр"
-                >
-                  <TbExternalLink size={16} color="#282964" />
-                </button>
-              </TableCell>
+      {/* Table */}
+      <div className="rounded-[3px] overflow-hidden shadow-md shadow-[#e1e2f9]">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>№</TableHead>
+              <TableHead>ИД</TableHead>
+              <TableHead>Номер</TableHead>
+              <TableHead>Этаж</TableHead>
+              <TableHead>Площадь</TableHead>
+              <TableHead>Комнат</TableHead>
+              <TableHead>Цена</TableHead>
+              <TableHead>Здание</TableHead>
+              <TableHead>Действия</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+
+          <TableBody>
+            {currentItems.map((item, i) => (
+              <TableRow key={item.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium">
+                  {startIndex + i + 1}
+                </TableCell>
+                <TableCell>{item.id}</TableCell>
+                <TableCell>{item.number}</TableCell>
+                <TableCell>{item.floor}</TableCell>
+                <TableCell>{item.area} м²</TableCell>
+                <TableCell>{item.room_count}</TableCell>
+                <TableCell>
+                  {typeof item.final_price === 'string' 
+                    ? item.final_price 
+                    : item.final_price}
+                </TableCell>
+                <TableCell>{item.building_id}</TableCell>
+                <TableCell className="text-right space-x-2">
+                  <button
+                    onClick={() => handleViewApartment(item.id as number)}
+                    className="p-1.5 hover:bg-gray-100 rounded transition"
+                    title="Просмотр"
+                  >
+                    <TbExternalLink size={16} color="#282964" />
+                  </button>
+                  <ModalDeleteApartments
+                    onSuccess={refreshData}
+                    buildingId={item.id}
+
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Footer info */}
+      <div className="mt-4 text-sm text-gray-500 flex justify-between items-center">
+        <div>
+          Показано {startIndex + 1}-
+          {Math.min(startIndex + ITEMS_PER_PAGE, apartments.length)} из{" "}
+          {apartments.length} квартир
+        </div>
+        <div className="flex items-center gap-2">
+          <span>
+            Страница {page} из {totalPages}
+          </span>
+          <button
+            onClick={refreshData}
+            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+          >
+            Обновить
+          </button>
+        </div>
+      </div>
     </section>
   );
 };

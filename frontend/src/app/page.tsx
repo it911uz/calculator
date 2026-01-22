@@ -1,11 +1,17 @@
-
-import DahboardLayout from "@/components/layouts/dashboard-layout/page";
+import DashboardLayout from "@/components/layouts/dashboard-layout/page";
 import Complex from "./(dashboard)/complex/page";
-export default function Home() {
+import { cookies } from "next/headers"; 
+import { redirect } from "next/navigation";
+
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+
+  if (!token) redirect("/login");
+
   return (
-    <DahboardLayout>
-     <Complex/>
-    </DahboardLayout>
-    
+    <DashboardLayout>
+      <Complex />
+    </DashboardLayout>
   );
 }

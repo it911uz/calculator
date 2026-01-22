@@ -11,62 +11,59 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { FC, useState } from "react";
-import { useComplexStore } from "@/modules/complex/complex.store";
 import { toast } from "sonner";
-
+import { useCreateComplex } from "@/hooks/useComplex"; // React Query hook
 
 type ModalProps = {
   onSuccess?: () => Promise<void>; 
 };
-export const ModalAddedComplex:FC<ModalProps> = ({ onSuccess }) => {
-  const { createComplex } = useComplexStore();
+
+export const ModalAddedComplex: FC<ModalProps> = ({ onSuccess }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    description: ""
-  });
+  const [formData, setFormData] = useState({ name: "", description: "" });
+
+  const { mutateAsync: createComplex } = useCreateComplex();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
-      alert("Имя комплексни киритинг");
+      toast.error("Войдите в комплекс псевдонимов");
       return;
     }
-     if (onSuccess) await onSuccess();
+
     setLoading(true);
     try {
       await createComplex({
         name: formData.name,
-        description: formData.description || "" 
+        description: formData.description || ""
       });
-      
+
       setFormData({ name: "", description: "" });
-      setOpen(false); 
-      toast.success("Добавлено успешно")
-      
+      setOpen(false);
+
+      toast.success("Добавлено успешно");
+
+      if (onSuccess) await onSuccess();
     } catch (error) {
-      console.error("Ошибка:", error);
-      toast.error("Ошибка")
+      console.error("Ошибка добавления комплекса:", error);
+      toast.error(error instanceof Error ? error.message : "Ошибка");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="bg-[#282964] px-2 py-1 rounded-[3px] leading-5 text-white text-sm hover:bg-[#1f2050] transition-colors">
-          Добавлять +
+          Добавлять комплекс +
         </button>
       </DialogTrigger>
       
@@ -131,4 +128,4 @@ export const ModalAddedComplex:FC<ModalProps> = ({ onSuccess }) => {
       </DialogContent>
     </Dialog>
   );
-}
+};

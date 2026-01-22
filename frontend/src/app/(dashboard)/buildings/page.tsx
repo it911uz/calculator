@@ -1,12 +1,15 @@
+import { getBuildings } from '@/action/buildings.action';
 import TableBuildings from '@/components/shared/ui-demo/table-buildings'
-import React from 'react'
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-const Buildings:React.FC = () => {
-  return (
-    <>
-    <TableBuildings/>
-    </>
-  )
+export default async function Buildings() {
+  
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+  
+  if (!token) redirect("/login");
+  const buildings = await getBuildings();
+
+  return <TableBuildings initialBuildings={buildings}  />
 }
-
-export default Buildings

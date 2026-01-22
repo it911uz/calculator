@@ -23,7 +23,7 @@ const Aside: React.FC<IasideProps> = ({ isOpen }) => {
           return (
             <li key={i}>
               <Link
-                href={item.pathName}
+                href={`${item.pathName}`}
                 className={`flex items-start gap-2 px-4 py-3 transition-all rounded-[3px]
                   ${
                     isActive
