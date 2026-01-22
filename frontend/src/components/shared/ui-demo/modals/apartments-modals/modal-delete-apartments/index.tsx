@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useDeleteApartment } from "@/hooks/useApartments";
 import { useApartmentsStore } from "@/modules/apartments/apartments.store";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
@@ -6,21 +7,30 @@ import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 
-export function ModalDeleteApartments({
-  buildingId,
-}: {
+
+interface ModalDeleteApartmentsProps {
   buildingId: string | number;
-}) {
-  const { removeApartments } = useApartmentsStore();
+  onSuccess?: () => void;
+}
+export function ModalDeleteApartments({ buildingId, onSuccess}: ModalDeleteApartmentsProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
+ const deleteMutation = useDeleteApartment()
+
   const handleDelete = async () => {
     try {
-      await removeApartments(Number(buildingId));
+      await deleteMutation.mutateAsync(Number(buildingId));
       setOpen(false);
       toast.success("Успешно удалено")
-      router.push("/apartments");
+      if (onSuccess) {
+        onSuccess();
+      }
+       if (window.location.pathname.includes('/apartments')) {
+        router.refresh();
+      } else {
+        router.push("/apartments");
+      }
     } catch (e) {
       console.error(e);
       toast.error("Ошибка")

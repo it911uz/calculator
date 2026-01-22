@@ -10,32 +10,21 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { FC, useEffect, useState } from "react";
+import { FC,  useState } from "react";
 import { toast } from "sonner";
-import { useBuildingsStore } from "@/modules/buildings/buildings.store";
-import { useComplexStore } from "@/modules/complex/complex.store";
-import { useCoefficientTypeStore } from "@/modules/coefficients-types/coefficients-types.store";
-import type { ICoefficientType } from "@/modules/coefficients-types/coefficients-types.types";
-import { useCoefficientStore } from "@/modules/coefficients/coefficients.store";
+import { useComplexes } from "@/hooks/useComplex";
+import { useCreateBuilding } from "@/hooks/useBuildings";
+
 type PriceUnit = "UZS" | "USD";
 type ModalProps = {
-  onSuccess?: () => Promise<void>; 
+  onSuccess?: () => void;
 };
-export const ModalAddedBuilding:FC<ModalProps> =({ onSuccess }) => {
-  const { createBuildings } = useBuildingsStore();
-  const { complex, fetchAllComplex } = useComplexStore();
-  const {
-    currentCoefficient,
-    fetchCoefficientTypeById,
-    loading: coefficientLoading,
-  } = useCoefficientTypeStore();
 
-  const {creteCoefficient} = useCoefficientStore()
-
-
+export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
+  const { data: complexes = [] } = useComplexes();
+  const createMutation = useCreateBuilding();
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     floor_count: "",
@@ -45,37 +34,15 @@ export const ModalAddedBuilding:FC<ModalProps> =({ onSuccess }) => {
     complex_id: "",
   });
 
-  useEffect(() => {
-    fetchAllComplex();
-  }, [fetchAllComplex]);
-
-  useEffect(() => {
-    if (formData.complex_id) {
-      fetchCoefficientTypeById(Number(formData.complex_id));
-      setFormData((prev) => ({ ...prev, max_coefficient: "" }));
-    }
-  }, [formData.complex_id, fetchCoefficientTypeById]);
-
-  const coefficientOptions: ICoefficientType[] = currentCoefficient
-    ? (Object.values(currentCoefficient).flat() as ICoefficientType[])
-    : [];
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    if (onSuccess)  onSuccess();
+    
     if (name === "floor_count" || name === "base_price" || name === "max_coefficient") {
-      if (value === "") {
-        setFormData((prev) => ({ ...prev, [name]: "" }));
-        return;
+      if (value === "" || /^\d*\.?\d*$/.test(value)) {
+        setFormData((prev) => ({ ...prev, [name]: value }));
       }
-
-      const num = Number(value);
-
-      if (!Number.isInteger(num) || num < 1) return;
-
-      setFormData((prev) => ({ ...prev, [name]: String(num) }));
       return;
     }
 
@@ -90,20 +57,27 @@ export const ModalAddedBuilding:FC<ModalProps> =({ onSuccess }) => {
       return;
     }
 
-    setLoading(true);
+    if (!formData.complex_id) {
+      toast.error("Выберите комплекс");
+      return;
+    }
+
+    const buildingData = {
+      name: formData.name,
+      floor_count: Number(formData.floor_count) || 1,
+      base_price: Number(formData.base_price) || 0,
+      price_unit: formData.price_unit,
+      max_coefficient: Number(formData.max_coefficient) || 1,
+      complex_id: formData.complex_id,
+    };
+
     try {
-      await createBuildings({
-        name: formData.name,
-        floor_count: Number(formData.floor_count),
-        base_price: Number(formData.base_price),
-        price_unit: formData.price_unit,
-        max_coefficient: Number(formData.max_coefficient),
-        complex_id: formData.complex_id,
-      });
-
-      toast.success("Добавлено успешно");
+      await createMutation.mutateAsync(buildingData);
+      
+      toast.success("Здание успешно добавлено");
       setOpen(false);
-
+      
+      // Formani tozalash
       setFormData({
         name: "",
         floor_count: "",
@@ -112,117 +86,139 @@ export const ModalAddedBuilding:FC<ModalProps> =({ onSuccess }) => {
         max_coefficient: "",
         complex_id: "",
       });
-    } catch (err) {
-      console.log(err);
+
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      console.log(error);
       
-      toast.error("Ошибка при добавлении" );
-    } finally {
-      setLoading(false);
+      toast.error("Ошибка при добавлении здания");
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-[#282964] px-2 py-1 rounded text-white text-sm hover:bg-[#1f2050] transition-colors">
-          Добавлять +
+        <button className="bg-[#282964] px-3 py-1 rounded text-white text-sm hover:bg-[#1f2050] transition-colors">
+          Добавить здание +
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Добавлять здания</DialogTitle>
+          <DialogTitle>Добавить здание</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-5 py-4">
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 py-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Комплекс</label>
+            <label className="text-sm font-medium">Комплекс *</label>
             <select
               name="complex_id"
               value={formData.complex_id}
               onChange={handleChange}
               required
-              disabled={loading}
-              className="w-full h-10 border rounded px-3"
+              disabled={createMutation.isPending}
+              className="w-full h-10 border rounded px-3 bg-white"
             >
               <option value="">Выберите комплекс</option>
-              {complex.map((item) => (
+              {complexes.map((item) => (
                 <option key={item.id} value={item.id}>
-                 id {item.id} ---  {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                  {item.name}
                 </option>
               ))}
             </select>
           </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-medium">Количество этажей</label>
-            <Input
-              name="floor_count"
-              type="number"
-              min={1}
-              value={formData.floor_count}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Имя здания</label>
+            <label className="text-sm font-medium">Название здания *</label>
             <Input
               name="name"
               value={formData.name}
               onChange={handleChange}
+              placeholder="Введите название"
               required
+              disabled={createMutation.isPending}
             />
           </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-medium">Базовая цена</label>
+            <label className="text-sm font-medium">Количество этажей *</label>
+            <Input
+              name="floor_count"
+              type="number"
+              min="1"
+              value={formData.floor_count}
+              onChange={handleChange}
+              placeholder="Например: 5"
+              required
+              disabled={createMutation.isPending}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Базовая цена *</label>
             <Input
               name="base_price"
               type="number"
-              min={1}
+              min="0"
+              step="0.01"
               value={formData.base_price}
               onChange={handleChange}
+              placeholder="Например: 1000000"
               required
+              disabled={createMutation.isPending}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">
-               Максимал коэффициент
-            </label>
+            <label className="text-sm font-medium">Максимальный коэффициент *</label>
             <Input
               name="max_coefficient"
               type="number"
-              min={1}
+              min="1"
+              step="0.01"
               value={formData.max_coefficient}
               onChange={handleChange}
+              placeholder="Например: 1.5"
               required
+              disabled={createMutation.isPending}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Единица цены</label>
+            <label className="text-sm font-medium">Валюта</label>
             <select
               name="price_unit"
               value={formData.price_unit}
               onChange={handleChange}
-              className="w-full h-10 border rounded px-3"
+              className="w-full h-10 border rounded px-3 bg-white"
+              disabled={createMutation.isPending}
             >
-              <option value="UZS">UZS</option>
-              <option value="USD">USD</option>
+              <option value="UZS">UZS (Сум)</option>
+              <option value="USD">USD (Доллар)</option>
             </select>
           </div>
 
-          <DialogFooter className="flex gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Отмена
-            </Button>
-            <Button type="submit" disabled={loading} variant="outline" className="bg-[#d0d5f6]">
-              {loading ? "Добавляется..." : "Добавить"}
-            </Button>
-          </DialogFooter>
+          <div className="col-span-2">
+            <DialogFooter className="flex gap-3 pt-4 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={createMutation.isPending}
+              >
+                Отмена
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={createMutation.isPending}
+                className="bg-[#282964] hover:bg-[#1f2050] text-white"
+              >
+                {createMutation.isPending ? "Добавление..." : "Добавить"}
+              </Button>
+            </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
   );
-}
+};

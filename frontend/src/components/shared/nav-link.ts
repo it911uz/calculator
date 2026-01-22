@@ -3,7 +3,12 @@ import { FaBuilding, FaCalculator } from "react-icons/fa";
 import { HiMiniBuildingOffice2 } from "react-icons/hi2";
 import { RiSettings4Fill } from "react-icons/ri";
 
-export const navigation = [
+interface INavigation {
+    navName: string;
+    icon: React.ComponentType<{ size?: string | number }>;
+    pathName: string;
+}
+export const navigation: INavigation[] = [
     { navName: "Объекты", icon: FaBuilding, pathName: "/"},
     { navName: "Здания", icon: HiMiniBuildingOffice2, pathName: "/buildings"},
     { navName: "Квартиры", icon: AiOutlineApartment, pathName: "/apartments"},
