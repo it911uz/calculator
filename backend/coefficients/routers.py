@@ -126,9 +126,9 @@ async def edit_coefficient_type(coefficient_type_id: int, update_coefficient_typ
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(has_permission("delete_building_coefficient_types"))]
 )
-async def delete_coefficient_type(coefficient_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_coefficient_type(coefficient_type_id: int, db: AsyncSession = Depends(get_db)):
     coefficient_type_manager = BuildingCoefficientTypeManager(db)
-    return await coefficient_type_manager.delete_coefficient_type(coefficient_id)
+    return await coefficient_type_manager.delete_coefficient_type(coefficient_type_id)
 
 "-------------------------------------------------------------------------------------------"
 
