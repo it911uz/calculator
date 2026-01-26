@@ -52,7 +52,7 @@ class BuildingCoefficientTypeManager:
         return await self.bct_repository.get_coefficient_type(coefficient_type_id)
 
     async def update_coefficient_type(self, coefficient_type_id: int, **kwargs):
-        await self.bct_validator.validate_building_fk(kwargs.get("coefficient_id"))
+        await self.bct_validator.validate_coefficient_fk(kwargs.get("coefficient_id"))
         return await self.bct_repository.update_coefficient_type(coefficient_type_id, **kwargs)
 
     async def delete_coefficient_type(self, coefficient_type_id: int):
