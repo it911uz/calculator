@@ -8,20 +8,22 @@ from coefficients.models import BuildingCoefficientType
 
 
 async def recalculate_final_price(db: AsyncSession, building_id: int, bct_ids: list[int]) -> Decimal:
+    # Max coefficient request
+    building = await db.get(Building, building_id)
+    base_price: Decimal = building.base_price
+    max_coefficient: Decimal = building.max_coefficient
+
+    if len(bct_ids) == 0:
+        return base_price
+    else:
+        each_bct_rate = max_coefficient / Decimal(len(bct_ids))
+
     # BCTs request
     result = await db.execute(
         select(BuildingCoefficientType)
         .where(BuildingCoefficientType.id.in_(bct_ids))
     )
     bcts = result.scalars().all()
-
-    # Max coefficient request
-    building = await db.get(Building, building_id)
-    base_price: Decimal = building.base_price
-    max_coefficient: Decimal = building.max_coefficient
-
-    # MAIN
-    each_bct_rate = max_coefficient / Decimal(len(bct_ids))
 
     total_rate: Decimal = Decimal("0")
     for bct in bcts:
