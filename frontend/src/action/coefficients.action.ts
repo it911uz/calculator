@@ -1,15 +1,11 @@
 "use server";
 
-import { CreateCoefficientPayload, CreateCoefficientTypePayload, ICoefficient } from "@/types";
+import { CreateCoefficientPayload, ICoefficient } from "@/types";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.120:8000";
-
-
-
-// Auth headers olish
+// Auth 
 async function getAuthHeaders() {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
@@ -25,7 +21,7 @@ async function getAuthHeaders() {
   };
 }
 
-// GET all coefficients
+// GET all 
 export async function getCoefficients(): Promise<ICoefficient[]> {
   try {
     const headers = await getAuthHeaders();
@@ -37,7 +33,6 @@ export async function getCoefficients(): Promise<ICoefficient[]> {
     return [];
   }
 }
-
 // GET coefficient by ID
 export async function getCoefficientById(id: number): Promise<ICoefficient | null> {
   try {
@@ -54,7 +49,7 @@ export async function getCoefficientById(id: number): Promise<ICoefficient | nul
   }
 }
 
-// CREATE coefficient
+// post 
 export async function createCoefficient(data: CreateCoefficientPayload): Promise<ICoefficient> {
   try {
     const headers = await getAuthHeaders();

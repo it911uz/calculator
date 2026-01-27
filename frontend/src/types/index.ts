@@ -2,62 +2,69 @@ import { CSSProperties } from "react";
 
 // Apartments types
 export interface IApartment {
-  id: number | string;
+  id: number;
   number: string;
-  floor: number | string;
-  area: string;
-  room_count: number | string;
-  final_price: string;
-  building_id: number | string;
-  bct_ids: number[] | undefined; 
+  floor: number;
+  area: string;          
+  room_count: number;
+  final_price: string;  
+  building_id: number;
+  bct_ids?: number[];
 }
+export interface ApartmentFormData {
+  number: string;
+  floor: number;
+  room_count: number;
+  area: string;       
+  final_price: string; 
+}
+
 
 // Buildings types
 export interface IBuildings {
   id: number | string;
   name: string;
   floor_count: number | string;
-  base_price: string | number;
   price_unit: string;
   max_coefficient: number 
+  base_price: string | number;
   complex_id: number | string;
 }
 
 // Complex types
 export interface IComplex {
-  id: number | string;
+  id: number;
   name: string;
   description: string;
 }
 
 // Coefficient types
-// Coefficient
 export interface ICoefficient {
   id: number;
   name: string;
   building_id: number | string;
 }
-
 // Coefficient Type
 export interface ICoefficientType {
   id: number;
   name: string;
-  rate: number;
+  rate: string | number;
   coefficient_id: number;
   bcts: string | number[];
   building_id: number; 
 }
-
+export type UpdateCoefficientTypePayload = {
+  name: string;
+  rate: string | number;
+  coefficient_id: number; 
+};
 // Group (API dan keladi)
 export interface ICoefficientTypeGroup {
   id: number;
   name: string;
   bcts: ICoefficientType[];
 }
-
 // Coefficient Type types
-
-
 export type LoginFormData = {
   username: string;
   password: string;
@@ -66,13 +73,11 @@ export type LoginFormData = {
   client_id?: string;
   client_secret?: string;
 };
-
 export type LoginResponse = {
   access_token: string;
   refresh_token: string;
   token_type: string;
 };
-
 export interface LottieAnimationProps {
   animationData: null | object;
   className?: string;
@@ -84,7 +89,6 @@ export interface LottieAnimationProps {
   speed?: number;
   onComplete?: () => void;
 }
-
 export type CreateCoefficientTypePayload = {
   name: string;
   rate: number;

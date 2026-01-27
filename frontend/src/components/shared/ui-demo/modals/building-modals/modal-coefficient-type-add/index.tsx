@@ -1,90 +1,69 @@
 "use client";
-
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { useState, useMemo } from "react";
-import { toast } from "sonner";
-
 import {
-  useCoefficientTypesByBuildingId,
-  useCreateCoefficientType,
-  useDeleteCoefficientType,
-  useUpdateCoefficientType,
-} from "@/hooks/useCoefficientTypes";
-
-import { useDeleteCoefficient } from "@/hooks/useCoefficient";
-
-interface ModalAddedCoefficientNameProps {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useCreateCoefficientType } from "@/hooks/useCoefficientTypes";
+interface ModalAddedCoefficientTypeProps {
+  buildingId: number;
+  coefficientId: number; 
   onSuccess?: () => void;
-  buildingId: string | number;
 }
-
 export const ModalAddedCoefficientType = ({
-  onSuccess,
   buildingId,
-}: ModalAddedCoefficientNameProps) => {
+  coefficientId,
+  onSuccess,
+}: ModalAddedCoefficientTypeProps) => {
   const [open, setOpen] = useState(false);
-
-  const { data: coefficientTypeGroups = [] } = useCoefficientTypesByBuildingId(
-    buildingId as number,
-  );
   const createCoefficientType = useCreateCoefficientType();
-
-  // STATES
   const [typeName, setTypeName] = useState("");
   const [rate, setRate] = useState<number | "">("");
 
-  const coefficientId = useMemo(() => {
-    return coefficientTypeGroups[0]?.id ?? null;
-  }, [coefficientTypeGroups]);
-
+  //creted coefficient type
   const handleCreateCoefficientType = async () => {
     if (!typeName || rate === "") {
       toast.error("Заполните все поля");
       return;
     }
-
-    if (!coefficientId) {
-      toast.error("Коэффициент не найден");
-      return;
-    }
-
     await createCoefficientType.mutateAsync({
       name: typeName.trim(),
       rate: Number(rate),
-      coefficient_id: coefficientId,
+      coefficient_id: coefficientId, 
+      building_id: buildingId,
     });
-
     toast.success("Тип коэффициента создан");
-
     setTypeName("");
     setRate("");
     setOpen(false);
     onSuccess?.();
   };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-[#46479f] px-3 py-1 rounded text-white text-sm hover:bg-[#1f2050] transition-colors mx-6">
+        <button className="bg-[#46479f] px-3 py-1 rounded text-white text-sm">
           Создать тип +
         </button>
       </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            Создать тип 
+          </DialogTitle>
+        </DialogHeader>
 
-      <DialogContent className="w-md">
-        <div className="space-y-6">
-          <label className="flex flex-col gap-2 text-sm">
-            Имя типа:
-            <Input
-              value={typeName}
-              onChange={(e) => setTypeName(e.target.value)}
-              placeholder="Имя типа"
-              className="bg-white"
-            />
-          </label>
-          <label className="flex flex-col gap-2 text-sm">
-            Ставка: %
-            <Input
+        <div className="space-y-4">
+          <Input
+            value={typeName}
+            onChange={(e) => setTypeName(e.target.value)}
+            placeholder="Имя типа"
+          />
+          <Input
               type="number"
               value={rate}
               min={0}
@@ -94,28 +73,21 @@ export const ModalAddedCoefficientType = ({
               className="bg-white"
               onChange={(e) => {
                 const raw = e.target.value;
-
                 if (raw === "") {
                   setRate("");
                   return;
                 }
-
                 const value = Number(raw);
                 if (value < 0 || value > 100) return;
-
                 setRate(value);
               }}
             />
-          </label>
-
-          <div className="flex justify-end">
-            <button
-              className="bg-[#46479f] text-white rounded-sm h-7 px-4"
-              onClick={handleCreateCoefficientType}
-            >
-              Создать
-            </button>
-          </div>
+          <button
+            className="bg-[#46479f] text-white px-4 py-1 rounded"
+            onClick={handleCreateCoefficientType}
+          >
+            Создать
+          </button>
         </div>
       </DialogContent>
     </Dialog>

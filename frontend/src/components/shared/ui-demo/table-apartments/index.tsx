@@ -14,50 +14,35 @@ import { ImFileEmpty } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { ModalAddedApartments } from "../modals/apartments-modals/modal-add-apartments";
 import { IApartment } from "@/types";
-import { useApartments, useDeleteApartment } from "@/hooks/useApartments";
-import { toast } from "sonner";
+import { useApartments } from "@/hooks/useApartments";
 import { ModalDeleteApartments } from "../modals/apartments-modals/modal-delete-apartments";
-
 const ITEMS_PER_PAGE = 10;
 const MAX_VISIBLE_PAGES = 5;
-
 interface TableApartmentsProps {
   initialApartments: IApartment[];
 }
-
-const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) => {
+const TableApartments: React.FC<TableApartmentsProps> = ({
+  initialApartments,
+}) => {
   const router = useRouter();
   const [page, setPage] = useState(1);
   console.log(initialApartments);
-  
+
   const {
     data: apartments = initialApartments,
     isLoading,
     error,
     refetch,
   } = useApartments();
-
-  const deleteMutation = useDeleteApartment();
-
-  const handleDelete = async (apartmentId: number) => {
-    if (window.confirm("Вы уверены, что хотите удалить эту квартиру?")) {
-      try {
-        await deleteMutation.mutateAsync(apartmentId);
-        toast.success("Квартира успешно удалена");
-      } catch {
-        toast.error("Ошибка при удалении квартиры");
-      }
-    }
-  };
-
   const refreshData = async () => {
     await refetch();
   };
-
   const totalPages = Math.ceil(apartments.length / ITEMS_PER_PAGE);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const currentItems = apartments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
+  const currentItems = apartments.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
   const getPages = () => {
     let start = Math.max(1, page - Math.floor(MAX_VISIBLE_PAGES / 2));
     let end = start + MAX_VISIBLE_PAGES - 1;
@@ -66,24 +51,20 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
       end = totalPages;
       start = Math.max(1, end - MAX_VISIBLE_PAGES + 1);
     }
-
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
-
   const pages = getPages();
-
   const handleViewApartment = (apartmentId: number) => {
+    console.log("Navigating to:", `/apartments/${apartmentId}`);
     router.push(`/apartments/${apartmentId}`);
   };
-
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
+      <div className="flex justify-center items-center min-h-80">
         <SpinnerDemo />
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="text-center p-8">
@@ -97,7 +78,6 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
       </div>
     );
   }
-
   if (apartments.length === 0) {
     return (
       <div className="text-center ">
@@ -109,13 +89,11 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
       </div>
     );
   }
-
   return (
     <section>
       <div className="flex w-full justify-between items-center pb-4">
         <ModalAddedApartments onSuccess={refreshData} />
 
-        {/* Pagination */}
         <div className="flex items-center">
           <button
             disabled={page === 1}
@@ -174,7 +152,6 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
         </div>
       </div>
 
-      {/* Table */}
       <div className="rounded-[3px] overflow-hidden shadow-md shadow-[#e1e2f9]">
         <Table>
           <TableHeader>
@@ -203,23 +180,22 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
                 <TableCell>{item.area} м²</TableCell>
                 <TableCell>{item.room_count}</TableCell>
                 <TableCell>
-                  {typeof item.final_price === 'string' 
-                    ? item.final_price 
+                  {typeof item.final_price === "string"
+                    ? item.final_price
                     : item.final_price}
                 </TableCell>
                 <TableCell>{item.building_id}</TableCell>
-                <TableCell className="text-right space-x-2">
+                <TableCell className="flex items-center space-x-2">
                   <button
                     onClick={() => handleViewApartment(item.id as number)}
                     className="p-1.5 hover:bg-gray-100 rounded transition"
                     title="Просмотр"
                   >
-                    <TbExternalLink size={16} color="#282964" />
+                    <TbExternalLink size={16} color="#282965" />
                   </button>
                   <ModalDeleteApartments
+                    apartmentId={Number(item.id)}
                     onSuccess={refreshData}
-                    buildingId={item.id}
-
                   />
                 </TableCell>
               </TableRow>
@@ -228,7 +204,6 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
         </Table>
       </div>
 
-      {/* Footer info */}
       <div className="mt-4 text-sm text-gray-500 flex justify-between items-center">
         <div>
           Показано {startIndex + 1}-

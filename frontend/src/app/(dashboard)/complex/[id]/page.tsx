@@ -1,101 +1,70 @@
-"use client";
-
-import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
 import { IoIosArrowBack } from "react-icons/io";
-import { SpinnerDemo } from "@/components/shared/ui-demo/spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
-import { ModalUpdateBuildings } from "@/components/shared/ui-demo/modals/building-modals/modal-update-buildings";
-import { useComplexStore } from "@/modules/complex/complex.store";
 import { ModalDeleteComplex } from "@/components/shared/ui-demo/modals/complex-modal/modal-delete-complex";
+import { LuText } from "react-icons/lu";
+import Link from "next/link";
+import ModalUpdateComplex from "@/components/shared/ui-demo/modals/complex-modal/modal-update-complex";
+import { getComplexById } from "@/action/complex.action"; 
 
-export default function SingleComplexPage() {
-  const params = useParams();
-  const router = useRouter();
-  const { id } = params;
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
-  const {
-    currentComplex,
-    loading,
-
-    fetchByIDComplex,
-  } = useComplexStore();
-
-  useEffect(() => {
-    if (id) {
-      fetchByIDComplex(id as string);
-    }
-  }, [id, fetchByIDComplex]);
-
-  if (loading) {
-    return (
-      <div className="p-6">
-        <SpinnerDemo />
-      </div>
-    );
-  }
-
+export default async function SingleComplexPage({ params }: Props) {
+  const { id } = await params;
+  const currentComplex = await getComplexById(id);
   if (!currentComplex) {
     return (
-      <div className="flex items-center justify-center flex-col h-screen ">
-        <p className="text-center">Информация не найдена</p>
-        <ImFileEmpty size={30} />
+      <div className="flex items-center justify-center flex-col h-screen">
+        <p className="text-center font-bold text-gray-500">Информация не найдена</p>
+        <ImFileEmpty size={40} className="text-gray-300 mt-2" />
+        <Link href="/complex" className="mt-4 text-indigo-600 underline">
+          Вернуться назад
+        </Link>
       </div>
     );
   }
-
   return (
-    <div>
-      <button
-        onClick={() => router.back()}
-        className=" text-gray-200 hover:text-white bg-[#282964] px-3 py-1 rounded-[3px] mb-6"
-      >
-        <IoIosArrowBack />
-      </button>
-
-      <div
-        className="p-5 rounded-[3px]py-4 px-2 rounded-[3px] shadow-[0_4px_16px_rgba(215,215,248,0.8)] bg-white
-                transform hover:-translate-y-1 transition-all duration-300"
-      >
-        <div className="flex items-start justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {currentComplex.name}
-          </h1>
-          <div className="px-3 py-1 bg-gradient-to-br from-blue-50 to-white text-sm font-bold rounded-sm">
-            ID: {currentComplex.id}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="p-3 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-sm">
-            <div className="text-xs text-gray-500 mb-1">Этажи</div>
-            <div className="text-lg font-bold text-gray-800">
-              {currentComplex.name}
+    <div className="">
+      <Link href={"/complex"}>
+        <button className="text-gray-200 hover:text-white bg-[#282964] px-3 py-1 rounded-[3px] mb-6 transition-colors">
+          <IoIosArrowBack />
+        </button>
+      </Link>
+      <div className="overflow-hidden rounded-sm bg-gradient-to-br from-indigo-200 via-indigo-100 to-indigo-100 border border-indigo-100 shadow-md transition-all duration-500 group">
+        <div className="py-6 px-3 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-sm font-bold text-indigo-700 flex gap-2 items-center px-3 py-1 shadow-sm">
+              <h1 className="text-md capitalize">
+                {currentComplex.name || "—"}
+              </h1>
+              <span className="text-xs text-gray-400 font-normal">Здание</span>
             </div>
           </div>
 
-          <div className="p-3 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-sm">
-            <div className="text-xs text-gray-500 mb-1">
-            Максимальный коэффициент
+          <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-white to-indigo-50 border border-indigo-100 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <LuText className="text-indigo-600" />
+              </div>
+              <span className="text-xs font-medium text-gray-500">Описание</span>
+            </div>
+            <div className="text-xl font-bold text-gray-900">
+              {currentComplex.description ? (
+                <span className="capitalize">{currentComplex.description}</span>
+              ) : (
+                <span className="flex gap-2 items-center text-gray-400 text-sm">
+                  <ImFileEmpty /> Описание отсутствует
+                </span>
+              )}
+            </div>
           </div>
-          <div className="text-lg font-bold text-gray-900">
-            {currentComplex.description}
-          </div>
-          </div>
-        </div>
 
-        
-
-        <div className="mt-4 flex items-center justify-center gap-2">
-          <div className="w-full h-1 bg-gradient-to-r from-indigo-900 via-gray-500 to-gray-200  rounded-full"></div>
+          <div className="flex gap-2.5 items-center pt-2">
+            <ModalDeleteComplex buildingId={currentComplex.id} />
+            <ModalUpdateComplex complex={currentComplex} />
+          </div>
         </div>
-       <div className="flex justify-between py-4">
-        <span></span>
-         <div className="flex items-center gap-2.5">
-          <ModalUpdateBuildings/>
-          <ModalDeleteComplex buildingId={currentComplex.id}/>
-        </div>
-       </div>
       </div>
     </div>
   );

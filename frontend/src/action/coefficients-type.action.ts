@@ -1,14 +1,11 @@
 "use server";
-
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { ICoefficientType, ICoefficientTypeGroup } from "@/types";
-
+import { ICoefficientType, ICoefficientTypeGroup, UpdateCoefficientTypePayload } from "@/types";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.120:8000";
-
-// Auth headers olish
-async function getAuthHeaders() {
+// auth
+export async function getAuthHeaders() {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
 
@@ -20,8 +17,7 @@ async function getAuthHeaders() {
     Accept: "application/json",
   };
 }
-
-// GET all coefficient types
+// getAll
 export async function getCoefficientTypes(): Promise<ICoefficientType[]> {
   try {
     const headers = await getAuthHeaders();
@@ -30,7 +26,8 @@ export async function getCoefficientTypes(): Promise<ICoefficientType[]> {
       cache: "no-store",
     });
 
-    if (!res.ok) throw new Error(`Failed to fetch coefficient types: ${res.status}`);
+    if (!res.ok)
+      throw new Error(`Failed to fetch coefficient types: ${res.status}`);
     return await res.json();
   } catch (error) {
     console.error("Error fetching coefficient types:", error);
@@ -38,16 +35,19 @@ export async function getCoefficientTypes(): Promise<ICoefficientType[]> {
   }
 }
 
-// GET coefficient types by building ID
+// get
 export async function getCoefficientTypesByBuildingId(
-  buildingId: number
+  buildingId: number,
 ): Promise<ICoefficientTypeGroup[]> {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch(`${BASE_URL}/coefficients-common/bcs-with-bcts-by-building-id/${buildingId}`, {
-      headers,
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${BASE_URL}/coefficients-common/bcs-with-bcts-by-building-id/${buildingId}`,
+      {
+        headers,
+        cache: "no-store",
+      },
+    );
 
     if (!res.ok) {
       if (res.status === 404) return [];
@@ -61,8 +61,10 @@ export async function getCoefficientTypesByBuildingId(
   }
 }
 
-// POST create coefficient type
-export async function createCoefficientType(data: Partial<ICoefficientType>): Promise<ICoefficientType> {
+// post
+export async function createCoefficientType(
+  data: Partial<ICoefficientType>,
+): Promise<ICoefficientType> {
   try {
     const headers = await getAuthHeaders();
     const res = await fetch(`${BASE_URL}/coefficient-types/add`, {
@@ -71,10 +73,9 @@ export async function createCoefficientType(data: Partial<ICoefficientType>): Pr
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) throw new Error(`Failed to create coefficient type: ${res.status}`);
+    if (!res.ok)
+      throw new Error(`Failed to create coefficient type: ${res.status}`);
     const result = await res.json();
-    // revalidatePath("/coefficient-types");
-    // revalidatePath(`/buildings/${data.building_id}`);
     return result;
   } catch (error) {
     console.error("Error creating coefficient type:", error);
@@ -82,44 +83,62 @@ export async function createCoefficientType(data: Partial<ICoefficientType>): Pr
   }
 }
 
-// PUT update coefficient type
+// update
 export async function updateCoefficientType(
-  id: number,
-  data: Partial<ICoefficientType>
+  coefficientTypeId: number,
+  data: UpdateCoefficientTypePayload
 ): Promise<ICoefficientType> {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch(`${BASE_URL}/coefficient-types/${id}`, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) throw new Error(`Failed to update coefficient type: ${res.status}`);
+    const requestData = {
+      id: coefficientTypeId,
+      name: data.name,
+      rate: String(data.rate), 
+      coefficient_id: data.coefficient_id
+    };
+    const res = await fetch(
+      `${BASE_URL}/coefficient-types/${coefficientTypeId}`, 
+      {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify(requestData),
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) {
+      const errorBody = await res.text();
+      console.error("Backend Error Detail:", errorBody);
+      throw new Error(`Server Error: ${res.status}`);
+    }
     const result = await res.json();
-    revalidatePath("/coefficient-types");
-    revalidatePath(`/buildings/${data.building_id}`);
+    revalidatePath("/buildings");
     return result;
   } catch (error) {
-    console.error("Error updating coefficient type:", error);
+    console.error("Action update error:", error);
     throw error;
   }
 }
-
-// DELETE coefficient type
-export async function deleteCoefficientType(id: number): Promise<{ success: boolean }> {
+//delete
+export async function deleteCoefficientType(
+  id: number,
+): Promise<{ success: boolean }> {
   try {
     const headers = await getAuthHeaders();
+
     const res = await fetch(`${BASE_URL}/coefficient-types/${id}`, {
       method: "DELETE",
       headers,
     });
 
-    if (!res.ok) throw new Error(`Failed to delete coefficient type: ${res.status}`);
-    revalidatePath("/coefficient-types");
+    if (!res.ok) {
+      if (res.status === 401) redirect("/login");
+      throw new Error(`Failed to delete coefficient: ${res.status}`);
+    }
+
+    revalidatePath("/buildings");
     return { success: true };
   } catch (error) {
-    console.error("Error deleting coefficient type:", error);
+    console.error("Error deleting building:", error);
     throw error;
   }
 }

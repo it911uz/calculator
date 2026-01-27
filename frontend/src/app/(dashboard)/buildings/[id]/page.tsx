@@ -1,79 +1,49 @@
-"use client";
-
-import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 import { IoIosArrowBack } from "react-icons/io";
-import { SpinnerDemo } from "@/components/shared/ui-demo/spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
-import { useBuildingById } from "@/hooks/useBuildings";
-import { useComplexes } from "@/hooks/useComplex";
-import { TabsDemo } from "@/components/shared/ui-demo/tabs";
+import { TabsDemoBuildings } from "@/components/shared/ui-demo/tabs/tab-buildings";
+import Link from "next/link";
+import { getBuildingById } from "@/action/buildings.action";
+import { getComplexes } from "@/action/complex.action";
 
-export default function SingleBuildingPage() {
-  const [coefficientModalOpen, setCoefficientModalOpen] = useState(false);
-  const params = useParams();
-  const router = useRouter();
-  const { id } = params;
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
-  // TanStack Query
-  const {
-    data: building,
-    isLoading: buildingLoading,
-    error: buildingError,
-    refetch: refetchBuilding,
-  } = useBuildingById(id as string);
+export default async function SingleBuildingPage({ params }: Props) {
+  const { id } = await params;
 
-  const { data: complexes = [], isLoading: complexLoading } = useComplexes();
+  const [building, complexes] = await Promise.all([
+    getBuildingById(id),
+    getComplexes(),
+  ]);
 
-  const isLoading = buildingLoading || complexLoading;
-
-  const handleCloseModal = () => {
-    setCoefficientModalOpen(false);
-  };
-
-  const handleSuccess = () => {
-    refetchBuilding();
-  };
-
-  const buildingComplex = building
-    ? complexes.find((c) => c.id === building.complex_id)
-    : null;
-
-  if (isLoading) {
+  if (!building) {
     return (
-      <div className="p-6">
-        <SpinnerDemo />
-      </div>
-    );
-  }
-
-  if (buildingError || !building) {
-    return (
-      <div className="flex items-center justify-center flex-col h-screen">
-        <p className="text-center">Информация не найдена</p>
-        <ImFileEmpty size={30} />
-        <button
-          onClick={() => router.back()}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      <div className="flex items-center justify-center flex-col h-screen text-gray-500">
+        <ImFileEmpty size={40} className="mb-2 text-gray-300" />
+        <p className="text-center font-medium font-sans">Информация не найдена</p>
+        <Link 
+          href="/buildings" 
+          className="mt-4 px-6 py-2 bg-[#282964] text-white rounded-[3px] text-sm"
         >
-          Назад
-        </button>
+          Назад к списку
+        </Link>
       </div>
     );
   }
 
   return (
     <div>
-      <button
-        onClick={() => router.back()}
-        className="text-gray-200 hover:text-white bg-[#282964] px-3 py-1 rounded-[3px] mb-6"
-      >
-        <IoIosArrowBack />
-      </button>
+      <Link href="/buildings">
+        <button className="text-gray-200 hover:text-white bg-[#282964] px-3 py-1.5 rounded-[3px] transition-all active:scale-95 shadow-sm mb-4">
+          <IoIosArrowBack size={18} />
+        </button>
+      </Link>
 
-      <TabsDemo />
-
-      
+      <TabsDemoBuildings 
+        initialBuilding={building} 
+        allComplexes={complexes} 
+      />
     </div>
   );
 }

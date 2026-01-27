@@ -13,11 +13,10 @@ import { SpinnerDemo } from "../spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { ModalAddedComplex } from "../modals/complex-modal/modal-add-complex";
-import { useComplexes, useDeleteComplex } from "@/hooks/useComplex";
-import { toast } from "sonner";
+import { useComplexes } from "@/hooks/useComplex";
 import { IComplex } from "@/types";
-import { MdDelete } from "react-icons/md";
 import { ModalDeleteComplex } from "../modals/complex-modal/modal-delete-complex";
+import Link from "next/link";
 
 const ITEMS_PER_PAGE = 12;
 const MAX_VISIBLE_PAGES = 5;
@@ -36,19 +35,6 @@ const TableObjects: React.FC<TableComplexProps> = ({ initialComplex }) => {
     error,
     refetch,
   } = useComplexes();
-
-  const deleteMutation = useDeleteComplex();
-
-  const handleDelete = async (complexId: number) => {
-    if (window.confirm("Вы уверены, что хотите удалить этот комплекс?")) {
-      try {
-        await deleteMutation.mutateAsync(complexId);
-        toast.success("Успешно удален");
-      } catch {
-        toast.error("Ошибка при удалении комплекса");
-      }
-    }
-  };
 
   const refreshData = async () => {
     await refetch();
@@ -115,7 +101,6 @@ const TableObjects: React.FC<TableComplexProps> = ({ initialComplex }) => {
       <div className="flex w-full justify-between items-center pb-4">
         <ModalAddedComplex onSuccess={refreshData} />
 
-        {/* Pagination */}
         <div className="flex items-center">
           <button
             disabled={page === 1}
@@ -174,7 +159,6 @@ const TableObjects: React.FC<TableComplexProps> = ({ initialComplex }) => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="rounded-[3px] overflow-hidden shadow-md shadow-[#e1e2f9]">
         <Table>
           <TableHeader>
@@ -199,17 +183,14 @@ const TableObjects: React.FC<TableComplexProps> = ({ initialComplex }) => {
                   {item.description}
                 </TableCell>
                 <TableCell className="text-right space-x-2">
-                  <button
-                    onClick={() => handleViewComplex(item.id)}
-                    className="p-1.5 hover:bg-gray-100 rounded transition"
+                  <Link
+                    href={`/complex/${item.id}`}
+                    className="inline-block p-1.5 hover:bg-gray-100 rounded transition"
                     title="Просмотр"
                   >
                     <TbExternalLink size={16} color="#282964" />
-                  </button>
-                  <ModalDeleteComplex 
-                     buildingId={item.id}
-                      onSuccess={refreshData}
-                    />
+                  </Link>
+                  <ModalDeleteComplex buildingId={item.id} />
                 </TableCell>
               </TableRow>
             ))}
@@ -217,7 +198,6 @@ const TableObjects: React.FC<TableComplexProps> = ({ initialComplex }) => {
         </Table>
       </div>
 
-      {/* Summary info */}
       <div className="mt-4 text-sm text-gray-500 flex justify-between items-center">
         <div>
           Показано {startIndex + 1}-

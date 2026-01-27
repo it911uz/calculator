@@ -48,7 +48,7 @@ export function ModalDeleteBuildings({ buildingId,onSuccess}: ModalDeleteBuildin
         >
           <MdOutlineDeleteForever 
             size={20} 
-            className={`${deleteMutation.isPending ? 'text-gray-400' : 'text-red-400'}`}
+            className={`${deleteMutation.isPending ? 'text-gray-400' : 'text-gray-600'}`}
           />
         </button>
       </DialogTrigger>

@@ -8,9 +8,8 @@ import {
   updateCoefficient,
   deleteCoefficient,
 } from "@/action/coefficients.action";
-import { QueryKeys } from "@/types";
+import { CreateCoefficientPayload, QueryKeys } from "@/types";
 import { ICoefficient } from "@/types";
-
 // GET all coefficients
 export function useCoefficients() {
   return useQuery({
@@ -18,8 +17,7 @@ export function useCoefficients() {
     queryFn: getCoefficients,
   });
 }
-
-// GET coefficient by ID
+// get
 export function useCoefficient(id: number) {
   return useQuery({
     queryKey: QueryKeys.coefficients.detail(id),
@@ -27,20 +25,23 @@ export function useCoefficient(id: number) {
     enabled: !!id,
   });
 }
-
-// CREATE coefficient
+// post
 export function useCreateCoefficient() {
   const queryClient = useQueryClient();
-  return useMutation({
+  return useMutation<ICoefficient, Error, CreateCoefficientPayload>({
     mutationFn: createCoefficient,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: QueryKeys.coefficients.all });
-      queryClient.invalidateQueries({ queryKey: QueryKeys.buildings.detail(data.building_id) });
+    onSuccess: (newCoefficient) => {
+      queryClient.invalidateQueries({ queryKey: ["coefficients"] });
+      queryClient.invalidateQueries({ 
+        queryKey: ["coefficients", "building", newCoefficient.building_id] 
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["coefficient-types", newCoefficient.building_id]
+      });
     },
   });
 }
-
-// UPDATE coefficient
+// patch
 export function useUpdateCoefficient() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -53,14 +54,19 @@ export function useUpdateCoefficient() {
     },
   });
 }
-
-// DELETE coefficient
-export function useDeleteCoefficient() {
+//delete
+export function useDeleteCoefficient(buildingId: number) { 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteCoefficient,
+    mutationFn: (id: number) => deleteCoefficient(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QueryKeys.coefficients.all });
+      queryClient.invalidateQueries({
+        queryKey: ["coefficient-types", buildingId]
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ["coefficients", "building", buildingId] 
+      });
     },
   });
 }

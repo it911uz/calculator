@@ -2,9 +2,6 @@ import { LottieAnimation } from "@/components/lottie-animations";
 import loginAnimation from "@/./../public/animations/Animation - 1747682284852 copy.json";
 import { LoginForm } from "@/components/shared/auth-forms/login-forms";
 export default async function LoginPage() {
-
-  
-  
   return (
     <div className="bg-gradient-to-br from-indigo-200 to-white min-h-screen fixed top-0 left-0 w-full h-full">
       <div className="grid place-content-center min-h-screen">

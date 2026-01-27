@@ -13,7 +13,6 @@ export function LottieAnimation({
   autoplay = true,
   width = "100%",
   height = "100%",
-  speed = 1,
   onComplete,
 }: LottieAnimationProps) {
   return (
@@ -25,7 +24,6 @@ export function LottieAnimation({
         animationData={animationData}
         loop={loop}
         autoplay={autoplay}
-        speed={speed}
         onComplete={onComplete}
       />
     </div>

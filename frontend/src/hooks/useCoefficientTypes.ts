@@ -1,6 +1,5 @@
 "use client";
-
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getCoefficientTypes,
   getCoefficientTypesByBuildingId,
@@ -8,18 +7,17 @@ import {
   updateCoefficientType,
   deleteCoefficientType,
 } from "@/action/coefficients-type.action";
-import { QueryKeys } from "@/types";
+import { CreateCoefficientTypePayload, ICoefficientTypeGroup, QueryKeys } from "@/types";
 import { ICoefficientType } from "@/types";
+import { toast } from 'sonner';
 
-// GET all coefficient types
 export function useCoefficientTypes() {
   return useQuery({
-    queryKey: QueryKeys.coefficientTypes.lists(),
+    queryKey: QueryKeys.coefficientTypes?.lists() || ["coefficientTypes", "list"],
     queryFn: getCoefficientTypes,
   });
 }
-
-// GET coefficient types by building ID
+// get
 export function useCoefficientTypesByBuildingId(buildingId: number) {
   return useQuery({
     queryKey: ["coefficient-types", buildingId],
@@ -28,16 +26,21 @@ export function useCoefficientTypesByBuildingId(buildingId: number) {
   });
 }
 
-// CREATE coefficient type
+// CREATE 
 export function useCreateCoefficientType() {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<
+    ICoefficientType,                  
+    Error,
+    CreateCoefficientTypePayload      
+  >({
     mutationFn: createCoefficientType,
+
     onSuccess: (data, variables) => {
-      queryClient.setQueryData(
+      queryClient.setQueryData<ICoefficientTypeGroup[]>(
         ["coefficient-types", variables.building_id],
-        (old: any[] | undefined) => {
+        (old) => {
           if (!old) return old;
 
           return old.map((group) => {
@@ -49,43 +52,72 @@ export function useCreateCoefficientType() {
             }
             return group;
           });
-        },
+        }
       );
     },
   });
 }
 
-// UPDATE coefficient type
-export function useUpdateCoefficientType() {
+
+// update
+export function useUpdateCoefficientType(buildingId?: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
-      id,
-      data,
+      coefficientTypeId,
+      name,
+      rate,
+      coefficient_id, 
     }: {
-      id: number;
-      data: Partial<ICoefficientType>;
-    }) => updateCoefficientType(id, data),
+      coefficientTypeId: number;
+      name: string;
+      rate: string | number;
+      coefficient_id: number;
+    }) =>
+      updateCoefficientType(coefficientTypeId, {
+        name,
+        rate,
+        coefficient_id,
+      }),
+
     onSuccess: (data, variables) => {
+      toast.success("Обновлено успешно");
       queryClient.invalidateQueries({
-        queryKey: QueryKeys.coefficientTypes.all,
+        queryKey: ["coefficient-types", buildingId],
       });
-      queryClient.invalidateQueries({
-        queryKey: ["coefficient-types", data.building_id],
-      });
+    },
+
+    onError: (error) => {
+      console.error("Update coefficient type error:", error);
+      toast.error("Не удалось обновить тип коэффициента");
     },
   });
 }
 
-// DELETE coefficient type
-export function useDeleteCoefficientType() {
+//dlete
+export function useDeleteCoefficientType(buildingId: number) {
   const queryClient = useQueryClient();
-  return useMutation({
+
+  return useMutation<{ success: boolean }, Error,number>({
     mutationFn: deleteCoefficientType,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: QueryKeys.coefficientTypes.all,
-      });
+    onSuccess: (_data, deletedId) => {
+      queryClient.setQueryData<ICoefficientTypeGroup[]>(
+        ["coefficient-types", buildingId],
+        (old) => {
+          if (!old) return old;
+
+          return old.map((group) => ({
+            ...group,
+            bcts: group.bcts.filter(
+              (item) => item.id !== deletedId
+            ),
+          }));
+        }
+      );
     },
   });
 }
+
+
+

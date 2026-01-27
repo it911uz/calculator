@@ -6,9 +6,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useCreateCoefficient } from "@/hooks/useCoefficient";
 import { useState } from "react";
 import { toast } from "sonner";
-import { createCoefficient } from "@/action/coefficients.action";
 
 interface ModalAddedCoefficientNameProps {
   onSuccess?: () => void;
@@ -21,33 +21,32 @@ export const ModalAddedCoefficientName = ({
 }: ModalAddedCoefficientNameProps) => {
   const [coefficientName, setCoefficientName] = useState("");
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleCreateCoefficient = async () => {
-    if (!coefficientName.trim()) {
+  const { mutate: createMutation, isPending } = useCreateCoefficient();
+  const handleCreateCoefficient = () => {
+    const trimmedName = coefficientName.trim();
+    if (!trimmedName) {
       toast.error("Введите имя коэффициента");
       return;
     }
-
-    setIsLoading(true);
-    try {
-      await createCoefficient({name: coefficientName.trim(), building_id: Number(buildingId)});
-
-      toast.success("Коэффициент создан");
-      setCoefficientName("");
-      setOpen(false);
-
-      if (onSuccess) {
-        onSuccess();
+    createMutation(
+      { 
+        name: trimmedName, 
+        building_id: Number(buildingId) 
+      },
+      {
+        onSuccess: () => {
+          toast.success("Коэффициент создан");
+          setCoefficientName("");
+          setOpen(false);
+          if (onSuccess) onSuccess();
+        },
+        onError: (error) => {
+          toast.error("Ошибка при создании коэффициента");
+          console.error(error);
+        }
       }
-    } catch (error) {
-      toast.error("Ошибка при создании коэффициента");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+    );
   };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -64,19 +63,19 @@ export const ModalAddedCoefficientName = ({
             placeholder="Имя коэффициента"
             className="bg-white w-full"
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === "Enter" && !isPending) {
                 handleCreateCoefficient();
               }
             }}
-            disabled={isLoading}
+            disabled={isPending}
           />
           <div className="flex justify-end">
             <button
               className="bg-[#46479f] text-white rounded-sm h-9 px-4 hover:bg-[#3a3b8a] transition-colors disabled:opacity-50"
               onClick={handleCreateCoefficient}
-              disabled={isLoading || !coefficientName.trim()}
+              disabled={isPending || !coefficientName.trim()}
             >
-              {isLoading ? "Создание..." : "Создать коэффициент"}
+              {isPending ? "Создание..." : "Создать коэффициент"}
             </button>
           </div>
         </div>
