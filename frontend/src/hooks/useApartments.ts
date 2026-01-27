@@ -1,4 +1,3 @@
-// hooks/useApartments.ts
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -18,15 +17,15 @@ export function useApartments() {
   return useQuery({
     queryKey: QueryKeys.apartments?.lists() || ["apartments", "list"],
     queryFn: getApartments,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, 
   });
 }
 
 // GET apartment by ID
-export function useApartment(id: string | number | undefined) {
+export function useApartmentById(id: number) {
   return useQuery({
-    queryKey: QueryKeys.apartments?.detail(id as string | number) || ["apartments", "detail", id],
-    queryFn: () => getApartmentById(id!),
+    queryKey: QueryKeys.apartments?.detail(id) || ["apartments", "detail", id],
+    queryFn: () => getApartmentById(id),
     enabled: !!id,
   });
 }
@@ -39,6 +38,7 @@ export function useApartmentsByBuilding(buildingId: string | number | undefined)
     enabled: !!buildingId,
   });
 }
+
 
 
 // CREATE apartment
@@ -59,22 +59,26 @@ export function useCreateApartment() {
   });
 }
 
-// UPDATE apartment
+import { useRouter } from "next/navigation"; 
+
 export function useUpdateApartment() {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<IApartment> }) =>
       updateApartment(id, data),
+
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["apartments"] });
-      queryClient.setQueryData(
-        ["apartments", "detail", variables.id],
-        data
-      );
+      
+      queryClient.setQueryData(["apartments", "detail", String(variables.id)], data);
+      
       if (data.building_id) {
         queryClient.invalidateQueries({ queryKey: ["buildings", "detail", data.building_id] });
       }
+
+      router.refresh(); 
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to update apartment");

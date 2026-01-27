@@ -1,77 +1,148 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { ICoefficientType } from "@/types";
+import { useEffect, useState } from "react";
 import { useUpdateCoefficientType } from "@/hooks/useCoefficientTypes";
+import { ICoefficientType } from "@/types";
+import { MdOutlineModeEditOutline } from "react-icons/md";
+import { toast } from "sonner";
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
-  item: ICoefficientType | null;
+  coefficientType: ICoefficientType;
+  coefficientId: number;
+  buildingId: number;
 }
 
-export function ModalEditCoefficientType({ open, onClose, item }: Props) {
-  const updateMutation = useUpdateCoefficientType();
-
+export function ModalEditCoefficientType({
+  coefficientType,
+  buildingId,
+  coefficientId,
+}: Props) {
   const [name, setName] = useState("");
-  const [rate, setRate] = useState<number | "">("");
-
-  // item kelganda state’larni to‘ldirish
+  const [rate, setRate] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const { mutate, isPending } = useUpdateCoefficientType(buildingId);
   useEffect(() => {
-    if (item) {
-      setName(item.name);
-      setRate(item.rate);
+    if (open) {
+      setName(coefficientType.name);
+      setRate(String(coefficientType.rate));
     }
-  }, [item]);
+  }, [open, coefficientType]);
 
-  const handleUpdate = async () => {
-    if (!item || rate === "" || !name) {
-      toast.error("Заполните все поля");
-      return;
+  const handleSubmit = () => {
+  if (!name.trim() || !rate.trim()) {
+    toast.error("Заполните поля.");
+    return;
+  }
+  mutate(
+    {
+      coefficientTypeId: coefficientType.id,
+      name: name.trim(),
+      rate: rate, 
+      coefficient_id: coefficientId, 
+    },
+    {
+      onSuccess: () => setOpen(false),
     }
-
-    await updateMutation.mutateAsync({
-      id: item.id,
-      data: {
-        name: name.trim(),
-        rate: Number(rate),
-        building_id: item.building_id,
-      },
-    });
-
-    toast.success("Тип коэффициента обновлён");
-    onClose();
+  );
+};
+  const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+      setRate(value);
+    }
   };
-
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="space-y-4">
-        <label className="flex flex-col gap-2 text-sm">
-          Ставка: %
-          <Input
-            type="number"
-            min={0}
-            max={100}
-            value={rate}
-            onChange={(e) => setRate(Number(e.target.value))}
-          />
-        </label>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button
+          className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+          title="Редактировать"
+        >
+          <MdOutlineModeEditOutline size={22} />
+        </button>
+      </DialogTrigger>
 
-        <label className="flex flex-col gap-2 text-sm">
-          Имя типа:
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
-        </label>
+      <DialogContent className="sm:max-w-[425px]" onKeyDown={handleKeyDown}>
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold">
+            Редактировать тип коэффициента
+          </DialogTitle>
+        </DialogHeader>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleUpdate}
-            className="bg-[#46479f] text-white rounded-sm px-4 h-8"
-          >
-            Сохранить
-          </button>
+        <div className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <label htmlFor="coefficient-name" className="text-sm font-medium">
+              Название *
+            </label>
+            <Input
+              id="coefficient-name"
+              placeholder="Введите название"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isPending}
+              className="w-full"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="coefficient-rate" className="text-sm font-medium">
+              Значение *
+            </label>
+            <Input
+              id="coefficient-rate"
+              type="text" 
+              placeholder="Например: 1.5"
+              value={rate}
+              onChange={handleRateChange}
+              disabled={isPending}
+              className="w-full"
+            />
+            <p className="text-xs text-gray-500">
+              Введите числовое значение
+            </p>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isPending}
+              className="min-w-[80px]"
+            >
+              Отмена
+            </Button>
+
+            <Button
+              onClick={handleSubmit}
+              disabled={isPending || !name.trim() || !rate.trim()}
+              className="min-w-[100px] bg-indigo-600 hover:bg-indigo-700"
+            >
+              {isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Сохранение...
+                </span>
+              ) : (
+                "Сохранить"
+              )}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

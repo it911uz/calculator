@@ -1,6 +1,4 @@
-// hooks/useComplex.ts
 "use client";
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getComplexes,
@@ -11,10 +9,8 @@ import {
 } from "@/action/complex.action";
 import { QueryKeys } from "@/types";
 import { IComplex } from "@/types";
-import { toast } from "sonner";
 
-type ComplexMutationData = Partial<IComplex>;
-
+//all
 export function useComplexes() {
   return useQuery({
     queryKey: QueryKeys.complex.lists(),
@@ -24,19 +20,17 @@ export function useComplexes() {
     staleTime: 5 * 60 * 1000, 
   });
 }
-
-export function useComplex(id: string | number | undefined) {
-  return useQuery({
-    queryKey: QueryKeys.complex.detail(id as string | number),
-    queryFn: () => getComplexById(id!),
-    enabled: !!id,
-    retry: 1,
+//by id
+export function useComplexById(id?: string | number) {
+  return useQuery<IComplex>({
+    queryKey: ["complex", id],
+    queryFn: () => getComplexById(id as string),
+    enabled: !!id, 
   });
 }
-
+//create complex
 export function useCreateComplex() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: createComplex,
     onSuccess: (data) => {
@@ -47,63 +41,43 @@ export function useCreateComplex() {
       );
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create complex");
+      console.error(error.message || "Failed to create complex");
     },
   });
 }
-
+//update
 export function useUpdateComplex() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: ComplexMutationData }) =>
-      updateComplex(id, data),
-    onSuccess: (data, variables) => {
-      toast.success("Complex updated successfully");
-      queryClient.invalidateQueries({ queryKey: QueryKeys.complex.all });
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: { name: string; description?: string };
+    }) => updateComplex(id, data),
+
+    onSuccess: (updatedComplex) => {
       queryClient.setQueryData(
-        QueryKeys.complex.detail(variables.id),
-        data
+        ["complex", updatedComplex.id],
+        updatedComplex
       );
-    },
-    onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: QueryKeys.complex.detail(id) });
-      
-      const previousComplex = queryClient.getQueryData<IComplex>(
-        QueryKeys.complex.detail(id)
-      );
-
-      if (previousComplex) {
-        queryClient.setQueryData<IComplex>(
-          QueryKeys.complex.detail(id),
-          { ...previousComplex, ...data }
-        );
-      }
-
-      return { previousComplex };
-    },
-    onError: (error, variables, context) => {
-      if (context?.previousComplex) {
-        queryClient.setQueryData(
-          QueryKeys.complex.detail(variables.id),
-          context.previousComplex
-        );
-      }
-      toast.error(error.message || "Failed to update complex");
+      queryClient.invalidateQueries({
+        queryKey: ["complex"],
+      });
     },
   });
 }
 
+
+//
 export function useDeleteComplex() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: deleteComplex,
     onSuccess: (_, variables) => {
-      toast.success("Complex deleted successfully");
       queryClient.invalidateQueries({ queryKey: QueryKeys.complex.all });
-      
-      // Check if variables is a number (id) or an object
       const id = typeof variables === 'number' ? variables : undefined;
       if (id) {
         queryClient.removeQueries({ queryKey: QueryKeys.complex.detail(id) });
@@ -115,13 +89,11 @@ export function useDeleteComplex() {
       const previousComplexes = queryClient.getQueryData<IComplex[]>(
         QueryKeys.complex.lists()
       );
-
       const newComplexes = previousComplexes?.filter((complex) => complex.id !== id) || [];
       queryClient.setQueryData<IComplex[]>(
         QueryKeys.complex.lists(),
         newComplexes
       );
-
       return { previousComplexes };
     },
     onError: (error, id, context) => {
@@ -131,7 +103,7 @@ export function useDeleteComplex() {
           context.previousComplexes
         );
       }
-      toast.error(error.message || "Failed to delete complex");
+      console.error(error.message || "Ошибка");
     },
   });
 }

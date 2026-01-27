@@ -1,3 +1,4 @@
+"use client";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useDeleteComplex } from "@/hooks/useComplex";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -8,9 +9,8 @@ import { toast } from "sonner";
 
 interface ModalDeleteComplexProps {
   buildingId: string | number;
-  onSuccess?: () => void;
 }
-export function ModalDeleteComplex({buildingId, onSuccess}:ModalDeleteComplexProps) {
+export function ModalDeleteComplex({buildingId}:ModalDeleteComplexProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -18,24 +18,16 @@ export function ModalDeleteComplex({buildingId, onSuccess}:ModalDeleteComplexPro
 
 
   const handleDelete = async () => {
-    try {
-      await deleteMutation.mutateAsync(Number(buildingId));
-      setOpen(false);
-      toast.success("Успешно удалено")
-      if (onSuccess) {
-        onSuccess();
-      }
-      if (window.location.pathname.includes('/complex')) {
-        router.refresh();
-      } else {
-        router.push("/complex");
-      }
-    } catch (e) {
-      console.error(e);
-      toast.error("Ошибка")
-    }
-  };
-
+  try {
+    await deleteMutation.mutateAsync(Number(buildingId));
+    setOpen(false);
+    toast.success("Успешно удалено");
+    router.push("/complex"); 
+  } catch (e) {
+    console.error(e);
+    toast.error("Ошибка при удалении");
+  }
+};
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -45,7 +37,7 @@ export function ModalDeleteComplex({buildingId, onSuccess}:ModalDeleteComplexPro
         >
           <MdOutlineDeleteForever 
             size={20} 
-            className={`${deleteMutation.isPending ? 'text-gray-400' : 'text-red-500'}`}
+            className={`${deleteMutation.isPending ? 'text-gray-400' : 'text-gray-400'}`}
           />
         </button>
       </DialogTrigger>

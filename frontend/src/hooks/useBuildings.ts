@@ -9,12 +9,11 @@ import {
   updateBuilding,
   deleteBuilding,
   getBuildingsByComplexId,
-  searchBuildings,
 } from "@/action/buildings.action";
 import { IBuildings, QueryKeys } from "@/types";
 import { toast } from "sonner";
-
-// GET all buildings
+ 
+// GET 
 export function useBuildings() {
   return useQuery({
     queryKey: QueryKeys.buildings.lists(),
@@ -22,7 +21,7 @@ export function useBuildings() {
   });
 }
 
-// GET building by ID
+// GET 
 export function useBuildingById(id: string | number | undefined) {
   return useQuery({
     queryKey: QueryKeys.buildings.detail(id as number | string),
@@ -31,7 +30,7 @@ export function useBuildingById(id: string | number | undefined) {
   });
 }
 
-// GET buildings by complex ID
+// GET 
 export function useBuildingsByComplex(complexId: string | number | undefined) {
   return useQuery({
     queryKey: [...QueryKeys.buildings.all, "complex", complexId],
@@ -40,17 +39,9 @@ export function useBuildingsByComplex(complexId: string | number | undefined) {
   });
 }
 
-// SEARCH buildings
-export function useSearchBuildings(query: string) {
-  return useQuery({
-    queryKey: [...QueryKeys.buildings.all, "search", query],
-    queryFn: () => searchBuildings(query),
-    enabled: query.length > 0,
-    staleTime: 0,
-  });
-}
 
-// CREATE building
+
+// CREATE
 export function useCreateBuilding() {
   const queryClient = useQueryClient();
 
@@ -70,31 +61,38 @@ export function useCreateBuilding() {
   });
 }
 
-// UPDATE building
+// UPDATE 
 export function useUpdateBuilding() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: Partial<IBuildings> }) =>
-      updateBuilding(id, data),
+  return useMutation<
+    IBuildings, 
+    Error,      
+    { id: string | number; data: Partial<IBuildings> }
+  >({
+    mutationFn: ({ id, data }) => updateBuilding(id, data),
+
     onSuccess: (data, variables) => {
-      toast.success("Building updated successfully");
+      toast.success("Здание обновлено");
+      
       queryClient.invalidateQueries({ queryKey: QueryKeys.buildings.all });
-      queryClient.setQueryData(
-        QueryKeys.buildings.detail(variables.id),
-        data
-      );
+
+      queryClient.setQueryData(QueryKeys.buildings.detail(variables.id), data);
+
       if (data.complex_id) {
         queryClient.invalidateQueries({
           queryKey: [...QueryKeys.buildings.all, "complex", data.complex_id],
         });
       }
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to update building");
+
+    onError: (error) => {
+      toast.error(error.message || "Ошибка при обновлении здания");
     },
   });
 }
+
+
 
 // DELETE building
 export function useDeleteBuilding() {
@@ -103,7 +101,6 @@ export function useDeleteBuilding() {
   return useMutation({
     mutationFn: deleteBuilding,
     onSuccess: (_, id) => {
-      toast.success("Building deleted successfully");
       queryClient.invalidateQueries({ queryKey: QueryKeys.buildings.all });
       queryClient.removeQueries({ queryKey: QueryKeys.buildings.detail(id) });
     },

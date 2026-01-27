@@ -10,20 +10,23 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useCreateApartment } from "@/hooks/useApartments";
 import { useBuildings } from "@/hooks/useBuildings";
+import { getCoefficientTypesByBuildingId } from "@/action/coefficients-type.action";
+import { ICoefficientTypeGroup } from "@/types";
 
 type ModalProps = {
-  onSuccess?: () => void; 
+  onSuccess?: () => void;
 };
 
 export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
   const { data: buildings = [] } = useBuildings();
   const createMutation = useCreateApartment();
-  
+
   const [open, setOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     number: "",
     floor: "",
@@ -31,91 +34,109 @@ export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
     final_price: "",
     building_id: "",
     area: "",
-    bct_ids: "", 
+    bct_ids: [] as number[],
   });
+
+  const [selectedBuildingFloorCount, setSelectedBuildingFloorCount] = useState<number | null>(null);
+  const [coefficientGroups, setCoefficientGroups] = useState<ICoefficientTypeGroup[]>([]);
+  const [isLoadingCoefficientGroups, setIsLoadingCoefficientGroups] = useState(false);
+
+  useEffect(() => {
+    if (!formData.building_id) {
+      setSelectedBuildingFloorCount(null);
+      setCoefficientGroups([]);
+      return;
+    }
+
+    const buildingIdNum = Number(formData.building_id);
+    const building = buildings.find((b) => b.id === buildingIdNum);
+
+    if (building) {
+      const floorCount = typeof building.floor_count === "string" 
+        ? Number(building.floor_count) 
+        : building.floor_count;
+      setSelectedBuildingFloorCount(floorCount);
+    }
+
+    const fetchCoefficients = async () => {
+      setIsLoadingCoefficientGroups(true);
+      try {
+        const data = await getCoefficientTypesByBuildingId(buildingIdNum);
+        setCoefficientGroups(data || []);
+      } catch (err) {
+        console.error("Ошибка при загрузке коэффициентов:", err);
+      } finally {
+        setIsLoadingCoefficientGroups(false);
+      }
+    };
+
+    fetchCoefficients();
+  }, [formData.building_id, buildings]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    if (name === "floor") {
+      if (value === "" || /^\d+$/.test(value)) {
+        const floorValue = Number(value);
+        if (selectedBuildingFloorCount !== null && floorValue > selectedBuildingFloorCount) {
+          toast.error(`Максимальный этаж: ${selectedBuildingFloorCount}`);
+          return;
+        }
+        setFormData((prev) => ({ ...prev, floor: value }));
+      }
+      return;
+    }
+
+    if (name === "building_id") {
+      setFormData((prev) => ({
+        ...prev,
+        building_id: value,
+        floor: "",
+        bct_ids: [],
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    console.log("🧪 FORM DATA перед отправкой:", formData);
 
-    if (!formData.number.trim()) {
-      toast.error("Введите номер квартиры");
-      return;
-    }
+    if (!formData.number.trim()) return toast.error("Введите номер квартиры");
+    if (!formData.building_id) return toast.error("Выберите здание");
 
-    if (!formData.building_id) {
-      toast.error("Выберите здание");
-      return;
-    }
-
-    // Swagger format
     const apartmentData = {
       number: formData.number,
+      building_id: Number(formData.building_id), 
       floor: Number(formData.floor) || 0,
       room_count: Number(formData.room_count) || 0,
       final_price: formData.final_price || "0",
-      building_id: formData.building_id,
       area: formData.area || "0",
-      bct_ids: formData.bct_ids 
-        ? formData.bct_ids.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
-        : [0], 
+      bct_ids: formData.bct_ids,
     };
-
-    console.log("🚀 Отправляемые данные на сервер:", apartmentData);
 
     try {
       await createMutation.mutateAsync(apartmentData);
-
       toast.success("Квартира успешно добавлена");
       setOpen(false);
       
       setFormData({
         number: "",
-        floor: "0",
-        room_count: "0",
-        final_price: "0",
+        floor: "",
+        room_count: "",
+        final_price: "",
         building_id: "",
-        area: "0",
-        bct_ids: "0", 
+        area: "",
+        bct_ids: [],
       });
 
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error: any) {
-      console.error(" Ошибка при добавлении квартиры:", error);
-      
-      if (error.message?.includes("BuildingCoefficientType")) {
-        toast.error("Ошибка: Указанный коэффициент не существует. Используйте существующие ID коэффициентов.");
-      } else if (error.message?.includes("Ошибка сервера")) {
-        const serverError = error.message.replace("Ошибка сервера: ", "");
-        toast.error(`Ошибка: ${serverError}`);
-      } else {
-        toast.error(`Ошибка: ${error.message || "Неизвестная ошибка"}`);
-      }
+      onSuccess?.();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Ошибка при добавлении";
+      toast.error(errorMessage);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    
-    if (name === "floor" || name === "room_count") {
-      if (value === "" || /^\d+$/.test(value)) {
-        setFormData((prev) => ({ ...prev, [name]: value }));
-      }
-      return;
-    }
-
-    // Price validation (decimal numbers)
-    if (name === "final_price" || name === "area") {
-      if (value === "" || /^\d*\.?\d*$/.test(value)) {
-        setFormData((prev) => ({ ...prev, [name]: value }));
-      }
-      return;
-    }
-
-    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -126,155 +147,125 @@ export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Добавить квартиру</DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="py-4 grid grid-cols-2 gap-5">
+        
+        <form onSubmit={handleSubmit} className="py-4 grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Здание */}
           <div className="space-y-2">
-            <label htmlFor="number" className="text-sm font-medium">
-              Номер квартиры *
-            </label>
-            <Input
-              id="number"
-              name="number"
-              type="text"
-              placeholder="Например: 101"
-              value={formData.number}
-              onChange={handleChange}
-              required
-              disabled={createMutation.isPending}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="floor" className="text-sm font-medium">
-              Этаж *
-            </label>
-            <Input
-              id="floor"
-              name="floor"
-              type="number"
-              placeholder="0 или больше"
-              value={formData.floor}
-              onChange={handleChange}
-              required
-              disabled={createMutation.isPending}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="area" className="text-sm font-medium">
-              Площадь (м²) *
-            </label>
-            <Input
-              id="area"
-              name="area"
-              type="text"
-              placeholder="Например: 65.5"
-              value={formData.area}
-              onChange={handleChange}
-              required
-              disabled={createMutation.isPending}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="room_count" className="text-sm font-medium">
-              Количество комнат *
-            </label>
-            <Input
-              id="room_count"
-              name="room_count"
-              type="number"
-              placeholder="0 или больше"
-              value={formData.room_count}
-              onChange={handleChange}
-              required
-              disabled={createMutation.isPending}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="final_price" className="text-sm font-medium">
-              Цена *
-            </label>
-            <Input
-              id="final_price"
-              name="final_price"
-              type="text"
-              placeholder="Например: 15000000"
-              value={formData.final_price}
-              onChange={handleChange}
-              required
-              disabled={createMutation.isPending}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="building_id" className="text-sm font-medium">
-              Здание *
-            </label>
+            <label className="text-sm font-medium">Здание *</label>
             <select
-              id="building_id"
               name="building_id"
               value={formData.building_id}
               onChange={handleChange}
               required
-              disabled={createMutation.isPending}
-              className="w-full h-10 border rounded px-3 bg-white"
+              className="w-full h-10 border rounded px-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
             >
               <option value="">Выберите здание</option>
-              {buildings.map((building) => (
-                <option key={building.id} value={building.id}>
-                  {building.name} 
+              {buildings.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="bct_ids" className="text-sm font-medium">
-              ID коэффициентов (через запятую)
-            </label>
+            <label className="text-sm font-medium">Номер квартиры *</label>
             <Input
-              id="bct_ids"
-              name="bct_ids"
-              type="text"
-              placeholder="Обязательно: 0"
-              value={formData.bct_ids}
+              name="number"
+              value={formData.number}
               onChange={handleChange}
-              disabled={createMutation.isPending}
-              className="w-full"
+              required
             />
-            
           </div>
 
-          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Этаж *</label>
+            <Input
+              name="floor"
+              type="number"
+              value={formData.floor}
+              onChange={handleChange}
+              placeholder={selectedBuildingFloorCount ? `Макс: ${selectedBuildingFloorCount}` : "Выберите здание"}
+              disabled={!formData.building_id}
+            />
+          </div>
 
-          <DialogFooter className="col-span-2 pt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={createMutation.isPending}
-              className="mr-2"
-            >
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Количество комнат *</label>
+            <Input
+              name="room_count"
+              type="number"
+              value={formData.room_count}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Площадь (м²) *</label>
+            <Input
+              name="area"
+              value={formData.area}
+              onChange={handleChange}
+              required
+              placeholder="65.5"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Цена *</label>
+            <Input
+              name="final_price"
+              value={formData.final_price}
+              onChange={handleChange}
+              required
+              placeholder="15000000"
+            />
+          </div>
+
+          {/* Koeffitsientlar - To'liq kenglikda */}
+          <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {coefficientGroups.map((group) => (
+              <div key={group.id} className="space-y-2">
+                <label className="text-sm font-medium">Тип: {group.name}</label>
+                <select
+                  value={formData.bct_ids.find((id) => group.bcts.some((b) => b.id === id)) ?? ""}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    setFormData((prev) => {
+                      const filtered = prev.bct_ids.filter((id) => !group.bcts.some((b) => b.id === id));
+                      return {
+                        ...prev,
+                        bct_ids: value ? [...filtered, value] : filtered,
+                      };
+                    });
+                  }}
+                  className="w-full h-10 border rounded px-3 bg-white disabled:opacity-50"
+                  disabled={isLoadingCoefficientGroups}
+                >
+                  <option value="">Не выбрано</option>
+                  {group.bcts.map((bct) => (
+                    <option key={bct.id} value={bct.id}>
+                      {bct.name} ({bct.rate})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter className=" flex gap-3">
+            <Button variant="outline" type="button" onClick={() => setOpen(false)}>
               Отмена
             </Button>
             <Button
               type="submit"
-              disabled={createMutation.isPending || 
-                !formData.number.trim() || 
-                !formData.building_id ||
-                !formData.area}
-              className="bg-[#282964] hover:bg-[#1f2050] text-white"
+              className="bg-[#282964] text-white hover:bg-[#1f2050]"
+              disabled={createMutation.isPending}
             >
               {createMutation.isPending ? "Добавление..." : "Добавить"}
             </Button>

@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { FC,  useState } from "react";
+import { FC, useState } from "react";
 import { toast } from "sonner";
 import { useComplexes } from "@/hooks/useComplex";
 import { useCreateBuilding } from "@/hooks/useBuildings";
@@ -35,17 +35,41 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    
-    if (name === "floor_count" || name === "base_price" || name === "max_coefficient") {
-      if (value === "" || /^\d*\.?\d*$/.test(value)) {
-        setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // max_coefficient (0–100)
+    if (name === "max_coefficient") {
+      if (value === "") {
+        setFormData((prev) => ({ ...prev, max_coefficient: "" }));
+        return;
+      }
+
+      if (/^\d*\.?\d*$/.test(value)) {
+        const num = Number(value);
+        if (num >= 0 && num <= 100) {
+          setFormData((prev) => ({ ...prev, max_coefficient: value }));
+        }
       }
       return;
     }
 
+    //floor_count (0–100)
+    if (name === "floor_count") {
+      if (value === "") {
+        setFormData((prev) => ({ ...prev, floor_count: "" }));
+        return;
+      }
+
+      if (/^\d+$/.test(value)) {
+        const num = Number(value);
+        if (num >= 0 && num <= 100) {
+          setFormData((prev) => ({ ...prev, floor_count: value }));
+        }
+      }
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -73,10 +97,10 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 
     try {
       await createMutation.mutateAsync(buildingData);
-      
+
       toast.success("Здание успешно добавлено");
       setOpen(false);
-      
+
       // Formani tozalash
       setFormData({
         name: "",
@@ -92,7 +116,7 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
       }
     } catch (error) {
       console.log(error);
-      
+
       toast.error("Ошибка при добавлении здания");
     }
   };
@@ -144,8 +168,8 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
             <label className="text-sm font-medium">Количество этажей *</label>
             <Input
               name="floor_count"
-              type="number"
-              min="1"
+              type="text"
+              inputMode="numeric"
               value={formData.floor_count}
               onChange={handleChange}
               placeholder="Например: 5"
@@ -168,14 +192,14 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
               disabled={createMutation.isPending}
             />
           </div>
-
           <div className="space-y-2">
-            <label className="text-sm font-medium">Максимальный коэффициент *</label>
+            <label className="text-sm font-medium">
+              Максимальный коэффициент *
+            </label>
             <Input
               name="max_coefficient"
-              type="number"
-              min="1"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               value={formData.max_coefficient}
               onChange={handleChange}
               placeholder="Например: 1.5"
@@ -208,8 +232,8 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
               >
                 Отмена
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={createMutation.isPending}
                 className="bg-[#282964] hover:bg-[#1f2050] text-white"
               >

@@ -1,66 +1,72 @@
+// components/shared/ui-demo/modals/apartments-modals/modal-delete-apartments.tsx
+"use client";
+
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useDeleteApartment } from "@/hooks/useApartments";
-import { useApartmentsStore } from "@/modules/apartments/apartments.store";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 
-
 interface ModalDeleteApartmentsProps {
-  buildingId: string | number;
+  apartmentId: string | number;
   onSuccess?: () => void;
 }
-export function ModalDeleteApartments({ buildingId, onSuccess}: ModalDeleteApartmentsProps) {
+
+export function ModalDeleteApartments({ 
+  apartmentId, 
+  onSuccess 
+}: ModalDeleteApartmentsProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-
- const deleteMutation = useDeleteApartment()
+  const deleteMutation = useDeleteApartment();
 
   const handleDelete = async () => {
-    try {
-      await deleteMutation.mutateAsync(Number(buildingId));
-      setOpen(false);
-      toast.success("Успешно удалено")
-      if (onSuccess) {
-        onSuccess();
-      }
-       if (window.location.pathname.includes('/apartments')) {
-        router.refresh();
-      } else {
-        router.push("/apartments");
-      }
-    } catch (e) {
-      console.error(e);
-      toast.error("Ошибка")
-    }
-  };
+  try {
+    await deleteMutation.mutateAsync(Number(apartmentId));
+    toast.success("Квартира успешно удалена");
+    setOpen(false);
+
+    router.push("/apartments");
+    router.refresh();
+
+  } catch (e) {
+    toast.error("Ошибка при удалении квартиры");
+  }
+};
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-[3px]">
-          <MdOutlineDeleteForever size={20} className="text-red-500" />
+        <button
+          className="flex items-center gap-2 rounded-[3px] bg-gradient-to-br from-indigo-100 to-white p-1"
+        >
+          <MdOutlineDeleteForever size={20} className="text-gray-500"/>
+         
         </button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogTitle className="text-lg text-center font-semibold">
-          Здание удалить?
+      <DialogContent className="sm:max-w-md">
+        <DialogTitle className="text-lg font-semibold text-center mb-4">
+          Удалить квартиру?
         </DialogTitle>
-        <div className="">
-          <div className="flex justify-center gap-2">
+        <div className="space-y-4">
+          <p className="text-center text-gray-600">
+            Вы уверены, что хотите удалить эту квартиру? Это действие нельзя отменить.
+          </p>
+          <div className="flex justify-center gap-3">
             <button
               onClick={() => setOpen(false)}
-              className="px-3 py-1 border rounded"
+              className="px-6 bg-gray-400 text-white  py-0.5 rounded-sm"
             >
-              нет
+              Отмена
             </button>
             <button
               onClick={handleDelete}
-              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-6 bg-red-400 text-white  py-0.5 rounded-sm"
             >
-              да
+              Удалить
             </button>
           </div>
         </div>

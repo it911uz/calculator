@@ -1,105 +1,249 @@
-"use client";
-
-import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { IoIosArrowBack } from "react-icons/io";
-import { SpinnerDemo } from "@/components/shared/ui-demo/spinner-demo";
-import { ImFileEmpty } from "react-icons/im";
-import { ModalUpdateBuildings } from "@/components/shared/ui-demo/modals/building-modals/modal-update-buildings";
-import { useApartmentsStore } from "@/modules/apartments/apartments.store";
+import { getApartmentById } from "@/action/apartments.action";
+import { PiBuildingApartmentFill } from "react-icons/pi";
+import { TfiRulerAlt2 } from "react-icons/tfi";
+import {
+  MdHomeWork,
+  MdOutlineHome,
+  MdOutlineMeetingRoom,
+} from "react-icons/md";
+import Link from "next/link";
+import { FaAngleLeft, FaKey } from "react-icons/fa";
+import { GrMoney } from "react-icons/gr";
 import { ModalDeleteApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-delete-apartments";
+import { ModalUpdateApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-update-apartments";
+import { LuChartNoAxesCombined } from "react-icons/lu";
+import { getCoefficientTypesByBuildingId } from "@/action/coefficients-type.action";
 
-export default function SingleApartmentsPage() {
-  const params = useParams();
-  const router = useRouter();
-  const { id } = params;
+export default async function SingleApartmentsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
-  const { currentApartments, fetchByIdApartments, loading} = useApartmentsStore();
+  const apartment = await getApartmentById(Number(id));
 
-  useEffect(() => {
-    if (id) fetchByIdApartments(id as string);
-   console.log(id);
-   
-  }, [id, fetchByIdApartments]);
-
- if (loading) {
+  if (!apartment) {
     return (
-      <div className="p-6">
-        <SpinnerDemo />
+      <div className="container mx-auto p-10 text-center">
+        <h1 className="text-xl font-bold text-gray-600">Квартира не найдена</h1>
+        <Link href="/apartments" className="text-indigo-600 underline">
+          Вернуться к списку
+        </Link>
       </div>
     );
   }
-  
-  if (!currentApartments) {
-    return (
-      <div className="flex items-center justify-center flex-col h-screen ">
-        <p className="text-center">Информация не найдена</p>
-        <ImFileEmpty size={30} />
-      </div>
-    );
-  }
- 
+
+  const allCoefficientTypes = await getCoefficientTypesByBuildingId(
+    Number(apartment.building_id),
+  );
+
+  const apartmentCoefficients = allCoefficientTypes
+    .flatMap((group) => group.bcts || [])
+    .filter((bct) => (apartment.bct_ids ?? []).includes(bct.id));
 
   return (
-    <div>
-      <button
-        onClick={() => router.back()}
-        className=" text-gray-200 hover:text-white bg-[#282964] px-3 py-1 rounded-[3px] mb-6"
-      >
-        <IoIosArrowBack />
-      </button>
+    <div className="container mx-auto space-y-4">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between items-start">
+        <Link href={"/apartments"}>
+          <button className="text-gray-200 hover:text-white bg-indigo-900 px-3 py-1 rounded-[3px]">
+            <FaAngleLeft />
+          </button>
+        </Link>
+      </div>
 
-      <div
-        className="p-5 rounded-[3px]py-4 px-2 rounded-[3px] shadow-[0_4px_16px_rgba(215,215,248,0.8)] bg-white
-                transform hover:-translate-y-1 transition-all duration-300"
-      >
-        <div className="flex items-start justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {currentApartments.number}
-          </h1>
-          <div className="px-3 py-1 bg-gradient-to-br from-indigo-100 to-indigo-50 text-sm font-bold rounded-sm">
-            ID: {currentApartments.id}
-          </div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 ">
+        <div className="col-span-2">
+          <div className="overflow-hidden rounded-sm bg-gradient-to-br from-indigo-200 via-indigo-100 to-white border border-indigo-100 shadow-[0_8px_32px_rgba(99,102,241,0.08)] mb-2">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-indigo-600">
+                  Основная информация
+                </h2>
+                <div className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-lg text-sm font-medium text-indigo-700">
+                  {apartment.room_count} комн.
+                </div>
+              </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="p-3 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-sm">
-            <div className="text-xs text-gray-500 mb-1">Этажи</div>
-            <div className="text-2xl font-bold text-gray-800">
-              {currentApartments.room_count}
+              <div className="grid grid-cols-1 md:grid-cols-2 ">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center">
+                      <span className="text-sm text-indigo-600">
+                        <MdOutlineHome />
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-500">
+                      Здание ID
+                    </span>
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {apartment.building_id}
+                  </div>
+
+                  <div className="group">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center">
+                        <span className="text-sm text-indigo-600">
+                          <FaKey />
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">
+                        Номер
+                      </span>
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {apartment.number}
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center">
+                        <span className="text-sm text-indigo-600">
+                          <PiBuildingApartmentFill />
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">
+                        Этаж
+                      </span>
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {apartment.floor}
+                      <span className="text-sm text-gray-500 ml-1">этаж</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="group">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center">
+                        <span className="text-sm text-indigo-600">
+                          <TfiRulerAlt2 />
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">
+                        Площадь
+                      </span>
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {apartment.area} м²
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center">
+                        <span className="text-sm text-indigo-600">
+                          <MdOutlineMeetingRoom />
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">
+                        Комнат
+                      </span>
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {apartment.room_count}
+                    </div>
+                  </div>
+                  <div className="group">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center">
+                        <span className="text-sm text-indigo-600">
+                          <GrMoney />
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-500">
+                        Цена
+                      </span>
+                    </div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {parseFloat(apartment.final_price).toLocaleString(
+                        "ru-RU",
+                      )}{" "}
+                      сум
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+          
 
-          <div className="p-3 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-sm">
-            <div className="text-xs text-gray-500 mb-1">Цена</div>
-            <div className="text-xl font-bold text-gray-800">
-              {currentApartments.final_price}
+          {apartmentCoefficients.length > 0 && (
+            <div className="overflow-hidden rounded-sm bg-gradient-to-br from-indigo-100 to-white border border-indigo-100 p-4 mt-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-md text-indigo-600 flex items-center gap-2 font-bold">
+                  <LuChartNoAxesCombined />
+                  Активные коэффициенты
+                </h2>
+                <span className="px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-sm font-medium text-indigo-700">
+                  {apartmentCoefficients.length} применены
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {apartmentCoefficients.map((bct) => (
+                  <div
+                    key={bct.id}
+                    className="p-4 bg-white border border-indigo-100 rounded-sm shadow-sm"
+                  >
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2 ">
+                        <div className="flex gap-3.5 items-center bg-gradient-to-r from-indigo-50 to-violet-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                          <span className="text-base font-semibold text-indigo-700">
+                            {bct.name}:
+                          </span>
+                          <span className="text-lg font-bold text-violet-700">
+                            {bct.rate}%
+                          </span>
+                        </div>
+
+                        <span className="text-[10px] bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 px-2 py-1 rounded-full border border-green-100 font-medium">
+                          Активен
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="text-xs text-gray-400">
-              {currentApartments.area}
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <div className="rounded-sm px-3 py-1.5 text-indigo-600 bg-gradient-to-br from-indigo-200 to-white flex items-end justify-center gap-2.5 shadow-sm">
+            <span className="text-2xl ">
+              <MdHomeWork size={30} />
+            </span>
+            <h1 className="text-md font-bold ">
+              Номер дома: {apartment.number}
+            </h1>
+          </div>
+
+          <div className="overflow-hidden text-indigo-600 rounded-sm bg-gradient-to-br from-indigo-100 to-white border border-indigo-100 p-4">
+            <h3 className="text-sm font-medium mb-3">Быстрые метрики</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="text-center p-2 bg-white border border-indigo-100 rounded-lg">
+                <div className="text-xs text-gray-500">Цена</div>
+                <div className="text-sm font-bold text-indigo-700">
+                  {apartment.final_price}
+                </div>
+              </div>
+              <div className="text-center p-2 bg-white border border-indigo-100 rounded-lg">
+                <div className="text-xs text-gray-500">М²/</div>
+                <div className="text-sm font-bold text-indigo-700">
+                  {apartment.area}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="p-3 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-sm">
-          <div className="text-xs text-gray-500 mb-1">
-            Максимальный коэффициент
-          </div>
-          <div className="text-3xl font-bold text-gray-900">
-            {currentApartments.floor}
+          <div className="flex items-center gap-3 py-3">
+            <ModalDeleteApartments apartmentId={Number(apartment.id)} />
+            <ModalUpdateApartments apartment={apartment} />
           </div>
         </div>
-
-        <div className="mt-4 flex items-center justify-center gap-2">
-          <div className="w-full h-1 bg-gradient-to-r from-indigo-900 via-gray-500 to-gray-200  rounded-full"></div>
-        </div>
-       <div className="flex justify-between py-4">
-        <span></span>
-         <div className="flex items-center gap-2.5">
-          <ModalUpdateBuildings/>
-          <ModalDeleteApartments buildingId={currentApartments.id}/>
-        </div>
-       </div>
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ export function LoginForm() {
       { username, password },
       {
         onSuccess: () => {
-         toast.success("Успешный вход ✅");
+         toast.success("Успешный вход");
       router.push("/complex");
       router.refresh();
         },

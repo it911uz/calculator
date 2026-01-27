@@ -7,12 +7,11 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
   const { pathname } = req.nextUrl;
 
-  // protected route + token yo‘q → login
   if (PROTECTED_ROUTES.some(p => pathname.startsWith(p)) && !token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // login page + token bor → complex
+  // login page + token bor → comple
   if (AUTH_ROUTES.includes(pathname) && token) {
     return NextResponse.redirect(new URL("/complex", req.url));
   }

@@ -9,7 +9,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.120:8000';
 
 
 
-// Auth headers olish
+// Auth 
 async function getAuthHeaders() {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
@@ -25,7 +25,7 @@ async function getAuthHeaders() {
   };
 }
 
-// GET all buildings
+// get
 export async function getBuildings(): Promise<IBuildings[]> {
   try {
     const headers = await getAuthHeaders();
@@ -120,32 +120,28 @@ export async function createBuilding(data: Partial<IBuildings>): Promise<IBuildi
 }
 
 // PUT update building
-export async function updateBuilding(id: string | number, data: Partial<IBuildings>): Promise<IBuildings> {
-  try {
-    const headers = await getAuthHeaders();
-    
-    const res = await fetch(`${BASE_URL}/buildings/${id}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(data),
-    });
-    
-    if (!res.ok) {
-      if (res.status === 401) redirect("/login");
-      throw new Error(`Failed to update building: ${res.status}`);
-    }
-    
-    const result = await res.json();
-    
-    revalidatePath('/buildings');
-    revalidatePath(`/buildings/${id}`);
-    revalidatePath(`/complex/${data.complex_id}`);
-    return result;
-  } catch (error) {
-    console.error('Error updating building:', error);
-    throw error;
+export async function updateBuilding(
+  id: string | number,
+  data: Partial<IBuildings>
+) {
+  // Auth headers
+  const headers = await getAuthHeaders(); 
+  headers["Content-Type"] = "application/json";
+
+  const res = await fetch(`${BASE_URL}/buildings/${id}/`, { 
+    method: "PATCH",
+    headers,
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to update building: ${text}`);
   }
+
+  return res.json();
 }
+
 
 // DELETE building
 export async function deleteBuilding(id: number): Promise<{ success: boolean }> {
@@ -170,24 +166,3 @@ export async function deleteBuilding(id: number): Promise<{ success: boolean }> 
   }
 }
 
-// Search buildings
-export async function searchBuildings(query: string): Promise<IBuildings[]> {
-  try {
-    const headers = await getAuthHeaders();
-    
-    const res = await fetch(`${BASE_URL}/buildings/search?q=${encodeURIComponent(query)}`, {
-      headers,
-      cache: 'no-store',
-    });
-    
-    if (!res.ok) {
-      if (res.status === 401) redirect("/login");
-      throw new Error(`Failed to search buildings: ${res.status}`);
-    }
-    
-    return await res.json();
-  } catch (error) {
-    console.error('Error searching buildings:', error);
-    return [];
-  }
-}

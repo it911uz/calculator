@@ -1,4 +1,3 @@
-// actions/apartments.action.ts
 "use server";
 
 import { FastApiErrorResponse, IApartment } from "@/types";
@@ -8,7 +7,7 @@ import { redirect } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.120:8000";
 
-// Auth headers olish
+// Auth 
 async function getAuthHeaders() {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;
@@ -24,7 +23,7 @@ async function getAuthHeaders() {
   };
 }
 
-// GET all apartments
+// GET 
 export async function getApartments(): Promise<IApartment[]> {
   try {
     const headers = await getAuthHeaders();
@@ -46,13 +45,9 @@ export async function getApartments(): Promise<IApartment[]> {
   }
 }
 
-// GET apartment by ID
-export async function getApartmentById(
-  id: string | number,
-): Promise<IApartment | null> {
+export async function getApartmentById(id: number): Promise<IApartment | null> {
   try {
     const headers = await getAuthHeaders();
-
     const res = await fetch(`${BASE_URL}/apartments/${id}`, {
       headers,
       cache: "no-store",
@@ -60,7 +55,6 @@ export async function getApartmentById(
 
     if (!res.ok) {
       if (res.status === 404) return null;
-      if (res.status === 401) redirect("/login");
       throw new Error(`Failed to fetch apartment: ${res.status}`);
     }
 
@@ -71,7 +65,7 @@ export async function getApartmentById(
   }
 }
 
-// GET apartments by building ID
+// get byid
 export async function getApartmentsByBuildingId(
   buildingId: string | number,
 ): Promise<IApartment[]> {
@@ -98,7 +92,7 @@ export async function getApartmentsByBuildingId(
   }
 }
 
-// POST create apartment
+// POST 
 export async function createApartment(
   data: Partial<IApartment>,
 ): Promise<IApartment> {
@@ -153,7 +147,7 @@ export async function createApartment(
     }
 
     const result = await res.json();
-    console.log("✅ Успешный ответ:", result);
+    console.log("Успешный ответ:", result);
 
     revalidatePath("/apartments");
     revalidatePath(`/buildings/${data.building_id}`);
@@ -161,46 +155,48 @@ export async function createApartment(
 
     return result;
   } catch (error) {
-    console.error("❌ Общая ошибка создания квартиры:", error);
+    console.error("Общая ошибка создания квартиры:", error);
     throw error;
   }
 }
 
-// PUT update apartment
-export async function updateApartment(
-  id: number,
-  data: Partial<IApartment>,
-): Promise<IApartment> {
+export async function updateApartment(id: number, data: Partial<IApartment>) {
   try {
     const headers = await getAuthHeaders();
-
-    const res = await fetch(`${BASE_URL}/apartments/${id}`, {
-      method: "PUT",
-      headers,
+    const res = await fetch(`${BASE_URL}/apartments/${id}/`, {
+      method: "PATCH", 
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(data),
     });
 
     if (!res.ok) {
-      if (res.status === 401) redirect("/login");
-      throw new Error(`Failed to update apartment: ${res.status}`);
+      const errorData = await res.json().catch(() => ({}));
+      console.error("Server validation error:", errorData);
+      
+      throw new Error(JSON.stringify(errorData.detail || errorData || "Update failed"));
     }
 
-    const result = await res.json();
+    return await res.json();
+  } catch (error: unknown) {
+    let message = "Noma'lum xatolik yuz berdi";
 
-    revalidatePath("/apartments");
-    revalidatePath(`/apartments/${id}`);
-    if (data.building_id) {
-      revalidatePath(`/buildings/${data.building_id}`);
+    if (error instanceof Error) {
+      message = error.message;
+    } else if (typeof error === "string") {
+      message = error;
     }
 
-    return result;
-  } catch (error) {
-    console.error("Error updating apartment:", error);
-    throw error;
+    console.error("Action error:", message);
+    throw new Error(message);
+  
   }
 }
 
-// DELETE apartment
+
+// DELETE 
 export async function deleteApartment(
   id: number,
 ): Promise<{ success: boolean }> {
