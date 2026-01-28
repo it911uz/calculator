@@ -16,7 +16,7 @@ export function useCreateApartment() {
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create apartment");
+      toast.error(error.message || "Не удалось создать квартиру");
     },
   });
 }

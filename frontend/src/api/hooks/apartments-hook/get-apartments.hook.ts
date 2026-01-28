@@ -8,6 +8,5 @@ export function useApartments() {
   return useQuery({
     queryKey: QueryKeys.apartments?.lists() || ["apartments", "list"],
     queryFn: getApartments,
-    staleTime: 5 * 60 * 1000, 
   });
 }

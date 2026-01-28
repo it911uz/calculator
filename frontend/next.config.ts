@@ -17,7 +17,6 @@ const nextConfig: NextConfig = {
     qualities: [75, 100],
     domains: ['localhost'],
   },
-  // reactCompiler: true,
   experimental: {
     inlineCss: true,
     dynamicOnHover: true,

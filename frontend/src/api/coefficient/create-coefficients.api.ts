@@ -1,24 +1,24 @@
-"use server";
-
 import { ENV } from "@/configs/env.config";
-import { getAuthHeaders } from "@/lib/utils";
-import { CreateCoefficientPayload, ICoefficient } from "@/types";
-import { revalidatePath } from "next/cache";
+import { getAuthData } from "@/lib/auth.util";
+import type { CreateCoefficientPayload, ICoefficient } from "@/types";
 
 export async function createCoefficient(data: CreateCoefficientPayload): Promise<ICoefficient> {
-  try {
-    const headers = await getAuthHeaders();
-    const res = await fetch(`${ENV.BASE_URL}/coefficients/add`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error("Failed to create coefficient");
-    const result = await res.json();
-    revalidatePath(`/buildings/${data.building_id}`);
-    return result;
-  } catch (error) {
-    console.error("Error creating coefficient:", error);
-    throw error;
+  const authData = await getAuthData();
+  
+  const res: Response = await fetch(`${ENV.BASE_URL}/coefficients/add/`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${authData.access}`, 
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Koeffitsient yaratishda xatolik: ${res.status}`);
   }
+
+  return (await res.json()) as ICoefficient;
 }

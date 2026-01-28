@@ -19,7 +19,7 @@ export function useCreateBuilding() {
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create building");
+      toast.error(error.message || "Не удалось построить здание");
     },
   });
 }

@@ -1,20 +1,28 @@
-"use server";
-
 import { ENV } from "@/configs/env.config";
-import { getAuthHeaders } from "@/lib/utils";
-import { ICoefficient } from "@/types";
+import { getAuthData } from "@/lib/auth.util";
+import type { ICoefficient } from "@/types";
 
 export async function getCoefficientById(id: number): Promise<ICoefficient | null> {
   try {
-    const headers = await getAuthHeaders();
-    const res = await fetch(`${ENV.BASE_URL}/coefficients/${id}`, { headers, cache: "no-store" });
+    const authData = await getAuthData();
+    const res: Response = await fetch(`${ENV.BASE_URL}/coefficients/${id}/`, { 
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${authData.access}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      cache: "no-store" 
+    });
+
     if (!res.ok) {
-      if (res.status === 404) return null;
-      throw new Error("Failed to fetch coefficient");
+      console.error(`Koeffitsient yuklashda xatolik: ${res.status}`);
+      return null;
     }
-    return await res.json();
+
+    return (await res.json()) as ICoefficient;
   } catch (error) {
-    console.error("Error fetching coefficient:", error);
+    console.error("Fetch coefficient error:", error);
     return null;
   }
 }

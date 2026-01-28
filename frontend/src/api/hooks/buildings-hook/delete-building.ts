@@ -15,7 +15,7 @@ export function useDeleteBuilding() {
       queryClient.removeQueries({ queryKey: QueryKeys.buildings.detail(id) });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete building");
+      toast.error(error.message || "Не удалось удалить здание");
     },
   });
 }

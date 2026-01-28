@@ -3,6 +3,7 @@
 import { deleteComplex } from "@/api/complex/delete-complex.api";
 import { IComplex, QueryKeys } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function useDeleteComplex() {
   const queryClient = useQueryClient();
@@ -35,7 +36,7 @@ export function useDeleteComplex() {
           context.previousComplexes
         );
       }
-      console.error(error.message || "Ошибка");
+      toast.error(error.message || "Ошибка");
     },
   });
 }

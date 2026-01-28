@@ -1,26 +1,27 @@
-"use server";
-
 import { ENV } from "@/configs/env.config";
-import { getAuthHeaders } from "@/lib/utils";
+import { getAuthData } from "@/lib/auth.util";
 import { IBuildings } from "@/types";
 
 export async function updateBuilding(
   id: string | number,
   data: Partial<IBuildings>
-) {
-  const headers = await getAuthHeaders(); 
-  headers["Content-Type"] = "application/json";
-
-  const res = await fetch(`${ENV.BASE_URL}/buildings/${id}/`, { 
+): Promise<IBuildings> {
+  const authData = await getAuthData();
+  
+  const res: Response = await fetch(`${ENV.BASE_URL}/buildings/${id}/`, {
     method: "PATCH",
-    headers,
+    headers: {
+      "Authorization": `Bearer ${authData.access}`,
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
     body: JSON.stringify(data),
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Failed to update building: ${text}`);
+    const errorText = await res.text().catch(() => "Unknown error");
+    throw new Error(`Bino yangilashda xato: ${res.status} - ${errorText}`);
   }
 
-  return res.json();
+  return (await res.json()) as IBuildings;
 }

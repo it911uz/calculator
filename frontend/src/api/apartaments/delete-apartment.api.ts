@@ -1,30 +1,19 @@
-"use server"
-
 import { ENV } from "@/configs/env.config";
-import { getAuthHeaders } from "@/lib/utils";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { getAuthData } from "@/lib/auth.util";
 
-export async function deleteApartment(
-  id: number,
-): Promise<{ success: boolean }> {
-  try {
-    const headers = await getAuthHeaders();
+export async function deleteApartment(id: number): Promise<void> {
+  const authData = await getAuthData();
+  
+  const res: Response = await fetch(`${ENV.BASE_URL}/apartments/${id}/`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${authData.access}`,
+      "Content-Type": "application/json",
+    },
+  });
 
-    const res = await fetch(`${ENV.BASE_URL}/apartments/${id}`, {
-      method: "DELETE",
-      headers,
-    });
-
-    if (!res.ok) {
-      if (res.status === 401) redirect("/login");
-      throw new Error(`Failed to delete apartment: ${res.status}`);
-    }
-
-    revalidatePath("/apartments");
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting apartment:", error);
-    throw error;
+  if (!res.ok) {
+    const errorDetail = await res.text().catch(() => "deleteApartmentda xatolik");
+    throw new Error(`O'chirishda xatolik: ${res.status} - ${errorDetail}`);
   }
 }

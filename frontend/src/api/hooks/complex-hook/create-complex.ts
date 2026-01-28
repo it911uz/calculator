@@ -3,6 +3,7 @@
 import { createComplex } from "@/api/complex/create-complex.api";
 import { QueryKeys } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function useCreateComplex() {
   const queryClient = useQueryClient();
@@ -16,7 +17,7 @@ export function useCreateComplex() {
       );
     },
     onError: (error: Error) => {
-      console.error(error.message || "Failed to create complex");
+      toast.error(error.message || "Не удалось создать комплекс");
     },
   });
 }
