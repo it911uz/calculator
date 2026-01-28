@@ -1,5 +1,6 @@
 "use client";
 
+import { useDeleteCoefficientType } from "@/api/hooks/coefficient-type-hook/delete-coefficient-type";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,6 @@ import {
 import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
-import { useDeleteCoefficientType } from "@/api/hooks/coefficient-type-hook/useCoefficientTypes";
 
 interface ModalDeleteCoefficientTypeProps {
   coefficientTypeId: number;

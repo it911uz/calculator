@@ -7,11 +7,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useUpdateApartment } from "@/api/hooks/apartments-hook/useApartments";
 import { ApartmentFormData, IApartment } from "@/types";
 import { useState } from "react";
 import { toast } from "sonner";
 import { MdEdit } from "react-icons/md";
+import { useUpdateApartment } from "@/api/hooks/apartments-hook/update-apartment.hook";
 interface ApiError {
   message: string;
   detail?: string;

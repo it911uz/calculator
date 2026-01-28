@@ -2,8 +2,8 @@ import { IoIosArrowBack } from "react-icons/io";
 import { ImFileEmpty } from "react-icons/im";
 import { TabsDemoBuildings } from "@/components/shared/ui-demo/tabs/tab-buildings";
 import Link from "next/link";
-import { getBuildingById } from "@/api/actions/buildings-action/buildings.action";
-import { getComplexes } from "@/api/actions/complex-action/complex.action";
+import { getBuildingById } from "@/api/buildings/get-building.api";
+import { getComplexes } from "@/api/complex/get-complexes.api";
 
 interface Props {
   params: Promise<{ id: string }>;

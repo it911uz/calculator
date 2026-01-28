@@ -1,8 +1,7 @@
-// components/shared/ui-demo/modals/apartments-modals/modal-delete-apartments.tsx
 "use client";
 
+import { useDeleteApartment } from "@/api/hooks/apartments-hook/delete-aparment.hook";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useDeleteApartment } from "@/api/hooks/apartments-hook/useApartments";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

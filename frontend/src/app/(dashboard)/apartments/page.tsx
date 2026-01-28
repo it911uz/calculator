@@ -1,4 +1,4 @@
-import { getApartments } from '@/api/actions/apartments-action/apartments.action'
+import { getApartments } from '@/api/apartaments/get-apartaments.api'
 import TableApartments from '@/components/shared/ui-demo/table-apartments'
 
 export default async function ApartmentsPage() {

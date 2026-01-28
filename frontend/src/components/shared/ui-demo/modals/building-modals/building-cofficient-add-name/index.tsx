@@ -1,12 +1,12 @@
 "use client";
 
+import { useCreateCoefficient } from "@/api/hooks/coefficient-hook/create-coefficient";
 import {
   Dialog,
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useCreateCoefficient } from "@/api/hooks/coefficient-hook/useCoefficient";
 import { useState } from "react";
 import { toast } from "sonner";
 
