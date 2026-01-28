@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { CiLogout } from "react-icons/ci";
 
 import Link from "next/link";
-import { logoutAction } from "@/action/auth.action";
+import { logoutAction } from "@/api/actions/auth-action/auth.action";
 interface IasideProps {
   isOpen: boolean;
 }

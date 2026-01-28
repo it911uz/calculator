@@ -1,10 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { loginAction } from "@/action/auth.action";
+import { loginAction } from "@/api/actions/auth-action/auth.action";
+import { LoginPayload } from "@/types";
 
-interface LoginPayload {
-  username: string;
-  password: string;
-}
+
 
 export function useLogin() {
   return useMutation<void, Error, LoginPayload>({

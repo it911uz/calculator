@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useCreateCoefficient } from "@/hooks/useCoefficient";
+import { useCreateCoefficient } from "@/api/hooks/coefficient-hook/useCoefficient";
 import { useState } from "react";
 import { toast } from "sonner";
 

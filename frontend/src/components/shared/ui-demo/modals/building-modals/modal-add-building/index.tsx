@@ -12,8 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { FC, useState } from "react";
 import { toast } from "sonner";
-import { useComplexes } from "@/hooks/useComplex";
-import { useCreateBuilding } from "@/hooks/useBuildings";
+import { useComplexes } from "@/api/hooks/complex-hook/useComplex";
+import { useCreateBuilding } from "@/api/hooks/buildings-hook/useBuildings";
 
 type PriceUnit = "UZS" | "USD";
 type ModalProps = {

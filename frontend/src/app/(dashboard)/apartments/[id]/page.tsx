@@ -1,4 +1,4 @@
-import { getApartmentById } from "@/action/apartments.action";
+import { getApartmentById } from "@/api/actions/apartments-action/apartments.action";
 import { PiBuildingApartmentFill } from "react-icons/pi";
 import { TfiRulerAlt2 } from "react-icons/tfi";
 import {
@@ -12,7 +12,7 @@ import { GrMoney } from "react-icons/gr";
 import { ModalDeleteApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-delete-apartments";
 import { ModalUpdateApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-update-apartments";
 import { LuChartNoAxesCombined } from "react-icons/lu";
-import { getCoefficientTypesByBuildingId } from "@/action/coefficients-type.action";
+import { getCoefficientTypesByBuildingId } from "@/api/actions/coefficients-type-action/coefficients-type.action";
 
 export default async function SingleApartmentsPage({
   params,

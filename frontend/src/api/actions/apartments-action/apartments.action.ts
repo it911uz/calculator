@@ -1,34 +1,15 @@
 "use server";
-
 import { FastApiErrorResponse, IApartment } from "@/types";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.120:8000";
-
-// Auth 
-async function getAuthHeaders() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-
-  if (!token) {
-    redirect("/login");
-  }
-
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-}
-
+import { ENV } from "@/configs/env.config";
+import { getAuthHeaders } from "@/lib/utils";
 // GET 
 export async function getApartments(): Promise<IApartment[]> {
   try {
     const headers = await getAuthHeaders();
 
-    const res = await fetch(`${BASE_URL}/apartments`, {
+    const res = await fetch(`${ENV.BASE_URL}/apartments`, {
       headers,
       cache: "no-store",
     });
@@ -48,7 +29,7 @@ export async function getApartments(): Promise<IApartment[]> {
 export async function getApartmentById(id: number): Promise<IApartment | null> {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch(`${BASE_URL}/apartments/${id}`, {
+    const res = await fetch(`${ENV.BASE_URL}/apartments/${id}`, {
       headers,
       cache: "no-store",
     });
@@ -73,7 +54,7 @@ export async function getApartmentsByBuildingId(
     const headers = await getAuthHeaders();
 
     const res = await fetch(
-      `${BASE_URL}/apartments?building_id=${buildingId}`,
+      `${ENV.BASE_URL}/apartments?building_id=${buildingId}`,
       {
         headers,
         cache: "no-store",
@@ -98,7 +79,7 @@ export async function createApartment(
 ): Promise<IApartment> {
   try {
     const headers = await getAuthHeaders();
-    const apiUrl = `${BASE_URL}/apartments/add`;
+    const apiUrl = `${ENV.BASE_URL}/apartments/add`;
 
     console.log(" Отправка запроса на:", apiUrl);
     console.log(" Отправляемые данные:", JSON.stringify(data, null, 2));
@@ -163,7 +144,7 @@ export async function createApartment(
 export async function updateApartment(id: number, data: Partial<IApartment>) {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch(`${BASE_URL}/apartments/${id}/`, {
+    const res = await fetch(`${ENV.BASE_URL}/apartments/${id}/`, {
       method: "PATCH", 
       headers: {
         ...headers,
@@ -203,7 +184,7 @@ export async function deleteApartment(
   try {
     const headers = await getAuthHeaders();
 
-    const res = await fetch(`${BASE_URL}/apartments/${id}`, {
+    const res = await fetch(`${ENV.BASE_URL}/apartments/${id}`, {
       method: "DELETE",
       headers,
     });

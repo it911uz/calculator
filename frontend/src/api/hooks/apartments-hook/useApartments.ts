@@ -8,7 +8,7 @@ import {
   updateApartment,
   deleteApartment,
   getApartmentsByBuildingId,
-} from "@/action/apartments.action";
+} from "@/api/actions/apartments-action/apartments.action";
 import { IApartment, QueryKeys } from "@/types";
 import { toast } from "sonner";
 

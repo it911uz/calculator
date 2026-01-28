@@ -13,7 +13,7 @@ import { SpinnerDemo } from "../spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { ModalAddedComplex } from "../modals/complex-modal/modal-add-complex";
-import { useComplexes } from "@/hooks/useComplex";
+import { useComplexes } from "@/api/hooks/complex-hook/useComplex";
 import { IComplex } from "@/types";
 import { ModalDeleteComplex } from "../modals/complex-modal/modal-delete-complex";
 import Link from "next/link";

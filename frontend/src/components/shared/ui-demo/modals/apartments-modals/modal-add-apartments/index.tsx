@@ -12,9 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { FC, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useCreateApartment } from "@/hooks/useApartments";
-import { useBuildings } from "@/hooks/useBuildings";
-import { getCoefficientTypesByBuildingId } from "@/action/coefficients-type.action";
+import { useCreateApartment } from "@/api/hooks/apartments-hook/useApartments";
+import { useBuildings } from "@/api/hooks/buildings-hook/useBuildings";
+import { getCoefficientTypesByBuildingId } from "@/api/actions/coefficients-type-action/coefficients-type.action";
 import { ICoefficientTypeGroup } from "@/types";
 
 type ModalProps = {

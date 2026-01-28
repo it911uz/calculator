@@ -7,7 +7,7 @@ import {
   createCoefficient,
   updateCoefficient,
   deleteCoefficient,
-} from "@/action/coefficients.action";
+} from "@/api/actions/coefficients-action/coefficients.action";
 import { CreateCoefficientPayload, QueryKeys } from "@/types";
 import { ICoefficient } from "@/types";
 // GET all coefficients

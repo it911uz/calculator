@@ -2,7 +2,7 @@
 "use client";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useDeleteApartment } from "@/hooks/useApartments";
+import { useDeleteApartment } from "@/api/hooks/apartments-hook/useApartments";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

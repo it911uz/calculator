@@ -1,15 +1,13 @@
 "use server";
 
+import { ENV } from "@/configs/env.config";
+import { LoginResponse } from "@/types";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-interface LoginResponse {
-  access_token: string;
-  refresh_token?: string;
-}
 
-export async function loginAction(formData: FormData): Promise<boolean> {
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL ?? "http://192.168.1.120:8000";
+
+export async function loginAction(formData: FormData): Promise<void> {
 
   const username = String(formData.get("username") ?? "").trim();
   const password = String(formData.get("password") ?? "").trim();
@@ -24,7 +22,7 @@ export async function loginAction(formData: FormData): Promise<boolean> {
     password,
   });
 
-  const res = await fetch(`${API_URL}/auth/token`, {
+  const res = await fetch(`${ENV.BASE_URL}/auth/token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -35,15 +33,11 @@ export async function loginAction(formData: FormData): Promise<boolean> {
   });
 
   if (!res.ok) {
-    const err = (await res.json().catch(() => null)) as {
-      detail?: string;
-      error?: string;
-    } | null;
-
-    throw new Error(err?.detail ?? err?.error ?? "Ошибка авторизации");
+    const err = await res.json().catch(() => ({} as { detail?: string }));
+    throw new Error(err.detail ?? "Ошибка авторизации");
   }
 
-  const data = (await res.json()) as LoginResponse;
+  const data: LoginResponse = await res.json();
 
   if (!data.access_token) {
     throw new Error("Токен не получен");
@@ -55,8 +49,8 @@ export async function loginAction(formData: FormData): Promise<boolean> {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    path: "/",
     maxAge: 60 * 60 * 24,
+    path: "/",
   });
 
   if (data.refresh_token) {
@@ -64,10 +58,16 @@ export async function loginAction(formData: FormData): Promise<boolean> {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      path: "/",
       maxAge: 60 * 60 * 24 * 7,
+      path: "/",
     });
   }
 
-  return true; 
+}
+
+export async function logoutAction(): Promise<void> {
+const cookieStore = await cookies();
+  cookieStore.delete("access_token");
+  cookieStore.delete("refresh_token");
+  redirect("/login");
 }

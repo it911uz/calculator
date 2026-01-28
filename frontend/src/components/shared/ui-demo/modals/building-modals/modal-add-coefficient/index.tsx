@@ -1,13 +1,13 @@
 "use client";
 import { FC } from "react";
-import { useCoefficientTypesByBuildingId } from "@/hooks/useCoefficientTypes";
+import { useCoefficientTypesByBuildingId } from "@/api/hooks/coefficient-type-hook/useCoefficientTypes";
 import { ModalAddedCoefficientName } from "../building-cofficient-add-name";
 import { ModalAddedCoefficientType } from "../modal-coefficient-type-add";
 import { ModalEditCoefficientType } from "../../coefficient-type-modals/coefficient-type-update";
 import { ModalDeleteCoefficientType } from "../../coefficient-type-modals/coefficient-type-delete";
 import { ImFilesEmpty } from "react-icons/im";
 import { MdOutlineDeleteForever } from "react-icons/md";
-import { useDeleteCoefficient } from "@/hooks/useCoefficient";
+import { useDeleteCoefficient } from "@/api/hooks/coefficient-hook/useCoefficient";
 
 interface ModalAddedCoefficientProps {
   buildingId: number;

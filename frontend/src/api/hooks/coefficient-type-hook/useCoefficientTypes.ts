@@ -6,7 +6,7 @@ import {
   createCoefficientType,
   updateCoefficientType,
   deleteCoefficientType,
-} from "@/action/coefficients-type.action";
+} from "@/api/actions/coefficients-type-action/coefficients-type.action";
 import { CreateCoefficientTypePayload, ICoefficientTypeGroup, QueryKeys } from "@/types";
 import { ICoefficientType } from "@/types";
 import { toast } from 'sonner';
