@@ -4,7 +4,7 @@ import { ModalDeleteComplex } from "@/components/shared/ui-demo/modals/complex-m
 import { LuText } from "react-icons/lu";
 import Link from "next/link";
 import ModalUpdateComplex from "@/components/shared/ui-demo/modals/complex-modal/modal-update-complex";
-import { getComplexById } from "@/action/complex.action"; 
+import { getComplexById } from "@/api/actions/complex-action/complex.action"; 
 
 interface Props {
   params: Promise<{ id: string }>;

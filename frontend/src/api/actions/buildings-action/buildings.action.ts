@@ -2,35 +2,16 @@
 
 import { IBuildings } from "@/types";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.120:8000';
-
-
-
-// Auth 
-async function getAuthHeaders() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-  
-  if (!token) {
-    redirect("/login");
-  }
-
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-}
+import { ENV } from "@/configs/env.config";
+import { getAuthHeaders } from "@/lib/utils";
 
 // get
 export async function getBuildings(): Promise<IBuildings[]> {
   try {
     const headers = await getAuthHeaders();
     
-    const res = await fetch(`${BASE_URL}/buildings`, {
+    const res = await fetch(`${ENV.BASE_URL}/buildings`, {
       headers,
       cache: 'no-store',
     });
@@ -52,7 +33,7 @@ export async function getBuildingById(id: string | number): Promise<IBuildings |
   try {
     const headers = await getAuthHeaders();
     
-    const res = await fetch(`${BASE_URL}/buildings/${id}`, {
+    const res = await fetch(`${ENV.BASE_URL}/buildings/${id}`, {
       headers,
       cache: 'no-store',
     });
@@ -75,7 +56,7 @@ export async function getBuildingsByComplexId(complexId: string | number): Promi
   try {
     const headers = await getAuthHeaders();
     
-    const res = await fetch(`${BASE_URL}/buildings?complex_id=${complexId}`, {
+    const res = await fetch(`${ENV.BASE_URL}/buildings?complex_id=${complexId}`, {
       headers,
       cache: 'no-store',
     });
@@ -97,7 +78,7 @@ export async function createBuilding(data: Partial<IBuildings>): Promise<IBuildi
   try {
     const headers = await getAuthHeaders();
     
-    const res = await fetch(`${BASE_URL}/buildings/add`, {
+    const res = await fetch(`${ENV.BASE_URL}/buildings/add`, {
       method: 'POST',
       headers,
       body: JSON.stringify(data),
@@ -128,7 +109,7 @@ export async function updateBuilding(
   const headers = await getAuthHeaders(); 
   headers["Content-Type"] = "application/json";
 
-  const res = await fetch(`${BASE_URL}/buildings/${id}/`, { 
+  const res = await fetch(`${ENV.BASE_URL}/buildings/${id}/`, { 
     method: "PATCH",
     headers,
     body: JSON.stringify(data),
@@ -148,7 +129,7 @@ export async function deleteBuilding(id: number): Promise<{ success: boolean }> 
   try {
     const headers = await getAuthHeaders();
     
-    const res = await fetch(`${BASE_URL}/buildings/${id}`, {
+    const res = await fetch(`${ENV.BASE_URL}/buildings/${id}`, {
       method: 'DELETE',
       headers,
     });

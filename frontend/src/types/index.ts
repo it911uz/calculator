@@ -73,11 +73,7 @@ export type LoginFormData = {
   client_id?: string;
   client_secret?: string;
 };
-export type LoginResponse = {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-};
+
 export interface LottieAnimationProps {
   animationData: null | object;
   className?: string;
@@ -109,6 +105,18 @@ export interface FastApiValidationErrorItem {
 
 export interface FastApiErrorResponse {
   detail: string | FastApiValidationErrorItem[];
+}
+
+export interface LoginResponse {
+  access_token: string;
+  refresh_token?: string;
+  token_type: string;
+  expires_in?: number;
+}
+
+export interface LoginPayload {
+  username: string;
+  password: string;
 }
 // Query keys
 export const QueryKeys = {

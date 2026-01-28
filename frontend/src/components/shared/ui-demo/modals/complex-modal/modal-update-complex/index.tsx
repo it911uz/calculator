@@ -6,7 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useUpdateComplex } from "@/hooks/useComplex";
+import { useUpdateComplex } from "@/api/hooks/complex-hook/useComplex";
 import { useState } from "react";
 import { IComplex } from "@/types";
 import { useRouter } from "next/navigation";

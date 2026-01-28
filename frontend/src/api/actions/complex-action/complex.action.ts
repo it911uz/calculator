@@ -1,16 +1,15 @@
 "use server";
 
+import { ENV } from "@/configs/env.config";
+import { getAuthHeaders } from "@/lib/utils";
 import { IComplex } from "@/types";
 import { redirect } from "next/navigation";
-import { getAuthHeaders } from "./coefficients-type.action";
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.120:8000";
-// Umumiy fetch funksiyasi
 async function apiFetch<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
   const headers = await getAuthHeaders();
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const response = await fetch(`${ENV.BASE_URL}${endpoint}`, {
     ...options,
     headers: {
       ...headers,
@@ -54,7 +53,7 @@ export async function updateComplex(
 ): Promise<IComplex> {
   const headers = await getAuthHeaders();
 
-  const res = await fetch(`${BASE_URL}/complexes/${id}/`, {
+  const res = await fetch(`${ENV.BASE_URL}/complexes/${id}/`, {
     method: "PATCH",
     headers: {
       ...headers,
@@ -73,7 +72,7 @@ export async function updateComplex(
 //delete
 export async function deleteComplex(id: number) {
   const headers = await getAuthHeaders();
-  const res = await fetch(`${BASE_URL}/complexes/${id}/`, {
+  const res = await fetch(`${ENV.BASE_URL}/complexes/${id}/`, {
     method: "DELETE",
     headers,
   });

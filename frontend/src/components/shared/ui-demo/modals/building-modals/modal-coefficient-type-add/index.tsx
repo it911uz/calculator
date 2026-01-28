@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useCreateCoefficientType } from "@/hooks/useCoefficientTypes";
+import { useCreateCoefficientType } from "@/api/hooks/coefficient-type-hook/useCoefficientTypes";
 interface ModalAddedCoefficientTypeProps {
   buildingId: number;
   coefficientId: number; 

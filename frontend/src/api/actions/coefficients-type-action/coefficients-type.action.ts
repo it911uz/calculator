@@ -1,27 +1,15 @@
 "use server";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ICoefficientType, ICoefficientTypeGroup, UpdateCoefficientTypePayload } from "@/types";
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://192.168.1.120:8000";
-// auth
-export async function getAuthHeaders() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
+import { ENV } from "@/configs/env.config";
+import { getAuthHeaders } from "@/lib/utils";
 
-  if (!token) redirect("/login");
-
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-}
 // getAll
 export async function getCoefficientTypes(): Promise<ICoefficientType[]> {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch(`${BASE_URL}/coefficient-types`, {
+    const res = await fetch(`${ENV.BASE_URL}/coefficient-types`, {
       headers,
       cache: "no-store",
     });
@@ -42,7 +30,7 @@ export async function getCoefficientTypesByBuildingId(
   try {
     const headers = await getAuthHeaders();
     const res = await fetch(
-      `${BASE_URL}/coefficients-common/bcs-with-bcts-by-building-id/${buildingId}`,
+      `${ENV.BASE_URL}/coefficients-common/bcs-with-bcts-by-building-id/${buildingId}`,
       {
         headers,
         cache: "no-store",
@@ -67,7 +55,7 @@ export async function createCoefficientType(
 ): Promise<ICoefficientType> {
   try {
     const headers = await getAuthHeaders();
-    const res = await fetch(`${BASE_URL}/coefficient-types/add`, {
+    const res = await fetch(`${ENV.BASE_URL}/coefficient-types/add`, {
       method: "POST",
       headers,
       body: JSON.stringify(data),
@@ -97,7 +85,7 @@ export async function updateCoefficientType(
       coefficient_id: data.coefficient_id
     };
     const res = await fetch(
-      `${BASE_URL}/coefficient-types/${coefficientTypeId}`, 
+      `${ENV.BASE_URL}/coefficient-types/${coefficientTypeId}`, 
       {
         method: "PATCH",
         headers,
@@ -125,7 +113,7 @@ export async function deleteCoefficientType(
   try {
     const headers = await getAuthHeaders();
 
-    const res = await fetch(`${BASE_URL}/coefficient-types/${id}`, {
+    const res = await fetch(`${ENV.BASE_URL}/coefficient-types/${id}`, {
       method: "DELETE",
       headers,
     });

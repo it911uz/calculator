@@ -14,7 +14,7 @@ import { ImFileEmpty } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { ModalAddedApartments } from "../modals/apartments-modals/modal-add-apartments";
 import { IApartment } from "@/types";
-import { useApartments } from "@/hooks/useApartments";
+import { useApartments } from "@/api/hooks/apartments-hook/useApartments";
 import { ModalDeleteApartments } from "../modals/apartments-modals/modal-delete-apartments";
 const ITEMS_PER_PAGE = 10;
 const MAX_VISIBLE_PAGES = 5;

@@ -9,7 +9,7 @@ import {
   updateBuilding,
   deleteBuilding,
   getBuildingsByComplexId,
-} from "@/action/buildings.action";
+} from "@/api/actions/buildings-action/buildings.action";
 import { IBuildings, QueryKeys } from "@/types";
 import { toast } from "sonner";
  

@@ -6,7 +6,7 @@ import {
   createComplex,
   updateComplex,
   deleteComplex,
-} from "@/action/complex.action";
+} from "@/api/actions/complex-action/complex.action";
 import { QueryKeys } from "@/types";
 import { IComplex } from "@/types";
 

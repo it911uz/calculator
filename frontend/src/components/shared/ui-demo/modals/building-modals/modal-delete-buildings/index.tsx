@@ -5,7 +5,7 @@ import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useDeleteBuilding } from "@/hooks/useBuildings";
+import { useDeleteBuilding } from "@/api/hooks/buildings-hook/useBuildings";
 
 interface ModalDeleteBuildingsProps {
   buildingId: string | number;
