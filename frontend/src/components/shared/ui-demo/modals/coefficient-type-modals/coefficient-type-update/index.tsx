@@ -10,10 +10,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { useUpdateCoefficientType } from "@/api/hooks/coefficient-type-hook/useCoefficientTypes";
 import { ICoefficientType } from "@/types";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { toast } from "sonner";
+import { useUpdateCoefficientType } from "@/api/hooks/coefficient-type-hook/update-coefficient-type";
 
 interface Props {
   coefficientType: ICoefficientType;

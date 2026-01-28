@@ -12,10 +12,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { FC, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useCreateApartment } from "@/api/hooks/apartments-hook/useApartments";
-import { useBuildings } from "@/api/hooks/buildings-hook/useBuildings";
-import { getCoefficientTypesByBuildingId } from "@/api/actions/coefficients-type-action/coefficients-type.action";
 import { ICoefficientTypeGroup } from "@/types";
+import { useBuildings } from "@/api/hooks/buildings-hook/get-buildings";
+import { useCreateApartment } from "@/api/hooks/apartments-hook/create-apartment.hook";
+import { getCoefficientTypesByBuildingId } from "@/api/coefficient-types/get-coefficient-type.api";
 
 type ModalProps = {
   onSuccess?: () => void;

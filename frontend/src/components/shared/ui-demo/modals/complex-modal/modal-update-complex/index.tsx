@@ -6,10 +6,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useUpdateComplex } from "@/api/hooks/complex-hook/useComplex";
 import { useState } from "react";
 import { IComplex } from "@/types";
 import { useRouter } from "next/navigation";
+import { useUpdateComplex } from "@/api/hooks/complex-hook/update-complex";
 
 const ModalUpdateComplex = ({ complex }: { complex: IComplex }) => {
   const [open, setOpen] = useState(false);

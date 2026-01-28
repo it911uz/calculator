@@ -1,5 +1,6 @@
 "use client";
 
+import { useCreateComplex } from "@/api/hooks/complex-hook/create-complex";
 import { Button } from "@/components/ui/button";
 import { 
   Dialog, 
@@ -12,7 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { FC, useState } from "react";
 import { toast } from "sonner";
-import { useCreateComplex } from "@/api/hooks/complex-hook/useComplex"; // React Query hook
 
 type ModalProps = {
   onSuccess?: () => Promise<void>; 

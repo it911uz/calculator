@@ -1,4 +1,4 @@
-import { getBuildings } from '@/api/actions/buildings-action/buildings.action';
+import { getBuildings } from '@/api/buildings/get-buildings.api';
 import TableBuildings from '@/components/shared/ui-demo/table-buildings';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';

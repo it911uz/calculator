@@ -7,9 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { useUpdateBuilding } from "@/api/hooks/buildings-hook/useBuildings";
 import { IBuildings } from "@/types";
 import { Input } from "@/components/ui/input";
+import { useUpdateBuilding } from "@/api/hooks/buildings-hook/update-building";
 
 interface ModalUpdateBuildingsProps {
   building: IBuildings;
