@@ -11,7 +11,7 @@ export function useCoefficients() {
     queryFn: getCoefficients,
   });
 }
-// get
+
 export function useCoefficient(id: number) {
   return useQuery({
     queryKey: QueryKeys.coefficients.detail(id),

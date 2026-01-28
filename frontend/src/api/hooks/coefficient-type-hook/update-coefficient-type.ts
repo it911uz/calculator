@@ -32,9 +32,8 @@ export function useUpdateCoefficientType(buildingId?: number) {
       });
     },
 
-    onError: (error) => {
-      console.error("Update coefficient type error:", error);
-      toast.error("Не удалось обновить тип коэффициента");
+    onError: (error: Error) => {
+      toast.error(error.message || "Не удалось обновить тип коэффициента",);
     },
   });
 }

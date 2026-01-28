@@ -1,30 +1,33 @@
-"use server"
-
 import { ENV } from "@/configs/env.config";
-import { getAuthHeaders } from "@/lib/utils";
-import { ICoefficientTypeGroup } from "@/types";
+import { getAuthData } from "@/lib/auth.util";
+import type { ICoefficientTypeGroup } from "@/types";
 
 export async function getCoefficientTypesByBuildingId(
   buildingId: number,
 ): Promise<ICoefficientTypeGroup[]> {
-  try {
-    const headers = await getAuthHeaders();
-    const res = await fetch(
-      `${ENV.BASE_URL}/coefficients-common/bcs-with-bcts-by-building-id/${buildingId}`,
-      {
-        headers,
-        cache: "no-store",
+  const authData = await getAuthData();
+  
+  const res: Response = await fetch(
+    `${ENV.BASE_URL}/coefficients-common/bcs-with-bcts-by-building-id/${buildingId}/`,
+    {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${authData.access}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
       },
+      cache: "no-store",
+    },
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData.detail || `Koeffitsient type kemadi ${res.status}`
     );
-
-    if (!res.ok) {
-      if (res.status === 404) return [];
-      throw new Error(`Failed to fetch coefficient types: ${res.status}`);
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error("Error fetching coefficient types:", error);
-    return [];
   }
+
+  const data: ICoefficientTypeGroup[] = await res.json();
+  
+  return data;
 }

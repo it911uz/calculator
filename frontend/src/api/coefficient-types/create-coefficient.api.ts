@@ -1,26 +1,26 @@
-"use server";
-
 import { ENV } from "@/configs/env.config";
-import { getAuthHeaders } from "@/lib/utils";
-import { ICoefficientType } from "@/types";
+import { getAuthData } from "@/lib/auth.util";
+import type { ICoefficientType } from "@/types";
 
 export async function createCoefficientType(
   data: Partial<ICoefficientType>,
 ): Promise<ICoefficientType> {
-  try {
-    const headers = await getAuthHeaders();
-    const res = await fetch(`${ENV.BASE_URL}/coefficient-types/add`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(data),
-    });
+  const authData = await getAuthData();
+  
+  const res: Response = await fetch(`${ENV.BASE_URL}/coefficient-types/add/`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${authData.access}`,
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-    if (!res.ok)
-      throw new Error(`Failed to create coefficient type: ${res.status}`);
-    const result = await res.json();
-    return result;
-  } catch (error) {
-    console.error("Error creating coefficient type:", error);
-    throw error;
+  if (!res.ok) {
+    const errorBody = await res.json().catch(() => ({}));
+    throw new Error(errorBody.detail || `postda xatolik: ${res.status}`);
   }
+
+  return (await res.json()) as ICoefficientType;
 }

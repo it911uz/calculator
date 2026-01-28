@@ -1,40 +1,20 @@
-"use server"
-
 import { ENV } from "@/configs/env.config";
-import { getAuthHeaders } from "@/lib/utils";
-import { IApartment } from "@/types";
+import { getAuthData } from "@/lib/auth.util";
+import type { IApartment } from "@/types";
 
 export async function updateApartment(id: number, data: Partial<IApartment>) {
-  try {
-    const headers = await getAuthHeaders();
-    const res = await fetch(`${ENV.BASE_URL}/apartments/${id}/`, {
-      method: "PATCH", 
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+  const authData = await getAuthData();
 
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      console.error("Server validation error:", errorData);
-      
-      throw new Error(JSON.stringify(errorData.detail || errorData || "Update failed"));
-    }
+  const res = await fetch(`${ENV.BASE_URL}/apartments/${id}/`, {
+    method: "PATCH",
+    headers: {
+      "Authorization": `Bearer ${authData.access}`, 
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-    return await res.json();
-  } catch (error: unknown) {
-    let message = "Noma'lum xatolik yuz berdi";
-
-    if (error instanceof Error) {
-      message = error.message;
-    } else if (typeof error === "string") {
-      message = error;
-    }
-
-    console.error("Action error:", message);
-    throw new Error(message);
-  
-  }
+  if (!res.ok) throw new Error("Update apartment ishlamadi");
+  return res.json();
 }

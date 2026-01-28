@@ -25,7 +25,7 @@ export function useUpdateApartment() {
       router.refresh(); 
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update apartment");
+      toast.error(error.message || "Не удалось обновить квартиру");
     },
   });
 }

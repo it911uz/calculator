@@ -14,7 +14,7 @@ export function useDeleteApartment() {
       queryClient.removeQueries({ queryKey: ["apartments", "detail", id] });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete apartment");
+      toast.error(error.message || "Не удалось удалить квартиру");
     },
   });
 }
