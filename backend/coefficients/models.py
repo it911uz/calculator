@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, Numeric
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, Numeric, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from core.db.base_model import BaseModel
@@ -10,10 +10,17 @@ class BuildingCoefficient(BaseModel):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(256), nullable=False)
 
-    building_id = Column(Integer, ForeignKey("buildings.id", ondelete="CASCADE"))
+    building_id = Column(Integer, ForeignKey("buildings.id", ondelete="CASCADE"), nullable=False)
     building = relationship("Building", back_populates="building_coefficients", lazy="selectin")
     building_coefficient_types = relationship("BuildingCoefficientType", back_populates="building_coefficient", lazy="selectin")
 
+    __table_args__ = (
+        UniqueConstraint(
+            "building_id",
+            "name",
+            name="uq_building_coefficients_building_id_name"
+        ),
+    )
 
 
 apartment_coefficients = Table(
@@ -34,5 +41,13 @@ class BuildingCoefficientType(BaseModel):
     coefficient_id = Column(Integer, ForeignKey("building_coefficients.id", ondelete="CASCADE"))
     apartments = relationship("Apartment", secondary=apartment_coefficients, back_populates="building_coefficient_types", lazy="selectin")
     building_coefficient = relationship("BuildingCoefficient", back_populates="building_coefficient_types", lazy="selectin")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "coefficient_id",
+            "name",
+            name="uq_building_coefficients_coefficient_id_name"
+        ),
+    )
 
 

@@ -95,7 +95,6 @@ class ApartmentValidator(BaseValidator):
 
         apartment_fields = ["number", "floor", "area", "room_count"]
         apartment_field_columns = column_names[:4]
-        print(apartment_field_columns)
         if apartment_fields != apartment_field_columns:
             raise HTTPException(status_code=400, detail="Первые 4 столбца неверно названы")
 

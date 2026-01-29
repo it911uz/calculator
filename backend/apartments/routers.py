@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 import pandas as pd
+from starlette.responses import JSONResponse
 
 from apartments.managers import ApartmentManager
 from apartments.models import Apartment
@@ -103,33 +104,35 @@ async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: A
         column_names=column_names
     )
 
-    for row_index, row in df.iterrows():
-        row_array = row.array
-
-        new_apartment = Apartment(building_id=building_id)
-        for loop_index, row_item in enumerate(row_array):
-            if loop_index == 0:
-                new_apartment.number = str(row_item)
-            elif loop_index == 1:
-                new_apartment.floor = row_item
-            elif loop_index == 2:
-                new_apartment.area = row_item
-            elif loop_index == 3:
-                new_apartment.room_count = row_item
-
-            else:
-                result = await db.execute(select(BuildingCoefficientType).where(BuildingCoefficientType.name == row_item))
-                bct_obj = result.scalar_one_or_none()
-
-                if bct_obj:
-                    new_apartment.building_coefficient_types.append(bct_obj)
-
-
+    errors = []
+    for _, row in df.iterrows():
+        new_apartment = Apartment(
+            building_id=building_id,
+            number=str(row["number"]),
+            floor=int(row["floor"]),
+            area=row["area"],
+            room_count=int(row["room_count"]),
+        )
 
         db.add(new_apartment)
+        await db.flush()
+
+        for bc_name in column_names[4:]:
+            result = await db.execute(select(BuildingCoefficientType).where(BuildingCoefficientType.name == row[bc_name]))
+            bct_obj = result.scalar_one_or_none()
+
+            if bct_obj:
+                new_apartment.building_coefficient_types.append(bct_obj)
+            else:
+                errors.append(f"{_ + 2} - qatorda xatolik")
+
+
         await db.commit()
 
-    return "nice"
+
+    if errors:
+        return errors
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"detail": "success"})
 
 
 
