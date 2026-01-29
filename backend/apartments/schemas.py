@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, Field
 
 from apartments.schema_validation_mixins import ApartmentSchemaValidationMixin
 
@@ -35,7 +35,8 @@ class UpdateApartmentBody(ApartmentSchemaValidationMixin):
     bct_ids: list[int]
 
 
-
+class BulkCreateApartmentsBody:
+    pass
 
 
 

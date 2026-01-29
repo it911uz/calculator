@@ -11,10 +11,12 @@ from core.validations import BaseValidator
 class ApartmentValidator(BaseValidator):
     async def validate_apartment_create(self, **kwargs):
         building_id = kwargs.get('building_id')
-        await self.validate_building_fk(building_id)
+        if building_id:
+            await self.validate_building_fk(building_id)
 
         floor = kwargs.get('floor')
-        await self._validate_floor(building_id, floor)
+        if floor:
+            await self._validate_floor(building_id, floor)
 
         bct_ids = kwargs.get("bct_ids")
         if bct_ids:
@@ -78,6 +80,33 @@ class ApartmentValidator(BaseValidator):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Расположение квартиры на этом этаже ({floor}) не может превышать количество этажей в здании ({floor_count})."
             )
+
+
+    async def http_validate_bulk_create(self, building_id: int, column_names: list[str]):
+        if building_id <= 0:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="FK не может быть отрицательным.")
+
+        building = (await self.db.execute(select(Building).where(Building.id == building_id))).scalar_one_or_none()
+        if not building:
+            raise HTTPException(status_code=404, detail=f"{Building.__name__} с идентификатором {building_id} не найдена.")
+
+        if len(column_names) < 4:
+            raise HTTPException(status_code=400, detail="Недостаточно столбцов :(")
+
+        apartment_fields = ["number", "floor", "area", "room_count"]
+        apartment_field_columns = column_names[:4]
+        print(apartment_field_columns)
+        if apartment_fields != apartment_field_columns:
+            raise HTTPException(status_code=400, detail="Первые 4 столбца неверно названы")
+
+
+        building_coefficients = building.building_coefficients
+        building_coefficient_names = [obj.name for obj in building_coefficients]
+
+        for bc_name in column_names[4:]:
+            if bc_name not in building_coefficient_names:
+                raise HTTPException(status_code=404, detail=f"Коэффицент с именем {bc_name} не найдена проверьте экцель файл и попробуйте снова.")
+
 
 
 

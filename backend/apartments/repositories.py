@@ -1,3 +1,4 @@
+from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -82,6 +83,6 @@ class ApartmentRepository(BaseRepository):
         return await super().delete(Apartment, apartment_id)
 
 
-
-
+    async def bulk_create_apartments(self, file: UploadFile):
+        pass
 
