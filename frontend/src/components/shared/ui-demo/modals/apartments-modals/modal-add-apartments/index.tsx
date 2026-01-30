@@ -13,9 +13,9 @@ import { Input } from "@/components/ui/input";
 import { FC, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ICoefficientTypeGroup } from "@/types";
-import { useBuildings } from "@/api/hooks/buildings-hook/get-buildings";
-import { useCreateApartment } from "@/api/hooks/apartments-hook/create-apartment.hook";
-import { getCoefficientTypesByBuildingId } from "@/api/coefficient-types/get-coefficient-type.api";
+import { useBuildings } from "@/action/hooks/buildings-hook/get-buildings";
+import { useCreateApartment } from "@/action/hooks/apartments-hook/create-apartment.hook";
+import { getCoefficientTypesByBuildingId } from "@/action/coefficient-types/get-coefficient-type.api";
 
 type ModalProps = {
   onSuccess?: () => void;

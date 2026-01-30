@@ -11,8 +11,8 @@ import { GrMoney } from "react-icons/gr";
 import { ModalDeleteApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-delete-apartments";
 import { ModalUpdateApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-update-apartments";
 import { LuChartNoAxesCombined } from "react-icons/lu";
-import { getApartmentById } from "@/api/apartaments/get-apartament.api";
-import { getCoefficientTypesByBuildingId } from "@/api/coefficient-types/get-coefficient-type.api";
+import { getApartmentById } from "@/action/apartaments/get-apartament.api";
+import { getCoefficientTypesByBuildingId } from "@/action/coefficient-types/get-coefficient-type.api";
 
 export default async function SingleApartmentsPage({
   params,
@@ -23,7 +23,7 @@ export default async function SingleApartmentsPage({
 
   const apartment = await getApartmentById(Number(id));
 
-  if (!apartment) {
+  if (!apartment || !apartment.data) {
     return (
       <div className="container mx-auto p-10 text-center">
         <h1 className="text-xl font-bold text-gray-600">Квартира не найдена</h1>
@@ -34,13 +34,15 @@ export default async function SingleApartmentsPage({
     );
   }
 
+  const apartmentData = apartment.data;
+
   const allCoefficientTypes = await getCoefficientTypesByBuildingId(
-    Number(apartment.building_id),
+    Number(apartmentData.building_id),
   );
 
   const apartmentCoefficients = allCoefficientTypes
     .flatMap((group) => group.bcts || [])
-    .filter((bct) => (apartment.bct_ids ?? []).includes(bct.id));
+    .filter((bct) => (apartmentData.bct_ids ?? []).includes(bct.id));
 
   return (
     <div className="container mx-auto space-y-4">
@@ -61,7 +63,7 @@ export default async function SingleApartmentsPage({
                   Основная информация
                 </h2>
                 <div className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-lg text-sm font-medium text-indigo-700">
-                  {apartment.room_count} комн.
+                  {apartmentData.room_count} комн.
                 </div>
               </div>
 
@@ -78,7 +80,7 @@ export default async function SingleApartmentsPage({
                     </span>
                   </div>
                   <div className="text-lg font-semibold text-gray-900">
-                    {apartment.building_id}
+                    {apartmentData.building_id}
                   </div>
 
                   <div className="group">
@@ -93,7 +95,7 @@ export default async function SingleApartmentsPage({
                       </span>
                     </div>
                     <div className="text-lg font-semibold text-gray-900">
-                      {apartment.number}
+                      {apartmentData.number}
                     </div>
                   </div>
 
@@ -109,7 +111,7 @@ export default async function SingleApartmentsPage({
                       </span>
                     </div>
                     <div className="text-lg font-semibold text-gray-900">
-                      {apartment.floor}
+                      {apartmentData.floor}
                       <span className="text-sm text-gray-500 ml-1">этаж</span>
                     </div>
                   </div>
@@ -128,7 +130,7 @@ export default async function SingleApartmentsPage({
                       </span>
                     </div>
                     <div className="text-lg font-semibold text-gray-900">
-                      {apartment.area} м²
+                      {apartmentData.area} м²
                     </div>
                   </div>
 
@@ -144,7 +146,7 @@ export default async function SingleApartmentsPage({
                       </span>
                     </div>
                     <div className="text-lg font-semibold text-gray-900">
-                      {apartment.room_count}
+                      {apartmentData.room_count}
                     </div>
                   </div>
                   <div className="group">
@@ -159,7 +161,7 @@ export default async function SingleApartmentsPage({
                       </span>
                     </div>
                     <div className="text-lg font-semibold text-gray-900">
-                      {parseFloat(apartment.final_price).toLocaleString(
+                      {parseFloat(apartmentData.final_price).toLocaleString(
                         "ru-RU",
                       )}{" "}
                       сум
@@ -218,7 +220,7 @@ export default async function SingleApartmentsPage({
               <MdHomeWork size={30} />
             </span>
             <h1 className="text-md font-bold ">
-              Номер дома: {apartment.number}
+              Номер дома: {apartmentData.number}
             </h1>
           </div>
 
@@ -228,20 +230,20 @@ export default async function SingleApartmentsPage({
               <div className="text-center p-2 bg-white border border-indigo-100 rounded-lg">
                 <div className="text-xs text-gray-500">Цена</div>
                 <div className="text-sm font-bold text-indigo-700">
-                  {apartment.final_price}
+                  {apartmentData.final_price}
                 </div>
               </div>
               <div className="text-center p-2 bg-white border border-indigo-100 rounded-lg">
                 <div className="text-xs text-gray-500">М²/</div>
                 <div className="text-sm font-bold text-indigo-700">
-                  {apartment.area}
+                  {apartmentData.area}
                 </div>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3 py-3">
-            <ModalDeleteApartments apartmentId={Number(apartment.id)} />
-            <ModalUpdateApartments apartment={apartment} />
+            <ModalDeleteApartments apartmentId={Number(apartmentData.id)} />
+            <ModalUpdateApartments apartment={apartmentData} />
           </div>
         </div>
       </div>

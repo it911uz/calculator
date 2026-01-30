@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { IBuildings } from "@/types";
 import { Input } from "@/components/ui/input";
-import { useUpdateBuilding } from "@/api/hooks/buildings-hook/update-building";
+import { useUpdateBuilding } from "@/action/hooks/buildings-hook/update-building";
 
 interface ModalUpdateBuildingsProps {
   building: IBuildings;

@@ -1,7 +1,7 @@
 "use client";
 
-import { useCreateBuilding } from "@/api/hooks/buildings-hook/create-building";
-import { useComplexes } from "@/api/hooks/complex-hook/get-complexes";
+import { useCreateBuilding } from "@/action/hooks/buildings-hook/create-building";
+import { useComplexes } from "@/action/hooks/complex-hook/get-complexes";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
