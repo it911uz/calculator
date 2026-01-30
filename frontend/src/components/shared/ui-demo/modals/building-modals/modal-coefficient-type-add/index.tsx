@@ -1,5 +1,5 @@
 "use client";
-import { useCreateCoefficientType } from "@/api/hooks/coefficient-type-hook/create-coefficient-type";
+import { useCreateCoefficientType } from "@/action/hooks/coefficient-type-hook/create-coefficient-type";
 import {
   Dialog,
   DialogContent,

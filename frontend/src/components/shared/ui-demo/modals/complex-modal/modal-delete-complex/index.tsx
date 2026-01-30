@@ -1,5 +1,5 @@
 "use client";
-import { useDeleteComplex } from "@/api/hooks/complex-hook/delete-complex";
+import { useDeleteComplex } from "@/action/hooks/complex-hook/delete-complex";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";

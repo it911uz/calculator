@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeleteCoefficientType } from "@/api/hooks/coefficient-type-hook/delete-coefficient-type";
+import { useDeleteCoefficientType } from "@/action/hooks/coefficient-type-hook/delete-coefficient-type";
 import {
   Dialog,
   DialogContent,

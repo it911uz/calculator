@@ -2,8 +2,8 @@ import { IoIosArrowBack } from "react-icons/io";
 import { ImFileEmpty } from "react-icons/im";
 import { TabsDemoBuildings } from "@/components/shared/ui-demo/tabs/tab-buildings";
 import Link from "next/link";
-import { getBuildingById } from "@/api/buildings/get-building.api";
-import { getComplexes } from "@/api/complex/get-complexes.api";
+import { getBuildingById } from "@/action/buildings/get-building.api";
+import { getComplexes } from "@/action/complex/get-complexes.api";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -12,10 +12,12 @@ interface Props {
 export default async function SingleBuildingPage({ params }: Props) {
   const { id } = await params;
 
-  const [building, complexes] = await Promise.all([
+  const [buildingSafe, complexes] = await Promise.all([
     getBuildingById(id),
     getComplexes(),
   ]);
+
+  const building = buildingSafe.data;
 
   if (!building) {
     return (

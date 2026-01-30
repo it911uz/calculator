@@ -1,4 +1,4 @@
-import { getComplexes } from '@/api/complex/get-complexes.api';
+import { getComplexes } from '@/action/complex/get-complexes.api';
 import TableObects from '@/components/shared/ui-demo/table-obects';
 
 export default async function Complex(){

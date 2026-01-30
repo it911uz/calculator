@@ -11,7 +11,7 @@ import { ApartmentFormData, IApartment } from "@/types";
 import { useState } from "react";
 import { toast } from "sonner";
 import { MdEdit } from "react-icons/md";
-import { useUpdateApartment } from "@/api/hooks/apartments-hook/update-apartment.hook";
+import { useUpdateApartment } from "@/action/hooks/apartments-hook/update-apartment.hook";
 interface ApiError {
   message: string;
   detail?: string;

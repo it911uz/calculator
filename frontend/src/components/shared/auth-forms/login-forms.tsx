@@ -3,9 +3,9 @@
 import { useState, FormEvent } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { useLogin } from "@/api/hooks/login-hook/useLogin";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { useLogin } from "@/action/hooks/login-hook/useLogin";
 
 export function LoginForm() {
     const router = useRouter();
@@ -29,6 +29,7 @@ export function LoginForm() {
         },
         onError: (err) => {
           console.error(err instanceof Error ? err.message : "Ошибка входа");
+          toast.error("Ошибка входа")
         },
       }
     );

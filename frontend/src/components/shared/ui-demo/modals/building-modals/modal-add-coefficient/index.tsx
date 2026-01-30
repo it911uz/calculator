@@ -6,8 +6,9 @@ import { ModalEditCoefficientType } from "../../coefficient-type-modals/coeffici
 import { ModalDeleteCoefficientType } from "../../coefficient-type-modals/coefficient-type-delete";
 import { ImFilesEmpty } from "react-icons/im";
 import { MdOutlineDeleteForever } from "react-icons/md";
-import { useCoefficientTypesByBuildingId } from "@/api/hooks/coefficient-type-hook/get-coefficient-type";
-import { useDeleteCoefficient } from "@/api/hooks/coefficient-hook/delete-coefficient";
+import { ICoefficientTypeGroup } from "@/types";
+import { useCoefficientTypesByBuildingId } from "@/action/hooks/coefficient-type-hook/get-coefficient-type";
+import { useDeleteCoefficient } from "@/action/hooks/coefficient-hook/delete-coefficient";
 
 interface ModalAddedCoefficientProps {
   buildingId: number;
@@ -15,8 +16,11 @@ interface ModalAddedCoefficientProps {
 export const ModalAddedCoefficient: FC<ModalAddedCoefficientProps> = ({
   buildingId,
 }) => {
-  const { data: coefficientTypeGroups = [] } =
-    useCoefficientTypesByBuildingId(buildingId);
+  const coefRes = useCoefficientTypesByBuildingId(buildingId);
+
+    const coefficientTypeGroups = Array.isArray(coefRes?.data) 
+    ? (coefRes.data as ICoefficientTypeGroup[]) 
+    : [];
   const deleteMutation = useDeleteCoefficient(buildingId);
 
   return (
@@ -110,7 +114,7 @@ export const ModalAddedCoefficient: FC<ModalAddedCoefficientProps> = ({
                               <div
                                 className="h-full bg-gradient-to-r from-indigo-300 to-purple-300"
                                 style={{
-                                  width: `${Math.min(Math.abs(bct.rate as number), 100)}%`,
+                                  width: `${Math.min(Math.abs (Number(bct.rate)), 100)}%`,
                                 }}
                               />
                             </div>

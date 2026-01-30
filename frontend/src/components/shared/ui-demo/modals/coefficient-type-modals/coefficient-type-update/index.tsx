@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { ICoefficientType } from "@/types";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { toast } from "sonner";
-import { useUpdateCoefficientType } from "@/api/hooks/coefficient-type-hook/update-coefficient-type";
+import { useUpdateCoefficientType } from "@/action/hooks/coefficient-type-hook/update-coefficient-type";
 
 interface Props {
   coefficientType: ICoefficientType;

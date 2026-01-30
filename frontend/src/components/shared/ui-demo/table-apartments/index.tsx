@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { ModalAddedApartments } from "../modals/apartments-modals/modal-add-apartments";
 import { IApartment } from "@/types";
 import { ModalDeleteApartments } from "../modals/apartments-modals/modal-delete-apartments";
-import { useApartments } from "@/api/hooks/apartments-hook/get-apartments.hook";
+import { useApartments } from "@/action/hooks/apartments-hook/get-apartments.hook";
 const ITEMS_PER_PAGE = 10;
 const MAX_VISIBLE_PAGES = 5;
 interface TableApartmentsProps {

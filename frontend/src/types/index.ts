@@ -48,9 +48,9 @@ export interface ICoefficient {
 export interface ICoefficientType {
   id: number;
   name: string;
-  rate: string | number;
+  rate: number;
   coefficient_id: number;
-  bcts: string | number[];
+  bcts: number[];
   building_id: number; 
 }
 export type UpdateCoefficientTypePayload = {
@@ -118,7 +118,44 @@ export interface LoginPayload {
   username: string;
   password: string;
 }
-// Query keys
+export interface UpdateArgs {
+  id: number | string;
+  data: Partial<IApartment>;
+}
+ export interface UpdateBuildingArgs {
+  id: string | number;
+  data: Partial<IBuildings>;
+}
+
+//--------------------------------------------
+export type TMetaReason = "TOKEN" | "HTTP" | "PARSE" | "UNKNOWN";
+
+export interface IMetaInfo {
+  status?: number;
+  error?: string;
+  reason?: TMetaReason;
+}
+
+export interface SafeObject<T> {
+  data: T | null;
+  _meta?: IMetaInfo;
+}
+export interface SafeDelete {
+  success: boolean;
+  _meta?: IMetaInfo;
+}
+export type SafeArray<T> = T[] & {
+  _meta?: IMetaInfo;
+};
+export interface SafeArrayGetCoefficient<T> {
+  data: T[];
+  _meta?: IMetaInfo;
+}
+export type ComplexArray<T = unknown> = T[] & {
+  _meta?: IMetaInfo;
+};
+//--------------------------------------------
+// Query keys types
 export const QueryKeys = {
   apartments: {
     all: ['apartments'] as const,

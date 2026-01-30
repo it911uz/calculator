@@ -4,7 +4,7 @@ import { ModalDeleteComplex } from "@/components/shared/ui-demo/modals/complex-m
 import { LuText } from "react-icons/lu";
 import Link from "next/link";
 import ModalUpdateComplex from "@/components/shared/ui-demo/modals/complex-modal/modal-update-complex";
-import { getComplexById } from "@/api/complex/get-complex.api";
+import { getComplexById } from "@/action/complex/get-complex.api";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -12,11 +12,16 @@ interface Props {
 
 export default async function SingleComplexPage({ params }: Props) {
   const { id } = await params;
-  const currentComplex = await getComplexById(id);
+  const currentComplexSafe = await getComplexById(id);
+
+  const currentComplex = currentComplexSafe.data;
+
   if (!currentComplex) {
     return (
       <div className="flex items-center justify-center flex-col h-screen">
-        <p className="text-center font-bold text-gray-500">Информация не найдена</p>
+        <p className="text-center font-bold text-gray-500">
+          Информация не найдена
+        </p>
         <ImFileEmpty size={40} className="text-gray-300 mt-2" />
         <Link href="/complex" className="mt-4 text-indigo-600 underline">
           Вернуться назад
@@ -24,6 +29,7 @@ export default async function SingleComplexPage({ params }: Props) {
       </div>
     );
   }
+
   return (
     <div className="">
       <Link href={"/complex"}>
@@ -31,13 +37,12 @@ export default async function SingleComplexPage({ params }: Props) {
           <IoIosArrowBack />
         </button>
       </Link>
+
       <div className="overflow-hidden rounded-sm bg-gradient-to-br from-indigo-200 via-indigo-100 to-indigo-100 border border-indigo-100 shadow-md transition-all duration-500 group">
         <div className="py-6 px-3 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-sm font-bold text-indigo-700 flex gap-2 items-center px-3 py-1 shadow-sm">
-              <h1 className="text-md capitalize">
-                {currentComplex.name || "—"}
-              </h1>
+              <h1 className="text-md capitalize">{currentComplex.name || "—"}</h1>
               <span className="text-xs text-gray-400 font-normal">Здание</span>
             </div>
           </div>

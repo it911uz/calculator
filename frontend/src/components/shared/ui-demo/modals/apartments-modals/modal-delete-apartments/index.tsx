@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeleteApartment } from "@/api/hooks/apartments-hook/delete-aparment.hook";
+import { useDeleteApartment } from "@/action/hooks/apartments-hook/delete-aparment.hook";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
