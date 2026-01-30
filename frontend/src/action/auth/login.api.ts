@@ -3,7 +3,6 @@
 import { ENV } from "@/configs/env.config";
 import { LoginResponse } from "@/types";
 import { cookies } from "next/headers";
-import { toast } from "sonner";
 
 export async function loginAction(formData: FormData): Promise<void> {
 
