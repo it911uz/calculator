@@ -1,10 +1,11 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from sqlalchemy import select
 from starlette import status
 
 from buildings.models import Building
 from coefficients.models import BuildingCoefficientType
 from buildings.repositories import BuildingRepository
+from core.config import MAX_FILE_SIZE
 from core.validations import BaseValidator
 
 
@@ -82,32 +83,77 @@ class ApartmentValidator(BaseValidator):
             )
 
 
+class ApartmentBulkCreateValidator(BaseValidator):
+    @staticmethod
+    async def validate_file_type(upload_file: UploadFile):
+        # print(upload_file.file)
+        # print(upload_file.filename)
+        # print(type(upload_file.filename))
+        # print(upload_file.size)
+        # print(upload_file.headers)
+        # print(upload_file.content_type)
+        filename = upload_file.filename
+        if not filename or not filename.lower().endswith((".xls", ".xlsx")):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Введите допустимый тип файла (.xls или .xlsx)"
+            )
+
+    @staticmethod
+    async def validate_file_size(size: int):
+        if size == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Файл пуст"
+            )
+
+        if size > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Файл слишком большой"
+            )
+
+
+
     async def http_validate_bulk_create(self, building_id: int, column_names: list[str]):
+        building = await self._validate_building_id(building_id)
+        await self._validate_column_length(column_length=len(column_names))
+        await self._validate_main_fields(main_field_column_names=column_names[:4])
+
+        building_coefficient_names = [obj.name for obj in building.building_coefficients]
+        await self._validate_building_coefficients(
+            building_coefficient_names=building_coefficient_names,
+            bc_column_names=column_names[4:]
+        )
+
+    async def _validate_building_id(self, building_id: int):
         if building_id <= 0:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="FK не может быть отрицательным.")
 
         building = (await self.db.execute(select(Building).where(Building.id == building_id))).scalar_one_or_none()
         if not building:
-            raise HTTPException(status_code=404, detail=f"{Building.__name__} с идентификатором {building_id} не найдена.")
+            raise HTTPException(status_code=404,
+                                detail=f"{Building.__name__} с идентификатором {building_id} не найдена.")
+        return building
 
-        if len(column_names) < 4:
+    @staticmethod
+    async def _validate_column_length(column_length: int):
+        if column_length < 4:
             raise HTTPException(status_code=400, detail="Недостаточно столбцов :(")
 
+    @staticmethod
+    async def _validate_main_fields(main_field_column_names: list[str]):
         apartment_fields = ["number", "floor", "area", "room_count"]
-        apartment_field_columns = column_names[:4]
-        if apartment_fields != apartment_field_columns:
+        if sorted(apartment_fields) != sorted(main_field_column_names):
             raise HTTPException(status_code=400, detail="Первые 4 столбца неверно названы")
 
-
-        building_coefficients = building.building_coefficients
-        building_coefficient_names = [obj.name for obj in building_coefficients]
-
-        for bc_name in column_names[4:]:
-            if bc_name not in building_coefficient_names:
-                raise HTTPException(status_code=404, detail=f"Коэффицент с именем {bc_name} не найдена проверьте экцель файл и попробуйте снова.")
-
-
-
+    @staticmethod
+    async def _validate_building_coefficients(building_coefficient_names: list[str], bc_column_names: list[str]):
+        if sorted(building_coefficient_names) != sorted(bc_column_names):
+            raise HTTPException(
+                status_code=404,
+                detail=f"Неправильные коэффиценты. Проверьте коэффиценты и попробуйте снова."
+            )
 
 
 

@@ -38,7 +38,7 @@ class BuildingCoefficientType(BaseModel):
     name = Column(String(256), nullable=False)
     rate = Column(Numeric(precision=20, scale=2), nullable=False)
 
-    coefficient_id = Column(Integer, ForeignKey("building_coefficients.id", ondelete="CASCADE"))
+    coefficient_id = Column(Integer, ForeignKey("building_coefficients.id", ondelete="CASCADE"), nullable=False)
     apartments = relationship("Apartment", secondary=apartment_coefficients, back_populates="building_coefficient_types", lazy="selectin")
     building_coefficient = relationship("BuildingCoefficient", back_populates="building_coefficient_types", lazy="selectin")
 

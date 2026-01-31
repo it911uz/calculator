@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictInt
 
 
 class AddCoefficientResponse(BaseModel):
@@ -49,7 +49,7 @@ class AddCoefficientTypeBody(BaseModel):
 class UpdateCoefficientTypeBody(BaseModel):
     name: str | None = None
     rate: Decimal | None = Field(default=None, max_digits=20, decimal_places=2)
-    coefficient_id: int | None = None
+    coefficient_id: StrictInt | None = None
 
 """ ----------------------------------------------------------- """
 # Custom

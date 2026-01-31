@@ -11,9 +11,10 @@ from starlette.responses import JSONResponse
 from apartments.managers import ApartmentManager
 from apartments.models import Apartment
 from apartments.schemas import AddApartmentResponse, AddApartmentBody, UpdateApartmentBody, BulkCreateApartmentsBody
-from apartments.validations import ApartmentValidator
+from apartments.services import recalculate_final_price
+from apartments.validations import ApartmentBulkCreateValidator
 from auth.dependencies import has_permission
-from coefficients.models import BuildingCoefficientType
+from coefficients.models import BuildingCoefficientType, BuildingCoefficient
 from core.db.session import get_db
 
 
@@ -77,26 +78,13 @@ async def delete_apartment(apartment_id: int, db: AsyncSession = Depends(get_db)
 
 @router.post("/bulk-create/{building_id}")
 async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: AsyncSession = Depends(get_db)):
-    apartment_validator = ApartmentValidator(db)
-
+    apartment_validator = ApartmentBulkCreateValidator(db)
+    await apartment_validator.validate_file_type(excel_file)
 
     content = await excel_file.read()
+    await apartment_validator.validate_file_size(len(content))
+
     df = pd.read_excel(BytesIO(content))
-
-    # print(type(df))
-    # print(df)
-    #
-    # print("--------------------------------------------\n")
-    # print(f"COLUMNS \n{df.columns}")
-    # print(f"index values: {df.columns.values.tolist()}")
-    #
-    # print("--------------------------------------------\n")
-    # print("ROWS")
-    # print(f"row labels: {df.index.tolist()}")
-    #
-    # print("--------------------------------------------\n")
-    # print("ITER ROWS")
-
     column_names = df.columns.values.tolist()
 
     await apartment_validator.http_validate_bulk_create(
@@ -104,36 +92,65 @@ async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: A
         column_names=column_names
     )
 
+    result = await db.execute(
+        select(BuildingCoefficientType)
+        .join(BuildingCoefficientType.building_coefficient)
+        .where(BuildingCoefficient.building_id == building_id)
+    )
+    building_bcts = result.scalars().all()
+
+    bct_dict = {bct.name: bct for bct in building_bcts}
     errors = []
-    for _, row in df.iterrows():
-        new_apartment = Apartment(
-            building_id=building_id,
-            number=str(row["number"]),
-            floor=int(row["floor"]),
-            area=row["area"],
-            room_count=int(row["room_count"]),
-        )
+    for row_index, row in df.iterrows():
+        row_has_error = False
 
-        db.add(new_apartment)
-        await db.flush()
+        async with db.begin_nested():  # SAVEPOINT
+            new_apartment = Apartment(
+                building_id=building_id,
+                number=str(row["number"]),
+                floor=int(row["floor"]),
+                area=row["area"],
+                room_count=int(row["room_count"]),
+            )
 
-        for bc_name in column_names[4:]:
-            result = await db.execute(select(BuildingCoefficientType).where(BuildingCoefficientType.name == row[bc_name]))
-            bct_obj = result.scalar_one_or_none()
+            new_apartment.building_coefficient_types = []
+            db.add(new_apartment)
+            await db.flush()
 
-            if bct_obj:
+            bct_ids = []
+
+            for bc_name in column_names[4:]:
+                if pd.isna(row[bc_name]):
+                    errors.append(f"{row_index + 2} - qatorda bo'shliq")
+                    row_has_error = True
+                    break
+
+                bct_obj = bct_dict.get(row[bc_name])
+                if not bct_obj:
+                    errors.append(f"{row_index + 2} - qatorda xatolik ({bc_name})")
+                    row_has_error = True
+                    break
+
+                bct_ids.append(bct_obj.id)
                 new_apartment.building_coefficient_types.append(bct_obj)
-            else:
-                errors.append(f"{_ + 2} - qatorda xatolik")
 
+            if row_has_error:
+                await db.rollback()
+                continue
 
-        await db.commit()
+            new_apartment.final_price = await recalculate_final_price(
+                db=db,
+                building_id=building_id,
+                bct_ids=bct_ids
+            )
 
+    # commit all successful rows
+    await db.commit()
 
     if errors:
-        return errors
-    return JSONResponse(status_code=status.HTTP_200_OK, content={"detail": "success"})
+        return JSONResponse(status_code=207, content={"errors": errors})
 
+    return {"detail": "success"}
 
 
 
