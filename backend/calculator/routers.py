@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apartments.repositories import ApartmentRepository
 from calculator.schemas import CalculateApartmentBody
+from calculator.services import get_payment_dates
 from core.db.session import get_db
 
 router = APIRouter(prefix="/calculator", tags=["Calculator"])
@@ -12,7 +13,6 @@ router = APIRouter(prefix="/calculator", tags=["Calculator"])
 
 @router.post("/{apartment_id}/")
 async def calculate_apartment_pricing(apartment_id: int, body: CalculateApartmentBody, db: AsyncSession = Depends(get_db)):
-
     response = {}
 
     apartment_repo = ApartmentRepository(db)
@@ -43,7 +43,9 @@ async def calculate_apartment_pricing(apartment_id: int, body: CalculateApartmen
     response["old_total_price"] = total_price
     response["new_total_price"] = new_total_price
     response["monthly_payment"] = payment_per_period
-    response["payment_date"] = body.first_payment_date.day
+
+    payment_dates = get_payment_dates(period_count, body.first_payment_date)
+    response["payment_dates"] = payment_dates
 
     return response
 

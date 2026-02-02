@@ -76,7 +76,7 @@ async def delete_apartment(apartment_id: int, db: AsyncSession = Depends(get_db)
     return await apartment_manager.delete_apartment(apartment_id)
 
 
-@router.post("/bulk-create/{building_id}")
+@router.post("/bulk-create/{building_id}", dependencies=[Depends(has_permission("create_apartments"))])
 async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: AsyncSession = Depends(get_db)):
     apartment_validator = ApartmentBulkCreateValidator(db)
     await apartment_validator.validate_file_type(excel_file)
@@ -151,7 +151,5 @@ async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: A
         return JSONResponse(status_code=207, content={"errors": errors})
 
     return {"detail": "success"}
-
-
 
 

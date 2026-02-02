@@ -10,9 +10,23 @@ services:
       - postgres
       - redis
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./backend:/app
+
+#  celery:
+#    build:
+#      context: ./backend
+#      dockerfile: Dockerfile
+#    container_name: celery-worker
+#    command: celery -A celery_app.celery worker -l info
+#    env_file:
+#      - .env
+#    depends_on:
+#      - redis
+#      - postgres
+#    volumes:
+#      - ./backend:/app
 
   postgres:
     image: 'postgres:17'
