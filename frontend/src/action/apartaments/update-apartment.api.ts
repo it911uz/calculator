@@ -32,9 +32,6 @@ export async function updateApartment(
       body: JSON.stringify(payload),
     });
     
-    console.log("Response status:", res.status);
-    console.log("Response status text:", res.statusText);
-    
     if (!res.ok) {
       const errorText = await res.text();
       console.error("Response error text:", errorText);
