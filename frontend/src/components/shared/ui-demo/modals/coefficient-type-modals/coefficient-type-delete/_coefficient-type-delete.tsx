@@ -27,7 +27,7 @@ export function ModalDeleteCoefficientType({
 
   const handleDelete = async () => {
     try {
-      await deleteMutation.mutateAsync(coefficientTypeId);
+      await deleteMutation.mutateAsync({ id: coefficientTypeId });
       toast.success("Коэффициент удалён");
       setOpen(false);
       onSuccess?.();

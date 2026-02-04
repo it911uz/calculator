@@ -27,7 +27,6 @@ export function useCreateComplex() {
         data
       );
 
-      toast.success("Комплекс успешно создан");
     },
     onError: (error) => {
       toast.error(error.message || "Не удалось создать комплекс");

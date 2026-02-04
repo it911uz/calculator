@@ -1,4 +1,4 @@
-import { LottieAnimation } from "@/components/lottie-animations";
+import { LottieAnimation } from "@/components/lottie-animations/_lottie-animations";
 import loginAnimation from "@/./../public/animations/Animation - 1747682284852 copy.json";
 import { LoginForm } from "@/components/shared/auth-forms/login-forms";
 export default async function LoginPage() {

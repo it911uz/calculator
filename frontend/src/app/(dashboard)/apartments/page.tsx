@@ -1,5 +1,5 @@
 import { getApartments } from '@/action/apartaments/get-apartaments.api'
-import TableApartments from '@/components/shared/ui-demo/table-apartments'
+import TableApartments from '@/components/shared/ui-demo/table-apartments/_table-apartments'
 
 export default async function ApartmentsPage() {
   const apartments = await getApartments()

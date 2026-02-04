@@ -1,10 +1,11 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
 import type { SafeDelete } from "@/types";
 
-export async function deleteApartment(id: string | number) {
+export async function deleteApartment(id: string | number, params: Record<string, number> = {}) {
   const result: SafeDelete = { success: false };
-
+  const searchParams = createSearchParams(params).toString()
   try {
     const authData = await getAuthData();
     if (!authData?.access) {
@@ -15,7 +16,7 @@ export async function deleteApartment(id: string | number) {
       };
       return result;
     }
-    const res = await fetch(`${ENV.BASE_URL}/apartments/${id}/`, {
+    const res = await fetch(`${ENV.PUBLIC_API_URL}/apartments/${id}${searchParams ? `?${searchParams}` : ""}`, {
       method: "DELETE",
       headers: {
         "Authorization": `Bearer ${authData.access}`,

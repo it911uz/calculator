@@ -23,8 +23,7 @@ export function ModalDeleteApartments({
 
   const handleDelete = async () => {
   try {
-    await deleteMutation.mutateAsync(Number(apartmentId));
-    toast.success("Квартира успешно удалена");
+    await deleteMutation.mutateAsync({id: Number(apartmentId)});
     setOpen(false);
 
     router.push("/apartments");
@@ -40,9 +39,9 @@ export function ModalDeleteApartments({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
-          className="flex items-center gap-2 rounded-[3px] bg-gradient-to-br from-indigo-100 to-white p-1"
+          className="text-gray-200 hover:text-white bg-indigo-900 px-3 py-1 rounded-[3px]"
         >
-          <MdOutlineDeleteForever size={20} className="text-gray-500"/>
+          <MdOutlineDeleteForever  />
          
         </button>
       </DialogTrigger>

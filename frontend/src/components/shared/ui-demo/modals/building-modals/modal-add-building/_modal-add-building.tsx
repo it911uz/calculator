@@ -12,6 +12,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { IComplex } from "@/types";
 import { FC, useState } from "react";
 import { toast } from "sonner";
 
@@ -21,7 +22,9 @@ type ModalProps = {
 };
 
 export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
-  const { data: complexes = [] } = useComplexes();
+  const { data: complexesRaw = [] } = useComplexes();
+  const complexes = (complexesRaw || []) as IComplex[];
+  
   const createMutation = useCreateBuilding();
 
   const [open, setOpen] = useState(false);
@@ -38,35 +41,19 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-
-    // max_coefficient (0–100)
     if (name === "max_coefficient") {
-      if (value === "") {
-        setFormData((prev) => ({ ...prev, max_coefficient: "" }));
-        return;
-      }
-
+      if (value === "") { setFormData((prev) => ({ ...prev, max_coefficient: "" })); return; }
       if (/^\d*\.?\d*$/.test(value)) {
         const num = Number(value);
-        if (num >= 0 && num <= 100) {
-          setFormData((prev) => ({ ...prev, max_coefficient: value }));
-        }
+        if (num >= 0 && num <= 100) setFormData((prev) => ({ ...prev, max_coefficient: value }));
       }
       return;
     }
-
-    //floor_count (0–100)
     if (name === "floor_count") {
-      if (value === "") {
-        setFormData((prev) => ({ ...prev, floor_count: "" }));
-        return;
-      }
-
+      if (value === "") { setFormData((prev) => ({ ...prev, floor_count: "" })); return; }
       if (/^\d+$/.test(value)) {
         const num = Number(value);
-        if (num >= 0 && num <= 100) {
-          setFormData((prev) => ({ ...prev, floor_count: value }));
-        }
+        if (num >= 0 && num <= 100) setFormData((prev) => ({ ...prev, floor_count: value }));
       }
       return;
     }
@@ -76,15 +63,8 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) {
-      toast.error("Введите имя здания");
-      return;
-    }
-
-    if (!formData.complex_id) {
-      toast.error("Выберите комплекс");
-      return;
-    }
+    if (!formData.name.trim()) return toast.error("Введите имя здания");
+    if (!formData.complex_id) return toast.error("Выберите комплекс");
 
     const buildingData = {
       name: formData.name,
@@ -92,7 +72,7 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
       base_price: Number(formData.base_price) || 0,
       price_unit: formData.price_unit,
       max_coefficient: Number(formData.max_coefficient) || 1,
-      complex_id: formData.complex_id,
+      complex_id: Number(formData.complex_id), 
     };
 
     try {
@@ -100,23 +80,13 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 
       toast.success("Здание успешно добавлено");
       setOpen(false);
-
-      // Formani tozalash
       setFormData({
-        name: "",
-        floor_count: "",
-        base_price: "",
-        price_unit: "UZS",
-        max_coefficient: "",
-        complex_id: "",
+        name: "", floor_count: "", base_price: "",
+        price_unit: "UZS", max_coefficient: "", complex_id: "",
       });
 
-      if (onSuccess) {
-        onSuccess();
-      }
+      if (onSuccess) onSuccess();
     } catch (error) {
-      console.log(error);
-
       toast.error("Ошибка при добавлении здания");
     }
   };

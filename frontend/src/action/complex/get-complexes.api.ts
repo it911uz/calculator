@@ -1,79 +1,61 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util"; 
 import { getAuthData } from "@/lib/auth.util";
-import type { ComplexArray } from "@/types";
+import type { ComplexArray, IComplex } from "@/types";
 
-
-function hasDataArray(value: unknown): value is { data: unknown[] } {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "data" in value &&
-    Array.isArray((value as { data: unknown[] }).data)
-  );
-}
-
-export async function getComplexes() {
+export async function getComplexes(params: Record<string, unknown> = {}) {
   const result: ComplexArray = [];
 
+  const searchParams = createSearchParams(params).toString();
   try {
     const auth = await getAuthData();
 
     if (!auth?.access) {
       result._meta = {
         status: 401,
-        error: "Unauthorized token",
+        error: "Ошибка авторизации: Токен не найден",
         reason: "TOKEN",
       };
       return result;
     }
 
-    const response = await fetch(`${ENV.PUBLIC_API_URL}/complexes`, {
+    const response = await fetch(`${ENV.BASE_URL}/complexes/${searchParams ? `?${searchParams}` : ""}`, {
       headers: {
         Authorization: `Bearer ${auth.access}`,
         "Content-Type": "application/json",
       },
+      cache: "no-store",
     });
 
     if (!response.ok) {
       result._meta = {
         status: response.status,
-        error: `HTTP error ${response.status}`,
+        error: `Ошибка HTTP: ${response.status}`,
         reason: "HTTP",
       };
       return result;
     }
 
-    let data: unknown;
-    try {
-      data = await response.json();
-    } catch {
-      result._meta = {
-        status: response.status,
-        error: "Invalid JSON response",
-        reason: "PARSE",
-      };
-      return result;
-    }
+    const data = await response.json();
 
-    if (Array.isArray(data)) {
-      return data;
-    }
+    // API formatiga qarab tekshiramiz (massiv yoki results ichida)
+    const items = Array.isArray(data) ? data : data?.results;
 
-    if (hasDataArray(data)) {
-      return data.data;
+    if (Array.isArray(items)) {
+      return items as IComplex[];
     }
 
     result._meta = {
       status: response.status,
-      error: "Unknown response format",
+      error: "Неизвестный формат ответа",
       reason: "UNKNOWN",
     };
     return result;
 
-  } catch {
+  } catch (error: unknown) {
     result._meta = {
       status: 500,
-      error: "Unexpected server error",
+      error: error instanceof Error ? error.message : "Непредвиденная ошибка сервера",
       reason: "UNKNOWN",
     };
     return result;

@@ -1,21 +1,9 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
 import type { IApartment, SafeArray } from "@/types";
-
-
-
-function hasDataArray<T>(value: unknown): value is { data: T[] } {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "data" in value &&
-    Array.isArray((value as { data: T[] }).data)
-  );
-}
-
-export async function getApartments() {
-  const result: SafeArray<IApartment> = [];
-
+export async function getApartments(params: Record<string, number> = {}) {  const result: SafeArray<IApartment> = [];
+  const searchParams = createSearchParams(params).toString();
   try {
     const authData = await getAuthData();
 
@@ -28,7 +16,7 @@ export async function getApartments() {
       return result;
     }
 
-    const res = await fetch(`${ENV.BASE_URL}/apartments/`, {
+    const res = await fetch(`${ENV.BASE_URL}/apartments/${searchParams ? `?${searchParams}` : ""}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authData.access}`,
@@ -63,9 +51,8 @@ export async function getApartments() {
       return data;
     }
 
-    if (hasDataArray<IApartment>(data)) {
-      return data.data;
-    }
+   
+    
 
     result._meta = {
       status: res.status,

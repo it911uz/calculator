@@ -8,11 +8,12 @@ import {
 import Link from "next/link";
 import { FaAngleLeft, FaKey } from "react-icons/fa";
 import { GrMoney } from "react-icons/gr";
-import { ModalDeleteApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-delete-apartments";
-import { ModalUpdateApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-update-apartments";
+import { ModalDeleteApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-delete-apartments/_modal-delete-apartment";
+import { ModalUpdateApartments } from "@/components/shared/ui-demo/modals/apartments-modals/modal-update-apartments/_modal-update-apartment";
 import { LuChartNoAxesCombined } from "react-icons/lu";
 import { getApartmentById } from "@/action/apartaments/get-apartament.api";
 import { getCoefficientTypesByBuildingId } from "@/action/coefficient-types/get-coefficient-type.api";
+import { ModalaUpdateCoefficientTypeApartment } from "@/components/shared/ui-demo/modals/apartments-modals/modal-update-coefficient-type-apartment/_modala-update-coefficient-type-apartment";
 
 export default async function SingleApartmentsPage({
   params,
@@ -45,13 +46,14 @@ export default async function SingleApartmentsPage({
     .filter((bct) => (apartmentData.bct_ids ?? []).includes(bct.id));
 
   return (
-    <div className="container mx-auto space-y-4">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between items-start">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <Link href={"/apartments"}>
           <button className="text-gray-200 hover:text-white bg-indigo-900 px-3 py-1 rounded-[3px]">
             <FaAngleLeft />
           </button>
         </Link>
+        <ModalDeleteApartments apartmentId={Number(apartmentData.id)} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 ">
@@ -62,7 +64,7 @@ export default async function SingleApartmentsPage({
                 <h2 className="text-xl font-bold text-indigo-600">
                   Основная информация
                 </h2>
-                <div className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-lg text-sm font-medium text-indigo-700">
+                <div className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-sm text-sm font-medium text-indigo-700">
                   {apartmentData.room_count} комн.
                 </div>
               </div>
@@ -164,14 +166,16 @@ export default async function SingleApartmentsPage({
                       {parseFloat(apartmentData.final_price).toLocaleString(
                         "ru-RU",
                       )}{" "}
-                      сум
                     </div>
                   </div>
                 </div>
               </div>
+              <div className="flex justify-between pt-4">
+                <span></span>
+                <ModalUpdateApartments apartment={apartmentData} />
+              </div>
             </div>
           </div>
-          
 
           {apartmentCoefficients.length > 0 && (
             <div className="overflow-hidden rounded-sm bg-gradient-to-br from-indigo-100 to-white border border-indigo-100 p-4 mt-4">
@@ -180,7 +184,7 @@ export default async function SingleApartmentsPage({
                   <LuChartNoAxesCombined />
                   Активные коэффициенты
                 </h2>
-                <span className="px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-sm font-medium text-indigo-700">
+                <span className="px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-sm text-sm font-medium text-indigo-700">
                   {apartmentCoefficients.length} применены
                 </span>
               </div>
@@ -206,6 +210,13 @@ export default async function SingleApartmentsPage({
                           Активен
                         </span>
                       </div>
+                    </div>
+                    <div className="flex items-center justify-end">
+                      <ModalaUpdateCoefficientTypeApartment
+                        coefficientType={bct}
+                        buildingId={Number(apartmentData.building_id)}
+                        coefficientId={bct.coefficient_id}
+                      />
                     </div>
                   </div>
                 ))}
@@ -241,10 +252,7 @@ export default async function SingleApartmentsPage({
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3 py-3">
-            <ModalDeleteApartments apartmentId={Number(apartmentData.id)} />
-            <ModalUpdateApartments apartment={apartmentData} />
-          </div>
+          <div className="flex items-center gap-3 py-3"></div>
         </div>
       </div>
     </div>

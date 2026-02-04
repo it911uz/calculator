@@ -1,39 +1,49 @@
 "use client";
 
 import { updateCoefficientType } from "@/action/coefficient-types/update-coefficcient.api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { QueryKey, useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { UpdateCoefficientTypePayload } from "@/types";
 
-export function useUpdateCoefficientType(buildingId?: number) {
+interface UpdateCoeffMutationArgs {
+  id: number;
+  data: UpdateCoefficientTypePayload;
+  params?: Record<string, unknown>;
+}
+
+export function useUpdateCoefficientType(
+  buildingId?: number,
+  extraKey?: QueryKey 
+) {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({
-      coefficientTypeId,
-      name,
-      rate,
-      coefficient_id, 
-    }: {
-      coefficientTypeId: number;
-      name: string;
-      rate: string | number;
-      coefficient_id: number;
-    }) =>
-      updateCoefficientType(coefficientTypeId, {
-        name,
-        rate,
-        coefficient_id,
-      }),
-
-    onSuccess: (data, variables) => {
-      toast.success("Обновлено успешно");
-      queryClient.invalidateQueries({
-        queryKey: ["coefficient-types", buildingId],
-      });
+  return useMutation<unknown, Error, UpdateCoeffMutationArgs>({
+    mutationFn: async ({ id, data, params }) => {
+      const res = await updateCoefficientType(id, data, params || {});
+      
+      if (res._meta?.error) {
+        throw new Error(res._meta.error);
+      }
+      return res.data;
     },
+    onSuccess: () => {
+      toast.success("Обновлено успешно");
 
+      if (buildingId) {
+        queryClient.invalidateQueries({
+          queryKey: ["coefficient-types", buildingId],
+        });
+      }
+
+      if (extraKey) {
+        queryClient.invalidateQueries({
+          queryKey: extraKey,
+          exact: false, 
+        });
+      }
+    },
     onError: (error: Error) => {
-      toast.error(error.message || "Не удалось обновить тип коэффициента",);
+      toast.error(error.message || "Ошибка при обновлении");
     },
   });
 }

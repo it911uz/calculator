@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { LoginPayload } from "@/types";
-import { loginAction } from "@/action/auth/login.api";
+import { loginAction } from "@/action/auth/login.action";
 
 
 

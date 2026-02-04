@@ -1,16 +1,11 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
 import type { IBuildings, SafeArray } from "@/types";
-function hasDataArray<T>(value: unknown): value is { data: T[] } {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "data" in value &&
-    Array.isArray((value as { data: T[] }).data)
-  );
-}
-export async function getBuildings() {
+
+export async function getBuildings(params: { search?: string; page?: number; category?: string }) {
   const result: SafeArray<IBuildings> = [];
+  const queryStr = createSearchParams(params).toString();
 
   try {
     const authData = await getAuthData();
@@ -24,7 +19,7 @@ export async function getBuildings() {
       return result;
     }
 
-    const res = await fetch(`${ENV.BASE_URL}/buildings/`, {
+const res = await fetch(`${ENV.PUBLIC_API_URL}/buildings/${queryStr ? `?${queryStr}` : ""}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authData.access}`,
@@ -57,11 +52,6 @@ export async function getBuildings() {
     if (Array.isArray(data)) {
       return data;
     }
-
-    if (hasDataArray<IBuildings>(data)) {
-      return data.data;
-    }
-
     result._meta = {
       status: res.status,
       error: "Unknown response format",

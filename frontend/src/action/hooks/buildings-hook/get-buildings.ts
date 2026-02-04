@@ -4,9 +4,10 @@ import { getBuildings } from "@/action/buildings/get-buildings.api";
 import { QueryKeys } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 
-export function useBuildings() {
-  return useQuery({
-    queryKey: QueryKeys.buildings.lists(),
-    queryFn: getBuildings,
+export function useBuildings(filters: { search?: string; page?: number } = {}) {
+    return useQuery({
+    queryKey: [QueryKeys.buildings.list, filters],
+    queryFn: () => getBuildings(filters),
+    enabled: true,
   });
 }

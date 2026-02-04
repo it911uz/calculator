@@ -1,7 +1,7 @@
 "use client";
-import Aside from "@/components/aside/page";
-import Header from "@/components/header/page";
-import MainLayout from "@/components/main/page";
+import Aside from "@/components/aside/_aside";
+import Header from "@/components/header/_header";
+import MainLayout from "@/components/main/_main";
 import React, { ReactNode, useState } from "react";
 
 interface DashboardLayoutProps {

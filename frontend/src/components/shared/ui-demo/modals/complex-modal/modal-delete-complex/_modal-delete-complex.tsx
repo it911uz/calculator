@@ -1,54 +1,42 @@
 "use client";
-
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import { useDeleteComplex } from "@/action/hooks/complex-hook/delete-complex";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { useDeleteBuilding } from "@/action/hooks/buildings-hook/delete-building";
 
-interface ModalDeleteBuildingsProps {
+interface ModalDeleteComplexProps {
   buildingId: string | number;
-  onSuccess?: () => void;
 }
-
-export function ModalDeleteBuildings({ buildingId,onSuccess}: ModalDeleteBuildingsProps) {
+export function ModalDeleteComplex({buildingId}:ModalDeleteComplexProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  
-  const deleteMutation = useDeleteBuilding();
+
+  const deleteMutation = useDeleteComplex()
+
 
   const handleDelete = async () => {
-    try {
-      await deleteMutation.mutateAsync(Number(buildingId));
-      setOpen(false);
-      toast.success("Здание успешно удалено");
-      
-      if (onSuccess) {
-        onSuccess();
-      }
-      
-      if (window.location.pathname.includes('/buildings')) {
-        router.refresh();
-      } else {
-        router.push("/buildings");
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Ошибка при удалении здания");
-    }
-  };
-
+  try {
+    await deleteMutation.mutateAsync({ id: Number(buildingId) });
+    setOpen(false);
+    router.push("/complex"); 
+  } catch (e) {
+    console.error(e);
+    toast.error("Ошибка при удалении");
+  }
+};
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button 
-          className="bg-gradient-to-br from-indigo-100 to-white hover:bg-gray-200 px-2 py-1 rounded-[3px] transition-colors"
+          className="bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-[3px] transition-colors"
           disabled={deleteMutation.isPending}
         >
           <MdOutlineDeleteForever 
             size={20} 
-            className={`${deleteMutation.isPending ? 'text-gray-400' : 'text-gray-600'}`}
+            className={`${deleteMutation.isPending ? 'text-gray-400' : 'text-gray-400'}`}
           />
         </button>
       </DialogTrigger>

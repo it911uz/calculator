@@ -1,32 +1,34 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
 import type { ICoefficientType, SafeObject, UpdateCoefficientTypePayload } from "@/types";
 
-
-
 export async function updateCoefficientType(
   coefficientTypeId: string | number,
-  payload: UpdateCoefficientTypePayload
-) {
+  payload: UpdateCoefficientTypePayload,
+  params: Record<string, unknown> = {} 
+): Promise<SafeObject<ICoefficientType>> {
   const result: SafeObject<ICoefficientType> = { data: null };
 
+  const searchParams = createSearchParams(params).toString();
   try {
     const auth = await getAuthData();
     if (!auth?.access) {
       result._meta = { 
         status: 401, 
-        error: "Sessiya muddati tugagan", 
+        error: "Срок сессии истек", 
         reason: "TOKEN" 
       };
       return result;
     }
+
     const requestBody = {
-      id: coefficientTypeId,
       name: payload.name,
       rate: String(payload.rate), 
       coefficient_id: payload.coefficient_id
     };
-    const res = await fetch(`${ENV.BASE_URL}/coefficient-types/${coefficientTypeId}/`, {
+
+    const res = await fetch(`${ENV.BASE_URL}/coefficient-types/${coefficientTypeId}/${searchParams ? `?${searchParams}` : ""}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${auth.access}`,
@@ -35,22 +37,24 @@ export async function updateCoefficientType(
       body: JSON.stringify(requestBody),
       cache: "no-store",
     });
+
     if (!res.ok) {
+      const errorData = (await res.json().catch(() => ({}))) as { detail?: string };
       result._meta = { 
         status: res.status, 
-        error: `Yangilashda xatolik: ${res.status}`, 
+        error: errorData.detail || `Ошибка при обновлении: ${res.status}`, 
         reason: "HTTP" 
       };
       return result;
     }
-    const data = await res.json();
-    result.data = data as ICoefficientType;
+
+    result.data = (await res.json()) as ICoefficientType;
     return result;
 
-  } catch (error) {
+  } catch (error: unknown) {
     result._meta = { 
       status: 500, 
-      error: error instanceof Error ? error.message : "Noma'lum xatolik", 
+      error: error instanceof Error ? error.message : "Неизвестная ошибка", 
       reason: "UNKNOWN" 
     };
     return result;
