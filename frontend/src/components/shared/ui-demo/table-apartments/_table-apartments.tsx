@@ -26,7 +26,6 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
 }) => {
   const router = useRouter();
   const [page, setPage] = useState(1);
-  console.log(initialApartments);
 
   const {
     data: apartments = initialApartments,

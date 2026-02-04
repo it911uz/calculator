@@ -152,18 +152,7 @@ export function ModalUpdateApartments({ apartment }: Props) {
               />
             </label>
           </div>
-          <label className="font-light text-sm">
-            Цена
-            <input
-              type="number"
-              name="final_price"
-              value={formData.final_price}
-              onChange={handleChange}
-              placeholder="Цена"
-              className="border p-2 rounded text-sm w-full"
-              required
-            />
-          </label>
+          
           <div className="flex justify-end gap-2 pt-4">
             <button
               type="button"
