@@ -1,13 +1,12 @@
 "use client"
 
 import { getBuildingsByComplexId } from "@/action/buildings/get-building-by-complexes.api";
-import { QueryKeys } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 
-export function useBuildingsByComplex(complexId: string | number | undefined) {
+export function useBuildingsByComplex(complexId: string | number) {
   return useQuery({
-    queryKey: [...QueryKeys.buildings.all, "complex", complexId],
-    queryFn: () => getBuildingsByComplexId(complexId!),
-    enabled: !!complexId,
+    queryKey: ["buildings", "by-complex", complexId],
+    queryFn: () => getBuildingsByComplexId(complexId),
+    enabled: !!complexId, 
   });
 }

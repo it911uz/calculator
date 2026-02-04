@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Dialog,
   DialogContent,
@@ -43,16 +42,18 @@ export function ModalEditCoefficientType({
     return;
   }
   mutate(
-    {
-      coefficientTypeId: coefficientType.id,
-      name: name.trim(),
-      rate: rate, 
-      coefficient_id: coefficientId, 
-    },
-    {
-      onSuccess: () => setOpen(false),
-    }
-  );
+      {
+        id: coefficientType.id, 
+        data: {                
+          name: name.trim(),
+          rate: rate,           
+          coefficient_id: coefficientId,
+        },
+      },
+      {
+        onSuccess: () => setOpen(false),
+      }
+    );
 };
   const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -77,7 +78,7 @@ export function ModalEditCoefficientType({
         </button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px]" onKeyDown={handleKeyDown}>
+      <DialogContent className="sm:max-w-96" onKeyDown={handleKeyDown}>
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             Редактировать тип коэффициента
@@ -123,7 +124,7 @@ export function ModalEditCoefficientType({
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={isPending}
-              className="min-w-[80px]"
+              className="min-w-20"
             >
               Отмена
             </Button>
@@ -131,7 +132,7 @@ export function ModalEditCoefficientType({
             <Button
               onClick={handleSubmit}
               disabled={isPending || !name.trim() || !rate.trim()}
-              className="min-w-[100px] bg-indigo-600 hover:bg-indigo-700"
+              className="min-w-24 bg-indigo-600 hover:bg-indigo-700"
             >
               {isPending ? (
                 <span className="flex items-center gap-2">

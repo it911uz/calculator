@@ -31,7 +31,6 @@ export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
     number: "",
     floor: "",
     room_count: "",
-    final_price: "",
     building_id: "",
     area: "",
     bct_ids: [] as number[],
@@ -112,13 +111,14 @@ export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
       building_id: Number(formData.building_id), 
       floor: Number(formData.floor) || 0,
       room_count: Number(formData.room_count) || 0,
-      final_price: formData.final_price || "0",
       area: formData.area || "0",
       bct_ids: formData.bct_ids,
     };
 
     try {
-      await createMutation.mutateAsync(apartmentData);
+      await createMutation.mutateAsync({
+        payload: apartmentData 
+      });
       toast.success("Квартира успешно добавлена");
       setOpen(false);
       
@@ -126,7 +126,6 @@ export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
         number: "",
         floor: "",
         room_count: "",
-        final_price: "",
         building_id: "",
         area: "",
         bct_ids: [],
@@ -215,19 +214,6 @@ export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
               placeholder="65.5"
             />
           </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Цена *</label>
-            <Input
-              name="final_price"
-              value={formData.final_price}
-              onChange={handleChange}
-              required
-              placeholder="15000000"
-            />
-          </div>
-
-          {/* Koeffitsientlar - To'liq kenglikda */}
           <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
             {coefficientGroups.map((group) => (
               <div key={group.id} className="space-y-2">

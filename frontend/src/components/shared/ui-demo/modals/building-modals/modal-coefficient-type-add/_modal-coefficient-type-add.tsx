@@ -25,7 +25,6 @@ export const ModalAddedCoefficientType = ({
   const [typeName, setTypeName] = useState("");
   const [rate, setRate] = useState<number | "">("");
 
-  //creted coefficient type
   const handleCreateCoefficientType = async () => {
     if (!typeName || rate === "") {
       toast.error("Заполните все поля");

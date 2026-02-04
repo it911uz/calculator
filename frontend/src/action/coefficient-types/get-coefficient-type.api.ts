@@ -1,22 +1,15 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util"; 
 import { getAuthData } from "@/lib/auth.util";
 import type { ICoefficientTypeGroup, SafeArray } from "@/types";
 
-
-
-function hasDataArray<T>(value: unknown): value is { data: T[] } {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "data" in value &&
-    Array.isArray((value as { data: T[] }).data)
-  );
-}
-
 export async function getCoefficientTypesByBuildingId(
-  buildingId: number,
-) {
+  buildingId: number | string,
+  params: Record<string, unknown> = {}
+): Promise<SafeArray<ICoefficientTypeGroup>> {
   const result: SafeArray<ICoefficientTypeGroup> = [];
+
+  const searchParams = createSearchParams(params).toString();
 
   try {
     const authData = await getAuthData();
@@ -24,65 +17,51 @@ export async function getCoefficientTypesByBuildingId(
     if (!authData?.access) {
       result._meta = {
         status: 401,
-        error: "Unauthorized token",
+        error: "Ошибка авторизации: Токен не найден",
         reason: "TOKEN",
       };
       return result;
     }
 
-    const res = await fetch(
-      `${ENV.BASE_URL}/coefficients-common/bcs-with-bcts-by-building-id/${buildingId}/`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authData.access}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        cache: "no-store",
+    const res = await fetch(`${ENV.BASE_URL}/coefficients-common/bcs-with-bcts-by-building-id/${buildingId}/${
+    searchParams ? `?${searchParams}` : ""
+  }`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authData.access}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-    );
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       result._meta = {
         status: res.status,
-        error: `HTTP error ${res.status}`,
+        error: `Ошибка HTTP: ${res.status}`,
         reason: "HTTP",
       };
       return result;
     }
 
-    let data: unknown;
-    try {
-      data = await res.json();
-    } catch {
-      result._meta = {
-        status: res.status,
-        error: "Invalid JSON response",
-        reason: "PARSE",
-      };
-      return result;
-    }
+    const data = await res.json();
 
     if (Array.isArray(data)) {
-      return data;
-    }
-
-    if (hasDataArray<ICoefficientTypeGroup>(data)) {
-      return data.data;
+      return data as ICoefficientTypeGroup[];
     }
 
     result._meta = {
       status: res.status,
-      error: "Unknown response format",
+      error: "Неизвестный формат ответа",
       reason: "UNKNOWN",
     };
     return result;
 
-  } catch {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Непредвиденная ошибка сервера";
     result._meta = {
       status: 500,
-      error: "Unexpected server error",
+      error: errorMessage,
       reason: "UNKNOWN",
     };
     return result;

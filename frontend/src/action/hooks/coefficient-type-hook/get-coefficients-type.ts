@@ -4,9 +4,9 @@ import { getCoefficientTypes } from "@/action/coefficient-types/get-coefficient-
 import { QueryKeys } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 
-export function useCoefficientTypes() {
+export function useCoefficientTypes(params: Record<string, unknown> = {}) {
   return useQuery({
-    queryKey: QueryKeys.coefficientTypes?.lists() || ["coefficientTypes", "list"],
-    queryFn: getCoefficientTypes,
+    queryKey: [...(QueryKeys.coefficientTypes?.lists() || ["coefficientTypes", "list"]), params],
+    queryFn: () => getCoefficientTypes(params),
   });
 }

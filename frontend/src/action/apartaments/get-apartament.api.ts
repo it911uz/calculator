@@ -1,12 +1,12 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
 import type { IApartment, SafeObject } from "@/types"; 
 
-
-
-export async function getApartmentById(id: string | number): Promise<SafeObject<IApartment>> {
+export async function getApartmentById(id: string | number, params: Record<string, number> = {}) {
   const result: SafeObject<IApartment> = { data: null };
-
+  const searchParams = createSearchParams(params).toString()
+  
   try {
     const auth = await getAuthData();
 
@@ -19,7 +19,7 @@ export async function getApartmentById(id: string | number): Promise<SafeObject<
       return result;
     }
 
-    const res = await fetch(`${ENV.BASE_URL}/apartments/${id}/`, {
+    const res = await fetch(`${ENV.BASE_URL}/apartments/${id}${searchParams ? `?${searchParams}` : ""}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${auth.access}`,

@@ -12,9 +12,10 @@ import { TbExternalLink } from "react-icons/tb";
 import { ImFileEmpty } from "react-icons/im";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ModalAddedBuilding } from "../modals/building-modals/modal-add-building";
-import { ModalDeleteBuildings } from "../modals/building-modals/modal-delete-buildings";
+import { ModalAddedBuilding } from "../modals/building-modals/modal-add-building/_modal-add-building";
+import { ModalDeleteBuildings } from "../modals/building-modals/modal-delete-buildings/_modal-delete-buildings";
 import type { IBuildings } from "@/types";
+import ModaDataSendingForExel from "../modals/building-modals/modal-sending-for-exel/_modal-sending-for-exel";
 
 const ITEMS_PER_PAGE = 10;
 const MAX_VISIBLE_PAGES = 5;
@@ -29,10 +30,7 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings }) => {
   const totalPages = Math.ceil(buildings.length / ITEMS_PER_PAGE);
 
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const currentItems = buildings.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
+  const currentItems = buildings.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const pages = useMemo(() => {
     let start = Math.max(1, page - Math.floor(MAX_VISIBLE_PAGES / 2));
@@ -66,57 +64,63 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings }) => {
         <ModalAddedBuilding onSuccess={handleRefresh} />
 
         <div className="flex items-center gap-1">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="px-2 py-1 text-gray-400 disabled:opacity-30"
-          >
-            ‹
-          </button>
-
-          {pages[0] > 1 && (
-            <>
-              <button onClick={() => setPage(1)} className="px-3 py-1 text-sm">
-                1
-              </button>
-              <span className="px-1 text-gray-400">…</span>
-            </>
-          )}
-
-          {pages.map((p) => (
+          <ModaDataSendingForExel />
+          <div>
             <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`px-3 py-1 rounded text-sm font-semibold
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="px-2 py-1 text-gray-400 disabled:opacity-30"
+            >
+              ‹
+            </button>
+
+            {pages[0] > 1 && (
+              <>
+                <button
+                  onClick={() => setPage(1)}
+                  className="px-3 py-1 text-sm"
+                >
+                  1
+                </button>
+                <span className="px-1 text-gray-400">…</span>
+              </>
+            )}
+
+            {pages.map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`px-3 py-1 rounded text-sm font-semibold
                 ${
                   p === page
                     ? "bg-[#282964] text-white"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
-            >
-              {p}
-            </button>
-          ))}
-
-          {pages[pages.length - 1] < totalPages && (
-            <>
-              <span className="px-1 text-gray-400">…</span>
-              <button
-                onClick={() => setPage(totalPages)}
-                className="px-3 py-1 text-sm"
               >
-                {totalPages}
+                {p}
               </button>
-            </>
-          )}
+            ))}
 
-          <button
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="px-2 py-1 text-gray-400 disabled:opacity-30"
-          >
-            ›
-          </button>
+            {pages[pages.length - 1] < totalPages && (
+              <>
+                <span className="px-1 text-gray-400">…</span>
+                <button
+                  onClick={() => setPage(totalPages)}
+                  className="px-3 py-1 text-sm"
+                >
+                  {totalPages}
+                </button>
+              </>
+            )}
+
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="px-2 py-1 text-gray-400 disabled:opacity-30"
+            >
+              ›
+            </button>
+          </div>
         </div>
       </div>
 
@@ -141,9 +145,7 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings }) => {
                 <TableCell>{item.id}</TableCell>
                 <TableCell className="font-medium">{item.name}</TableCell>
                 <TableCell>{item.floor_count}</TableCell>
-                <TableCell>
-                  {item.base_price?.toLocaleString()}
-                </TableCell>
+                <TableCell>{item.base_price?.toLocaleString()}</TableCell>
                 <TableCell className="flex gap-2 justify-end">
                   <Link
                     href={`/buildings/${item.id}`}

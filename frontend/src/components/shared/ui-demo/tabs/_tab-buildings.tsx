@@ -1,9 +1,9 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ModalUpdateBuildings } from "../modals/building-modals/modal-update-buildings";
-import { ModalDeleteBuildings } from "../modals/building-modals/modal-delete-buildings";
-import { ModalAddedCoefficient } from "../modals/building-modals/modal-add-coefficient";
+import { ModalUpdateBuildings } from "../modals/building-modals/modal-update-buildings/_modal-update-building";
+import { ModalDeleteBuildings } from "../modals/building-modals/modal-delete-buildings/_modal-delete-buildings";
+import { ModalAddedCoefficient } from "../modals/building-modals/modal-add-coefficient/_modal-add-coefficient";
 import { FaRegBuilding } from "react-icons/fa";
 import { MdOutlineBarChart } from "react-icons/md";
 import { GrMoney } from "react-icons/gr";

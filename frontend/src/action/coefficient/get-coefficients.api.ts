@@ -1,25 +1,24 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
 import type { ICoefficient, SafeArrayGetCoefficient } from "@/types";
 
-
-
-export async function getCoefficients() {
+export async function getCoefficients(params: Record<string, unknown> = {}) {
   const result: SafeArrayGetCoefficient<ICoefficient> = { data: [] };
-
+  const searchParams = createSearchParams(params).toString();
   try {
     const auth = await getAuthData();
 
     if (!auth?.access) {
       result._meta = {
         status: 401,
-        error: "Unauthorized token",
+        error: "Ошибка авторизации: Токен не найден",
         reason: "TOKEN",
       };
       return result;
     }
 
-    const res = await fetch(`${ENV.BASE_URL}/coefficients/`, {
+    const res = await fetch(`${ENV.BASE_URL}/coefficients/${searchParams ? `?${searchParams}` : ""}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${auth.access}`,
@@ -32,40 +31,35 @@ export async function getCoefficients() {
     if (!res.ok) {
       result._meta = {
         status: res.status,
-        error: `HTTP error ${res.status}`,
+        error: `Ошибка HTTP: ${res.status}`,
         reason: "HTTP",
       };
       return result;
     }
 
-    let data: unknown;
-    try {
-      data = await res.json();
-    } catch {
-      result._meta = {
-        status: res.status,
-        error: "Invalid JSON response",
-        reason: "PARSE",
-      };
-      return result;
-    }
+    const data = await res.json();
 
     if (Array.isArray(data)) {
       result.data = data as ICoefficient[];
       return result;
     }
 
+    if (data && typeof data === 'object' && 'results' in data && Array.isArray(data.results)) {
+       result.data = data.results as ICoefficient[];
+       return result;
+    }
+
     result._meta = {
       status: res.status,
-      error: "Unknown response format",
+      error: "Неизвестный формат ответа",
       reason: "UNKNOWN",
     };
     return result;
 
-  } catch (error) {
+  } catch (error: unknown) {
     result._meta = {
       status: 500,
-      error: error instanceof Error ? error.message : "Unexpected server error",
+      error: error instanceof Error ? error.message : "Непредвиденная ошибка сервера",
       reason: "UNKNOWN",
     };
     return result;

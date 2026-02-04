@@ -1,10 +1,10 @@
-import React, { startTransition, useTransition } from "react";
+import React, { useTransition } from "react";
 import { navigation } from "../shared/nav-link";
 import { usePathname } from "next/navigation";
 import { CiLogout } from "react-icons/ci";
 
 import Link from "next/link";
-import { logoutAction } from "@/action/auth/logout.api";
+import { logoutAction } from "@/action/auth/logout.action";
 interface IasideProps {
   isOpen: boolean;
 }

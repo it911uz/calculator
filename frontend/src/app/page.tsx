@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/layouts/dashboard-layout/page";
+import DashboardLayout from "@/components/layouts/dashboard-layout/_dashboard-layout";
 import Complex from "./(dashboard)/complex/page";
 import { cookies } from "next/headers"; 
 import { redirect } from "next/navigation";

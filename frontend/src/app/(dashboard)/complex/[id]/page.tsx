@@ -1,9 +1,9 @@
 import { IoIosArrowBack } from "react-icons/io";
 import { ImFileEmpty } from "react-icons/im";
-import { ModalDeleteComplex } from "@/components/shared/ui-demo/modals/complex-modal/modal-delete-complex";
+import { ModalDeleteComplex } from "@/components/shared/ui-demo/modals/complex-modal/modal-delete-complex/_modal-delete-complex";
 import { LuText } from "react-icons/lu";
 import Link from "next/link";
-import ModalUpdateComplex from "@/components/shared/ui-demo/modals/complex-modal/modal-update-complex";
+import ModalUpdateComplex from "@/components/shared/ui-demo/modals/complex-modal/modal-update-complex/_modal-update-complex";
 import { getComplexById } from "@/action/complex/get-complex.api";
 
 interface Props {

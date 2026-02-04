@@ -1,9 +1,9 @@
 "use client";
 import { FC } from "react";
-import { ModalAddedCoefficientName } from "../building-cofficient-add-name";
-import { ModalAddedCoefficientType } from "../modal-coefficient-type-add";
-import { ModalEditCoefficientType } from "../../coefficient-type-modals/coefficient-type-update";
-import { ModalDeleteCoefficientType } from "../../coefficient-type-modals/coefficient-type-delete";
+import { ModalAddedCoefficientName } from "../building-cofficient-add-name/_building-coefficient-add-name";
+import { ModalAddedCoefficientType } from "../modal-coefficient-type-add/_modal-coefficient-type-add";
+import { ModalEditCoefficientType } from "../../coefficient-type-modals/coefficient-type-update/_coefficient-type-delete";
+import { ModalDeleteCoefficientType } from "../../coefficient-type-modals/coefficient-type-delete/_coefficient-type-delete";
 import { ImFilesEmpty } from "react-icons/im";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { ICoefficientTypeGroup } from "@/types";
@@ -55,7 +55,7 @@ export const ModalAddedCoefficient: FC<ModalAddedCoefficientProps> = ({
                       <div className="flex items-center gap-2.5">
                         <button
                           onClick={() => {
-                            deleteMutation.mutate(group.id);
+                            deleteMutation.mutate({ id: group.id });
                           }}
                           className="bg-gradient-to-br from-indigo-100 to-white hover:bg-red-50 px-2 py-1 rounded-[3px] transition-colors border border-indigo-100 hover:border-red-200"
                           disabled={deleteMutation.isPending}

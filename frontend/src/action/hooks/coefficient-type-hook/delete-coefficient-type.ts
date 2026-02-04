@@ -5,16 +5,25 @@ import type { ICoefficientTypeGroup } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+interface DeleteCoefficientTypeArgs {
+  id: number | string;
+  params?: Record<string, unknown>;
+}
+
 export function useDeleteCoefficientType(buildingId: number) {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, number>({
-    mutationFn: async (id: number) => {
-      const res = await deleteCoefficientType(id);
+
+  return useMutation<void, Error, DeleteCoefficientTypeArgs>({
+    mutationFn: async ({ id, params }) => {
+      const res = await deleteCoefficientType(id, params || {});
+      
       if (!res.success || res._meta?.error) {
-        throw new Error(res._meta?.error || "O'chirishda xatolik yuz berdi");
+        throw new Error(res._meta?.error || "Произошла ошибка при удалении");
       }
     },
-    onSuccess: (_, deletedId) => {
+    onSuccess: (_, variables) => {
+      const deletedId = variables.id;
+
       queryClient.setQueryData<ICoefficientTypeGroup[]>(
         ["coefficient-types", buildingId],
         (old) => {
@@ -22,7 +31,7 @@ export function useDeleteCoefficientType(buildingId: number) {
 
           return old.map((group) => ({
             ...group,
-            bcts: group.bcts.filter((item) => item.id !== deletedId),
+            bcts: group.bcts.filter((item) => item.id !== Number(deletedId)),
           }));
         }
       );
@@ -31,9 +40,9 @@ export function useDeleteCoefficientType(buildingId: number) {
         queryKey: ["coefficient-types", buildingId]
       });
       
-      toast.success("Тип коэффициента удален.");
+      toast.success("Тип коэффициента успешно удален.");
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(error.message);
     }
   });

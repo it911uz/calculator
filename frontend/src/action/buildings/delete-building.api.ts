@@ -1,47 +1,34 @@
 import { ENV } from "@/configs/env.config";
+import { createSearchParams } from "@/lib/api.util"; 
 import { getAuthData } from "@/lib/auth.util";
 import type { SafeDelete } from "@/types";
-export async function deleteBuilding(id: string | number) {
+
+export async function deleteBuilding(id: string | number, params: Record<string, number> = {}) {
   const result: SafeDelete = { success: false };
+  const searchParams = createSearchParams(params).toString();
   try {
     const auth = await getAuthData();
-
     if (!auth?.access) {
-      result._meta = { 
-        status: 401, 
-        error: "Avtorizatsiya xatosi: Token topilmadi", 
-        reason: "TOKEN" 
-      };
+      result._meta = { status: 401, error: "Avtorizatsiya xatosi", reason: "TOKEN" };
       return result;
     }
-
-    const res = await fetch(`${ENV.BASE_URL}/buildings/${id}/`, {
+    const res = await fetch(`${ENV.BASE_URL}/buildings/${id}/${searchParams ? `?${searchParams}` : ""}`, {
       method: 'DELETE',
       headers: {
         "Authorization": `Bearer ${auth.access}`,
         "Content-Type": "application/json",
       },
     });
-
     if (!res.ok) {
-      result._meta = { 
-        status: res.status, 
-        error: `Binoni o'chirishda xatolik: ${res.status}`, 
-        reason: "HTTP" 
-      };
+      result._meta = { status: res.status, error: `Xatolik: ${res.status}`, reason: "HTTP" };
       return result;
     }
-
     result.success = true;
     result._meta = { status: res.status, reason: "HTTP" };
     return result;
 
   } catch (error) {
-    result._meta = { 
-      status: 500, 
-      error: error instanceof Error ? error.message : "Noma'lum xatolik", 
-      reason: "UNKNOWN" 
-    };
+    result._meta = { status: 500, error: "Noma'lum xatolik", reason: "UNKNOWN" };
     return result;
   }
 }

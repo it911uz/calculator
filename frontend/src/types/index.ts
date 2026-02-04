@@ -1,6 +1,5 @@
 import { CSSProperties } from "react";
 
-// Apartments types
 export interface IApartment {
   id: number;
   number: string;
@@ -10,6 +9,7 @@ export interface IApartment {
   final_price: string;  
   building_id: number;
   bct_ids?: number[];
+  block?: string
 }
 export interface ApartmentFormData {
   number: string;
@@ -127,6 +127,28 @@ export interface UpdateArgs {
   data: Partial<IBuildings>;
 }
 
+export interface CalculatePricingPayload {
+  first_investment_rate: number;
+  first_payment_date: string; 
+  period_count: number;
+}
+
+export interface CalculatePricingResponse {
+  block: string;
+  floor: number;
+  area: number;
+  first_investment_rate: number;
+  first_payment_date: string;
+  period_count: number;
+  old_price_per_sqrm: number;
+  new_price_per_sqrm: number;
+  old_total_price: number;
+  new_total_price: number;
+  monthly_payment: number;
+  payment_dates: string[];
+}
+
+
 //--------------------------------------------
 export type TMetaReason = "TOKEN" | "HTTP" | "PARSE" | "UNKNOWN";
 
@@ -154,6 +176,9 @@ export interface SafeArrayGetCoefficient<T> {
 export type ComplexArray<T = unknown> = T[] & {
   _meta?: IMetaInfo;
 };
+export interface SafeResponse<T> {
+  data?: T;
+}
 //--------------------------------------------
 // Query keys types
 export const QueryKeys = {

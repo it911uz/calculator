@@ -1,4 +1,4 @@
-import DahboardLayout from "@/components/layouts/dashboard-layout/page";
+import DahboardLayout from "@/components/layouts/dashboard-layout/_dashboard-layout";
 export default function DashboardGroupLayout({
   children,
 }: {

@@ -1,18 +1,6 @@
 import { ENV } from "@/configs/env.config";
 import { getAuthData } from "@/lib/auth.util";
 import type { IApartment, SafeArray } from "@/types";
-
-
-
-function hasDataArray<T>(value: unknown): value is { data: T[] } {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "data" in value &&
-    Array.isArray((value as { data: T[] }).data)
-  );
-}
-
 export async function getApartmentsByBuildingId(
   buildingId: number
 ) {
@@ -68,9 +56,7 @@ export async function getApartmentsByBuildingId(
       return data;
     }
 
-    if (hasDataArray<IApartment>(data)) {
-      return data.data;
-    }
+    
 
     result._meta = {
       status: res.status,

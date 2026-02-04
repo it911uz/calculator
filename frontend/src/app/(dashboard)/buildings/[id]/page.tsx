@@ -1,9 +1,10 @@
 import { IoIosArrowBack } from "react-icons/io";
 import { ImFileEmpty } from "react-icons/im";
-import { TabsDemoBuildings } from "@/components/shared/ui-demo/tabs/tab-buildings";
+import { TabsDemoBuildings } from "@/components/shared/ui-demo/tabs/_tab-buildings";
 import Link from "next/link";
 import { getBuildingById } from "@/action/buildings/get-building.api";
 import { getComplexes } from "@/action/complex/get-complexes.api";
+import { IComplex } from "@/types";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -44,7 +45,7 @@ export default async function SingleBuildingPage({ params }: Props) {
 
       <TabsDemoBuildings 
         initialBuilding={building} 
-        allComplexes={complexes} 
+        allComplexes={complexes as IComplex[]} 
       />
     </div>
   );

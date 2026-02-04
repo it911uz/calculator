@@ -67,7 +67,7 @@ export const ModalAddedComplex: FC<ModalProps> = ({ onSuccess }) => {
         </button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-w-96">
         <DialogHeader>
           <DialogTitle>Добавлять комплекс</DialogTitle>
         </DialogHeader>

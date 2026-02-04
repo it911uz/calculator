@@ -9,40 +9,44 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TbExternalLink } from "react-icons/tb";
-import { SpinnerDemo } from "../spinner-demo";
+import { SpinnerDemo } from "../spinner-demo/_spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
-import { useRouter } from "next/navigation";
-import { ModalAddedApartments } from "../modals/apartments-modals/modal-add-apartments";
-import { IApartment } from "@/types";
-import { ModalDeleteApartments } from "../modals/apartments-modals/modal-delete-apartments";
-import { useApartments } from "@/action/hooks/apartments-hook/get-apartments.hook";
-const ITEMS_PER_PAGE = 10;
+import { ModalAddedComplex } from "../modals/complex-modal/modal-add-complex/_modal-add-complex";
+import { ComplexArray, IComplex } from "@/types";
+import { ModalDeleteComplex } from "../modals/complex-modal/modal-delete-complex/_modal-delete-complex";
+import Link from "next/link";
+import { useComplexes } from "@/action/hooks/complex-hook/get-complexes";
+
+const ITEMS_PER_PAGE = 12;
 const MAX_VISIBLE_PAGES = 5;
-interface TableApartmentsProps {
-  initialApartments: IApartment[];
+
+interface TableComplexProps {
+  initialComplex: IComplex[] | ComplexArray;
 }
-const TableApartments: React.FC<TableApartmentsProps> = ({
-  initialApartments,
-}) => {
-  const router = useRouter();
+
+const TableObjects: React.FC<TableComplexProps> = ({ initialComplex }) => {
   const [page, setPage] = useState(1);
-  console.log(initialApartments);
 
   const {
-    data: apartments = initialApartments,
+    data: complexData,
     isLoading,
     error,
     refetch,
-  } = useApartments();
+  } = useComplexes();
+
   const refreshData = async () => {
     await refetch();
   };
-  const totalPages = Math.ceil(apartments.length / ITEMS_PER_PAGE);
+  const complex: IComplex[] = Array.isArray(complexData) 
+    ? (complexData as IComplex[]) 
+    : Array.isArray(initialComplex) 
+    ? (initialComplex as IComplex[]) 
+    : [];
+
+  const totalPages = Math.ceil(complex.length / ITEMS_PER_PAGE);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const currentItems = apartments.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE,
-  );
+  const currentItems = complex.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const getPages = () => {
     let start = Math.max(1, page - Math.floor(MAX_VISIBLE_PAGES / 2));
     let end = start + MAX_VISIBLE_PAGES - 1;
@@ -51,20 +55,20 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
       end = totalPages;
       start = Math.max(1, end - MAX_VISIBLE_PAGES + 1);
     }
+
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
+
   const pages = getPages();
-  const handleViewApartment = (apartmentId: number) => {
-    console.log("Navigating to:", `/apartments/${apartmentId}`);
-    router.push(`/apartments/${apartmentId}`);
-  };
+
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-80">
+      <div className="flex justify-center items-center min-h-96">
         <SpinnerDemo />
       </div>
     );
   }
+
   if (error) {
     return (
       <div className="text-center p-8">
@@ -78,21 +82,23 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
       </div>
     );
   }
-  if (apartments.length === 0) {
+
+  if (complex.length === 0) {
     return (
-      <div className="text-center ">
-        <div className="flex flex-1">
-          <ModalAddedApartments onSuccess={refreshData} />
+      <div className="text-center">
+        <div className="flex justify-start ">
+          <ModalAddedComplex onSuccess={refreshData} />
         </div>
         <p className="text-gray-500 mb-4">Информация не найдена</p>
         <ImFileEmpty size={48} className="mx-auto text-gray-300" />
       </div>
     );
   }
+
   return (
     <section>
       <div className="flex w-full justify-between items-center pb-4">
-        <ModalAddedApartments onSuccess={refreshData} />
+        <ModalAddedComplex onSuccess={refreshData} />
 
         <div className="flex items-center">
           <button
@@ -158,12 +164,8 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
             <TableRow>
               <TableHead>№</TableHead>
               <TableHead>ИД</TableHead>
-              <TableHead>Номер</TableHead>
-              <TableHead>Этаж</TableHead>
-              <TableHead>Площадь</TableHead>
-              <TableHead>Комнат</TableHead>
-              <TableHead>Цена</TableHead>
-              <TableHead>Здание</TableHead>
+              <TableHead>Имя</TableHead>
+              <TableHead>Описание</TableHead>
               <TableHead>Действия</TableHead>
             </TableRow>
           </TableHeader>
@@ -175,28 +177,19 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
                   {startIndex + i + 1}
                 </TableCell>
                 <TableCell>{item.id}</TableCell>
-                <TableCell>{item.number}</TableCell>
-                <TableCell>{item.floor}</TableCell>
-                <TableCell>{item.area} м²</TableCell>
-                <TableCell>{item.room_count}</TableCell>
-                <TableCell>
-                  {typeof item.final_price === "string"
-                    ? item.final_price
-                    : item.final_price}
+                <TableCell>{item.name}</TableCell>
+                <TableCell className="max-w-72 truncate">
+                  {item.description}
                 </TableCell>
-                <TableCell>{item.building_id}</TableCell>
-                <TableCell className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleViewApartment(item.id as number)}
-                    className="p-1.5 hover:bg-gray-100 rounded transition"
+                <TableCell className="text-right space-x-2">
+                  <Link
+                    href={`/complex/${item.id}`}
+                    className="inline-block p-1.5 hover:bg-gray-100 rounded transition"
                     title="Просмотр"
                   >
-                    <TbExternalLink size={16} color="#282965" />
-                  </button>
-                  <ModalDeleteApartments
-                    apartmentId={Number(item.id)}
-                    onSuccess={refreshData}
-                  />
+                    <TbExternalLink size={16} color="#282964" />
+                  </Link>
+                  <ModalDeleteComplex buildingId={item.id} />
                 </TableCell>
               </TableRow>
             ))}
@@ -207,8 +200,8 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
       <div className="mt-4 text-sm text-gray-500 flex justify-between items-center">
         <div>
           Показано {startIndex + 1}-
-          {Math.min(startIndex + ITEMS_PER_PAGE, apartments.length)} из{" "}
-          {apartments.length} квартир
+          {Math.min(startIndex + ITEMS_PER_PAGE, complex.length)} из{" "}
+          {complex.length} комплексов
         </div>
         <div className="flex items-center gap-2">
           <span>
@@ -226,4 +219,4 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
   );
 };
 
-export default TableApartments;
+export default TableObjects;
