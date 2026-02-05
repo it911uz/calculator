@@ -1,7 +1,7 @@
 "use server";
 
 import { ENV } from "@/configs/env.config";
-import { LoginResponse } from "@/types";
+import type { LoginResponse } from "@/types/auth.types";
 import { cookies } from "next/headers";
 
 export async function loginAction(formData: FormData): Promise<void> {

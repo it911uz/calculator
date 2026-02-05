@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util"; 
 import { getAuthData } from "@/lib/auth.util";
-import type { ICoefficientTypeGroup, SafeArray } from "@/types";
+import type { ICoefficientTypeGroup } from "@/types/coefficient-type.types";
+import type { SafeArray } from "@/types/safe-response.types";
 
 export async function getCoefficientTypesByBuildingId(
   buildingId: number | string,

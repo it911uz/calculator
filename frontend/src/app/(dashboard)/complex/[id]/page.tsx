@@ -5,13 +5,17 @@ import { LuText } from "react-icons/lu";
 import Link from "next/link";
 import ModalUpdateComplex from "@/components/shared/ui-demo/modals/complex-modal/modal-update-complex/_modal-update-complex";
 import { getComplexById } from "@/action/complex/get-complex.api";
+import { getAuthData } from "@/lib/auth.util";
+import { redirect } from "next/navigation";
+import { Props } from "@/types/props.types";
 
-interface Props {
-  params: Promise<{ id: string }>;
-}
 
 export default async function SingleComplexPage({ params }: Props) {
+
+  const { access } = await getAuthData();
+  if (!access) redirect('/login');
   const { id } = await params;
+  if (!id) redirect('/complex');
   const currentComplexSafe = await getComplexById(id);
 
   const currentComplex = currentComplexSafe.data;

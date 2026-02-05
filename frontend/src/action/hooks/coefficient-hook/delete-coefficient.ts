@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteCoefficient } from "@/action/coefficient/delete-coefficients.api";
-import { QueryKeys } from "@/types";
+import { QueryKeys } from "@/lib/query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

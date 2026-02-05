@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteCoefficientType } from "@/action/coefficient-types/delete-coefficient.api";
-import type { ICoefficientTypeGroup } from "@/types";
+import { ICoefficientTypeGroup } from "@/types/coefficient-type.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

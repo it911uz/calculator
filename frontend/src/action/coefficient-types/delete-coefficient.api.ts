@@ -1,7 +1,7 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { SafeDelete } from "@/types";
+import type { SafeDelete } from "@/types/safe-response.types";
 
 export async function deleteCoefficientType(
   id: string | number, 

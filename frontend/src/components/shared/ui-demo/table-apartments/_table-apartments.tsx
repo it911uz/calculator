@@ -13,14 +13,12 @@ import { SpinnerDemo } from "../spinner-demo/_spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { ModalAddedApartments } from "../modals/apartments-modals/modal-add-apartments/_modal-add-apartments";
-import { IApartment } from "@/types";
 import { ModalDeleteApartments } from "../modals/apartments-modals/modal-delete-apartments/_modal-delete-apartment";
 import { useApartments } from "@/action/hooks/apartments-hook/get-apartments.hook";
+import { TableApartmentsProps } from "@/types/props.types";
 const ITEMS_PER_PAGE = 10;
 const MAX_VISIBLE_PAGES = 5;
-interface TableApartmentsProps {
-  initialApartments: IApartment[];
-}
+
 const TableApartments: React.FC<TableApartmentsProps> = ({
   initialApartments,
 }) => {

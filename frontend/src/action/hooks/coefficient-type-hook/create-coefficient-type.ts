@@ -1,6 +1,6 @@
 "use client";
 import { createCoefficientType } from "@/action/coefficient-types/create-coefficient.api";
-import type { ICoefficientType } from "@/types";
+import { ICoefficientType } from "@/types/coefficient-type.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateCoefficientType() {

@@ -1,5 +1,5 @@
-import React, { forwardRef } from "react";
-import { CalculatePricingResponse } from "@/types";
+import type { CalculatePricingResponse } from "@/types/calculator.types";
+import { forwardRef } from "react";
 
 interface Props {
   data: CalculatePricingResponse;

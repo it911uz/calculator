@@ -1,8 +1,8 @@
 "use client";
 
 import { createBuilding } from "@/action/buildings/create-building.api";
-import  {  QueryKeys } from "@/types";
-import type { IBuildings } from "@/types";
+import { QueryKeys } from "@/lib/query-keys";
+import type { IBuildings } from "@/types/building.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

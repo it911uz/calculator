@@ -7,15 +7,12 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { ModalDeleteCoefficientTypeProps } from "@/types/props.types";
 import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 
-interface ModalDeleteCoefficientTypeProps {
-  coefficientTypeId: number;
-  buildingId: number;
-  onSuccess?: () => void;
-}
+
 export function ModalDeleteCoefficientType({
   coefficientTypeId,
   buildingId,

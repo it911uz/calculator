@@ -1,7 +1,7 @@
 "use client";
 
 import { getComplexById } from "@/action/complex/get-complex.api";
-import type { IComplex } from "@/types";
+import type { IComplex } from "@/types/complex.types";
 import { useQuery } from "@tanstack/react-query";
 
 export function useComplexById(
@@ -25,6 +25,5 @@ export function useComplexById(
       
       return res.data;
     },
-    enabled: !!id, 
   });
 }

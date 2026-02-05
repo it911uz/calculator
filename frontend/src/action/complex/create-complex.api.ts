@@ -1,6 +1,7 @@
-import type { IComplex, SafeObject } from "@/types";
 import { ENV } from "@/configs/env.config";
 import { getAuthData } from "@/lib/auth.util";
+import type { IComplex } from "@/types/complex.types";
+import type { SafeObject } from "@/types/safe-response.types";
 
 
 export async function createComplex(payload: Partial<IComplex>) {

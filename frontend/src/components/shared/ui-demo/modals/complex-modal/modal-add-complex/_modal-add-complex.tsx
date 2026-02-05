@@ -11,14 +11,13 @@ import {
   DialogFooter 
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ModalPropsModalAddedComplex } from "@/types/props.types";
 import { FC, useState } from "react";
 import { toast } from "sonner";
 
-type ModalProps = {
-  onSuccess?: () => Promise<void>; 
-};
 
-export const ModalAddedComplex: FC<ModalProps> = ({ onSuccess }) => {
+
+export const ModalAddedComplex: FC<ModalPropsModalAddedComplex> = ({ onSuccess }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ name: "", description: "" });

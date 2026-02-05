@@ -1,7 +1,7 @@
 "use client";
 
 import { createCoefficient } from "@/action/coefficient/create-coefficients.api";
-import type { CreateCoefficientPayload } from "@/types";
+import type { CreateCoefficientPayload } from "@/types/coefficient-type.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

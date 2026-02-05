@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { IComplex } from "@/types";
 import { useRouter } from "next/navigation";
 import { useUpdateComplex } from "@/action/hooks/complex-hook/update-complex";
+import { IComplex } from "@/types/complex.types";
 
 const ModalUpdateComplex = ({ complex }: { complex: IComplex }) => {
   const [open, setOpen] = useState(false);

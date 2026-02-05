@@ -7,14 +7,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { IBuildings } from "@/types";
 import { Input } from "@/components/ui/input";
 import { useUpdateBuilding } from "@/action/hooks/buildings-hook/update-building";
+import type { ModalUpdateBuildingsProps } from "@/types/props.types";
 
-interface ModalUpdateBuildingsProps {
-  building: IBuildings;
-  onSuccess?: () => void;
-}
+
 
 export function ModalUpdateBuildings({
   building,

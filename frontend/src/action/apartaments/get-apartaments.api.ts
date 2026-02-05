@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { IApartment, SafeArray } from "@/types";
+import { IApartment } from "@/types/apartment.types";
+import { SafeArray } from "@/types/safe-response.types";
 export async function getApartments(params: Record<string, number> = {}) {  const result: SafeArray<IApartment> = [];
   const searchParams = createSearchParams(params).toString();
   try {

@@ -14,15 +14,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ModalAddedBuilding } from "../modals/building-modals/modal-add-building/_modal-add-building";
 import { ModalDeleteBuildings } from "../modals/building-modals/modal-delete-buildings/_modal-delete-buildings";
-import type { IBuildings } from "@/types";
 import ModaDataSendingForExel from "../modals/building-modals/modal-sending-for-exel/_modal-sending-for-exel";
+import type { TableBuildingsProps } from "@/types/props.types";
 
 const ITEMS_PER_PAGE = 10;
 const MAX_VISIBLE_PAGES = 5;
 
-interface TableBuildingsProps {
-  buildings: IBuildings[];
-}
+
 const TableBuildings: FC<TableBuildingsProps> = ({ buildings }) => {
   const router = useRouter();
   const [page, setPage] = useState(1);

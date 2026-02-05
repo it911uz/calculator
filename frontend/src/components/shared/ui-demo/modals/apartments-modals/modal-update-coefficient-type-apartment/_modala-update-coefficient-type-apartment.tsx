@@ -10,23 +10,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { ICoefficientType, QueryKeys } from "@/types";
 import { MdEdit } from "react-icons/md";
 import { toast } from "sonner";
 import { useUpdateCoefficientType } from "@/action/hooks/coefficient-type-hook/update-coefficient-type";
 import { useRouter } from "next/navigation";
+import { QueryKeys } from "@/lib/query-keys";
+import type { PropsModalaUpdateCoefficientTypeApartment } from "@/types/props.types";
 
-interface Props {
-  coefficientType: ICoefficientType;
-  buildingId: number;
-  coefficientId: number; 
-}
 
 export function ModalaUpdateCoefficientTypeApartment({
   coefficientType,
   buildingId,
   coefficientId,
-}: Props) {
+}: PropsModalaUpdateCoefficientTypeApartment) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [rate, setRate] = useState("");

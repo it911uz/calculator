@@ -1,7 +1,7 @@
 "use client";
 
 import { createApartment } from "@/action/apartaments/create-apartment.api";
-import type { IApartment } from "@/types";
+import type { IApartment } from "@/types/apartment.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

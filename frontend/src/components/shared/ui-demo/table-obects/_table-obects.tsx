@@ -12,17 +12,16 @@ import { TbExternalLink } from "react-icons/tb";
 import { SpinnerDemo } from "../spinner-demo/_spinner-demo";
 import { ImFileEmpty } from "react-icons/im";
 import { ModalAddedComplex } from "../modals/complex-modal/modal-add-complex/_modal-add-complex";
-import { ComplexArray, IComplex } from "@/types";
 import { ModalDeleteComplex } from "../modals/complex-modal/modal-delete-complex/_modal-delete-complex";
 import Link from "next/link";
 import { useComplexes } from "@/action/hooks/complex-hook/get-complexes";
+import type { TableComplexProps } from "@/types/props.types";
+import { IComplex } from "@/types/complex.types";
 
 const ITEMS_PER_PAGE = 12;
 const MAX_VISIBLE_PAGES = 5;
 
-interface TableComplexProps {
-  initialComplex: IComplex[] | ComplexArray;
-}
+
 
 const TableObjects: React.FC<TableComplexProps> = ({ initialComplex }) => {
   const [page, setPage] = useState(1);

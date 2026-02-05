@@ -1,0 +1,38 @@
+export const QueryKeys = {
+  apartments: {
+    all: ['apartments'] as const,
+    lists: () => [...QueryKeys.apartments.all, 'list'] as const,
+    list: (filters: string) => [...QueryKeys.apartments.lists(), { filters }] as const,
+    details: () => [...QueryKeys.apartments.all, 'detail'] as const,
+    detail: (id: string | number) => [...QueryKeys.apartments.details(), id] as const,
+  },
+  buildings: {
+    all: ['buildings'] as const,
+    lists: () => [...QueryKeys.buildings.all, 'list'] as const,
+    list: (filters: string) => [...QueryKeys.buildings.lists(), { filters }] as const,
+    details: () => [...QueryKeys.buildings.all, 'detail'] as const,
+    detail: (id: string | number) => [...QueryKeys.buildings.details(), id] as const,
+  },
+  complex: {
+    all: ['complex'] as const,
+    lists: () => [...QueryKeys.complex.all, 'list'] as const,
+    list: (filters: string) => [...QueryKeys.complex.lists(), { filters }] as const,
+    details: () => [...QueryKeys.complex.all, 'detail'] as const,
+    detail: (id: string | number) => [...QueryKeys.complex.details(), id] as const,
+  },
+  coefficients: {
+    all: ['coefficients'] as const,
+    lists: () => [...QueryKeys.coefficients.all, 'list'] as const,
+    list: (filters: string) => [...QueryKeys.coefficients.lists(), { filters }] as const,
+    details: () => [...QueryKeys.coefficients.all, 'detail'] as const,
+    detail: (id: string | number) => [...QueryKeys.coefficients.details(), id] as const,
+  },
+  coefficientTypes: {
+    all: ['coefficientTypes'] as const,
+    lists: () => [...QueryKeys.coefficientTypes.all, 'list'] as const,
+    list: (filters: string) => [...QueryKeys.coefficientTypes.lists(), { filters }] as const,
+    details: () => [...QueryKeys.coefficientTypes.all, 'detail'] as const,
+    detail: (id: string | number) => [...QueryKeys.coefficientTypes.details(), id] as const,
+    byBuilding: (buildingId: number) => [...QueryKeys.coefficientTypes.all, 'building', buildingId] as const,
+  },
+};

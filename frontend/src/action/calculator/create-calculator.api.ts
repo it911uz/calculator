@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { CalculatePricingPayload, CalculatePricingResponse, SafeObject } from "@/types";
+import type { CalculatePricingPayload, CalculatePricingResponse } from "@/types/calculator.types";
+import type { SafeObject } from "@/types/safe-response.types";
 
 export async function calculateApartmentPricing(
   apartmentId: number | string,

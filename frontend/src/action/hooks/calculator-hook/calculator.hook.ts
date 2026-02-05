@@ -1,9 +1,9 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import type { CalculatePricingPayload } from "@/types";
 import { toast } from "sonner";
 import { calculateApartmentPricing } from "@/action/calculator/create-calculator.api";
+import type { CalculatePricingPayload } from "@/types/calculator.types";
 interface CalculateArgs {
   apartmentId: number | string;
   payload: CalculatePricingPayload;

@@ -11,9 +11,10 @@ import {
 import { useComplexes } from "@/action/hooks/complex-hook/get-complexes";
 import { useBuildings } from "@/action/hooks/buildings-hook/get-buildings";
 import { toast } from "sonner";
-import { IBuildings, IComplex } from "@/types";
 import { ChevronRight, RefreshCcw, FileUp } from "lucide-react";
 import { useBulkCreateApartments } from "@/action/hooks/create-excel-hook/use-bulk-create-apartments";
+import type { IComplex } from "@/types/complex.types";
+import type { IBuildings } from "@/types/building.types";
 
 const ModaDataSendingForExel = () => {
   // States

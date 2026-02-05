@@ -14,13 +14,15 @@ import { LuChartNoAxesCombined } from "react-icons/lu";
 import { getApartmentById } from "@/action/apartaments/get-apartament.api";
 import { getCoefficientTypesByBuildingId } from "@/action/coefficient-types/get-coefficient-type.api";
 import { ModalaUpdateCoefficientTypeApartment } from "@/components/shared/ui-demo/modals/apartments-modals/modal-update-coefficient-type-apartment/_modala-update-coefficient-type-apartment";
+import { getAuthData } from "@/lib/auth.util";
+import { redirect } from "next/navigation";
+import type { Props } from "@/types/props.types";
 
-export default async function SingleApartmentsPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function SingleApartmentsPage({params}: Props) {
+  const { access } = await getAuthData();
+  if (!access) redirect('/login');
   const { id } = await params;
+  if (!id) redirect('/apartments');
 
   const apartment = await getApartmentById(Number(id));
 

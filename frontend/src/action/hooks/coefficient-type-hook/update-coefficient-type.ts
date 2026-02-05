@@ -1,9 +1,9 @@
 "use client";
 
 import { updateCoefficientType } from "@/action/coefficient-types/update-coefficcient.api";
+import { UpdateCoefficientTypePayload } from "@/types/coefficient-type.types";
 import { QueryKey, useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { UpdateCoefficientTypePayload } from "@/types";
 
 interface UpdateCoeffMutationArgs {
   id: number;

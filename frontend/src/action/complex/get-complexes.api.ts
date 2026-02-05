@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util"; 
 import { getAuthData } from "@/lib/auth.util";
-import type { ComplexArray, IComplex } from "@/types";
+import type { IComplex } from "@/types/complex.types";
+import type { ComplexArray } from "@/types/safe-response.types";
 
 export async function getComplexes(params: Record<string, unknown> = {}) {
   const result: ComplexArray = [];

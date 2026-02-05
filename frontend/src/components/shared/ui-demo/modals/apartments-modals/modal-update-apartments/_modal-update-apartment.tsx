@@ -6,22 +6,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ApartmentFormData, IApartment } from "@/types";
 import { useState } from "react";
 import { toast } from "sonner";
 import { MdEdit } from "react-icons/md";
 import { useUpdateApartment } from "@/action/hooks/apartments-hook/update-apartment.hook";
+import type { ApartmentFormData, IApartment } from "@/types/apartment.types";
+import type { PropsModalUpdateApartments } from "@/types/props.types";
 
 interface ApiError {
   message: string;
   detail?: string;
 }
 
-interface Props {
-  apartment: IApartment;
-}
 
-export function ModalUpdateApartments({ apartment }: Props) {
+export function ModalUpdateApartments({ apartment }: PropsModalUpdateApartments) {
   const [open, setOpen] = useState(false);
   const updateMutation = useUpdateApartment();
   const [formData, setFormData] = useState<ApartmentFormData>({

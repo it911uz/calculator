@@ -1,10 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { IApartment, SafeObject } from "@/types";
-
-
-
+import type { IApartment } from "@/types/apartment.types";
+import type { SafeObject } from "@/types/safe-response.types";
 export async function updateApartment(
   id: string | number, 
   payload: Partial<IApartment>,

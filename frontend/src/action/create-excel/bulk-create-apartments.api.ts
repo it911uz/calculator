@@ -1,6 +1,6 @@
 import { ENV } from "@/configs/env.config";
 import { getAuthData } from "@/lib/auth.util";
-import type { SafeResponse } from "@/types";
+import { SafeResponse } from "@/types/safe-response.types";
 
 interface BulkCreateResponseData {
   message?: string;

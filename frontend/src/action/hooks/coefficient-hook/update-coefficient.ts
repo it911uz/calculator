@@ -1,8 +1,8 @@
 "use client";
 
 import { updateCoefficient } from "@/action/coefficient/update-coefficients.api";
-import type { ICoefficient } from "@/types";
-import { QueryKeys } from "@/types";
+import { QueryKeys } from "@/lib/query-keys";
+import type { ICoefficient } from "@/types/coefficient-type.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
