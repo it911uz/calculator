@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { ICoefficientType, SafeObject, UpdateCoefficientTypePayload } from "@/types";
+import type { ICoefficientType, UpdateCoefficientTypePayload } from "@/types/coefficient-type.types";
+import type { SafeObject } from "@/types/safe-response.types";
 
 export async function updateCoefficientType(
   coefficientTypeId: string | number,

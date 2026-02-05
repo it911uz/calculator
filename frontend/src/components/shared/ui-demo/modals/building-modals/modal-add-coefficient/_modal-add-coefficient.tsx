@@ -6,9 +6,9 @@ import { ModalEditCoefficientType } from "../../coefficient-type-modals/coeffici
 import { ModalDeleteCoefficientType } from "../../coefficient-type-modals/coefficient-type-delete/_coefficient-type-delete";
 import { ImFilesEmpty } from "react-icons/im";
 import { MdOutlineDeleteForever } from "react-icons/md";
-import { ICoefficientTypeGroup } from "@/types";
 import { useCoefficientTypesByBuildingId } from "@/action/hooks/coefficient-type-hook/get-coefficient-type";
 import { useDeleteCoefficient } from "@/action/hooks/coefficient-hook/delete-coefficient";
+import type { ICoefficientTypeGroup } from "@/types/coefficient-type.types";
 
 interface ModalAddedCoefficientProps {
   buildingId: number;

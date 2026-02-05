@@ -1,8 +1,9 @@
 "use client";
 
 import { deleteComplex } from "@/action/complex/delete-complex.api";
-import type { IComplex, SafeDelete } from "@/types";
-import { QueryKeys } from "@/types";
+import { QueryKeys } from "@/lib/query-keys";
+import type { IComplex } from "@/types/complex.types";
+import type { SafeDelete } from "@/types/safe-response.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

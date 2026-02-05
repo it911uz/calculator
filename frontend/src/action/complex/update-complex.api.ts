@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { IComplex, SafeObject } from "@/types";
+import type { IComplex } from "@/types/complex.types";
+import type { SafeObject } from "@/types/safe-response.types";
 
 export async function updateComplex(
   id: string | number, 

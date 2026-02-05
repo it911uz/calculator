@@ -1,9 +1,9 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { QueryKeys } from "@/types";
 import { toast } from "sonner";
 import { bulkCreateApartments } from "@/action/create-excel/bulk-create-apartments.api";
+import { QueryKeys } from "@/lib/query-keys";
 
 interface BulkCreateArgs {
   buildingId: number | string;

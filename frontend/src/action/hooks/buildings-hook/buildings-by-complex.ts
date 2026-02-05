@@ -7,6 +7,5 @@ export function useBuildingsByComplex(complexId: string | number) {
   return useQuery({
     queryKey: ["buildings", "by-complex", complexId],
     queryFn: () => getBuildingsByComplexId(complexId),
-    enabled: !!complexId, 
   });
 }

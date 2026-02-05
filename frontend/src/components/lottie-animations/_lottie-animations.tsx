@@ -2,7 +2,7 @@
 
 import Lottie from "lottie-react";
 
-import { LottieAnimationProps } from "@/types";
+import { LottieAnimationProps } from "@/types/lottie.types";
 
 
 export function LottieAnimation({

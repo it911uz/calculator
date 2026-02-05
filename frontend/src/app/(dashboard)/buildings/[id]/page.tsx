@@ -4,15 +4,21 @@ import { TabsDemoBuildings } from "@/components/shared/ui-demo/tabs/_tab-buildin
 import Link from "next/link";
 import { getBuildingById } from "@/action/buildings/get-building.api";
 import { getComplexes } from "@/action/complex/get-complexes.api";
-import { IComplex } from "@/types";
+import type { IComplex } from "@/types/complex.types";
+import { getAuthData } from "@/lib/auth.util";
+import { redirect } from "next/navigation";
+import type { Props } from "@/types/props.types";
 
-interface Props {
-  params: Promise<{ id: string }>;
-}
 
 export default async function SingleBuildingPage({ params }: Props) {
-  const { id } = await params;
 
+  const { access } = await getAuthData()
+
+  if(!access) {
+    redirect("/login")
+  }
+  const { id } = await params;
+  if(!id) { redirect("/buildings")}
   const [buildingSafe, complexes] = await Promise.all([
     getBuildingById(id),
     getComplexes(),

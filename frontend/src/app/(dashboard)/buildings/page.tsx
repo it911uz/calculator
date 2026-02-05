@@ -1,11 +1,13 @@
 import { getBuildings } from '@/action/buildings/get-buildings.api';
 import TableBuildings from '@/components/shared/ui-demo/table-buildings/_table-buildings';
-import { cookies } from 'next/headers';
+import { getAuthData } from '@/lib/auth.util';
 import { redirect } from 'next/navigation';
 export default async function BuildingsPage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-  if (!token) redirect("/login");
+  const { access } = await getAuthData() 
+
+  if (!access) {
+    redirect('/login');
+  }
   const buildings = await getBuildings({});
   return (
     <div><TableBuildings buildings={buildings}/></div>

@@ -9,22 +9,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { ICoefficientType } from "@/types";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { toast } from "sonner";
 import { useUpdateCoefficientType } from "@/action/hooks/coefficient-type-hook/update-coefficient-type";
+import type { PropsModalEditCoefficientType } from "@/types/props.types";
 
-interface Props {
-  coefficientType: ICoefficientType;
-  coefficientId: number;
-  buildingId: number;
-}
+
 
 export function ModalEditCoefficientType({
   coefficientType,
   buildingId,
   coefficientId,
-}: Props) {
+}: PropsModalEditCoefficientType) {
   const [name, setName] = useState("");
   const [rate, setRate] = useState<string>("");
   const [open, setOpen] = useState(false);

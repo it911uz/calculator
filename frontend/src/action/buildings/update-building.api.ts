@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { IBuildings, SafeObject } from "@/types";
+import { IBuildings } from "@/types/building.types";
+import { SafeObject } from "@/types/safe-response.types";
 
 export async function updateBuilding(
   id: string | number,

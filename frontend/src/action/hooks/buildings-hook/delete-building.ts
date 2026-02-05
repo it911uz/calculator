@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteBuilding } from "@/action/buildings/delete-building.api";
-import { QueryKeys } from "@/types";
+import { QueryKeys } from "@/lib/query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -18,8 +18,6 @@ export function useDeleteBuilding() {
       if (response.success) {
         queryClient.invalidateQueries({ queryKey: QueryKeys.buildings.all });
         queryClient.removeQueries({ queryKey: QueryKeys.buildings.detail(id) });
-        
-      } else {
       }
     },
     onError: (error) => {

@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { IBuildings, SafeArray } from "@/types";
+import type { IBuildings } from "@/types/building.types";
+import type { SafeArray } from "@/types/safe-response.types";
 
 export async function getBuildings(params: { search?: string; page?: number; category?: string }) {
   const result: SafeArray<IBuildings> = [];

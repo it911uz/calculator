@@ -12,16 +12,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { FC, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { ICoefficientTypeGroup } from "@/types";
 import { useBuildings } from "@/action/hooks/buildings-hook/get-buildings";
 import { useCreateApartment } from "@/action/hooks/apartments-hook/create-apartment.hook";
 import { getCoefficientTypesByBuildingId } from "@/action/coefficient-types/get-coefficient-type.api";
+import type { ICoefficientTypeGroup } from "@/types/coefficient-type.types";
+import type { TModalPropsAddedApartments } from "@/types/props.types";
 
-type ModalProps = {
-  onSuccess?: () => void;
-};
-
-export const ModalAddedApartments: FC<ModalProps> = ({ onSuccess }) => {
+export const ModalAddedApartments: FC<TModalPropsAddedApartments> = ({ onSuccess }) => {
   const { data: buildings = [] } = useBuildings();
   const createMutation = useCreateApartment();
 

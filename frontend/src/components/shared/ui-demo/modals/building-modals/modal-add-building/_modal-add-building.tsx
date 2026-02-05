@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { IComplex } from "@/types";
+import type { IComplex } from "@/types/complex.types";
 import { FC, useState } from "react";
 import { toast } from "sonner";
 

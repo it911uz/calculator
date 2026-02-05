@@ -1,6 +1,7 @@
 import { ENV } from "@/configs/env.config";
 import { getAuthData } from "@/lib/auth.util";
-import type { IApartment, SafeArray } from "@/types";
+import type { IApartment } from "@/types/apartment.types";
+import type { SafeArray } from "@/types/safe-response.types";
 export async function getApartmentsByBuildingId(
   buildingId: number
 ) {

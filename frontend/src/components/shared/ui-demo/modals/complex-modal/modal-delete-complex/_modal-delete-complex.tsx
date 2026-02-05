@@ -1,16 +1,17 @@
 "use client";
 import { useDeleteComplex } from "@/action/hooks/complex-hook/delete-complex";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import type { ModalDeleteComplexProps } from "@/types/props.types";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 
-interface ModalDeleteComplexProps {
-  buildingId: string | number;
-}
-export function ModalDeleteComplex({buildingId}:ModalDeleteComplexProps) {
+
+export function ModalDeleteComplex({buildingId}:ModalDeleteComplexProps
+
+) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 

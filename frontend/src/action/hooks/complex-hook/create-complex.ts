@@ -1,8 +1,8 @@
 "use client";
 
 import { createComplex } from "@/action/complex/create-complex.api";
-import type { IComplex } from "@/types";
-import { QueryKeys } from "@/types";
+import { QueryKeys } from "@/lib/query-keys";
+import { IComplex } from "@/types/complex.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

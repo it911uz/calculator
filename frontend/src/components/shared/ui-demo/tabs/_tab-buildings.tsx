@@ -8,12 +8,9 @@ import { FaRegBuilding } from "react-icons/fa";
 import { MdOutlineBarChart } from "react-icons/md";
 import { GrMoney } from "react-icons/gr";
 import { useRouter } from "next/navigation";
-import { IBuildings, IComplex } from "@/types";
+import type { TabsProps } from "@/types/props.types";
 
-interface TabsProps {
-  initialBuilding: IBuildings;
-  allComplexes: IComplex[];
-}
+
 
 export function TabsDemoBuildings({ initialBuilding, allComplexes }: TabsProps) {
   const router = useRouter();

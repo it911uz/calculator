@@ -15,14 +15,12 @@ import { useApartments } from "@/action/hooks/apartments-hook/get-apartments.hoo
 import { useCalculatePricing } from "@/action/hooks/calculator-hook/calculator.hook";
 import { useBuildings } from "@/action/hooks/buildings-hook/get-buildings";
 import { useComplexes } from "@/action/hooks/complex-hook/get-complexes";
-import type {
-  CalculatePricingPayload,
-  CalculatePricingResponse,
-  IApartment,
-  IBuildings,
-  IComplex,
-  SafeResponse,
-} from "@/types";
+import type { CalculatePricingPayload, CalculatePricingResponse } from "@/types/calculator.types";
+import type { IComplex } from "@/types/complex.types";
+import type { IBuildings } from "@/types/building.types";
+import type { IApartment } from "@/types/apartment.types";
+import type { SafeResponse } from "@/types/safe-response.types";
+
 
 const EMPTY_DATA: CalculatePricingResponse = {
   block: "-",
@@ -52,7 +50,6 @@ export const CalculatorClientPage: React.FC = () => {
     period_count: 12,
   });
 
-  // Hooklardan kelayotgan data unknown bo'lmasligi uchun aniq cast qilamiz
   const { data: complexesData = [] } = useComplexes();
   const { data: buildingsData = [] } = useBuildings({});
   const { data: apartmentsData = [] } = useApartments();
@@ -66,7 +63,6 @@ export const CalculatorClientPage: React.FC = () => {
   const filteredBuildings = useMemo(() => {
     if (!selectedComplexId) return [];
     return buildings.filter((b) => {
-      // Obyekt yoki ID ekanligini xavfsiz tekshirish
       const complexId =
         typeof b.complex_id === "object" && b.complex_id !== null
           ? (b.complex_id as { id: number | string }).id

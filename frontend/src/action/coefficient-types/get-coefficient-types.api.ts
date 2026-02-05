@@ -1,7 +1,8 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { ICoefficientType, SafeArrayGetCoefficient } from "@/types";
+import type { ICoefficientType } from "@/types/coefficient-type.types";
+import type { SafeArrayGetCoefficient } from "@/types/safe-response.types";
 
 export async function getCoefficientTypes(params: Record<string, unknown> = {}) {
   const result: SafeArrayGetCoefficient<ICoefficientType> = { data: [] };

@@ -10,6 +10,5 @@ export function useCoefficientTypesByBuildingId(
   return useQuery({
     queryKey: ["coefficient-types", buildingId, params],
     queryFn: () => getCoefficientTypesByBuildingId(buildingId, params),
-    enabled: !!buildingId,
   });
 }

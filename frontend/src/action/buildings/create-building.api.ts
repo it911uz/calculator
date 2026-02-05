@@ -1,6 +1,7 @@
 import { ENV } from "@/configs/env.config";
 import { getAuthData } from "@/lib/auth.util";
-import type { IBuildings, SafeObject } from "@/types";
+import type { IBuildings } from "@/types/building.types";
+import type { SafeObject } from "@/types/safe-response.types";
 export async function createBuilding(payload: Partial<IBuildings>) {
   const result: SafeObject<IBuildings> = { data: null };
   try {

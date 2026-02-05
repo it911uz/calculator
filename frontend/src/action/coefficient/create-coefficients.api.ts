@@ -1,6 +1,7 @@
 import { ENV } from "@/configs/env.config";
 import { getAuthData } from "@/lib/auth.util";
-import type { CreateCoefficientPayload, ICoefficient, SafeObject } from "@/types";
+import { CreateCoefficientPayload, ICoefficient } from "@/types/coefficient-type.types";
+import { SafeObject } from "@/types/safe-response.types";
 
 
 export async function createCoefficient(payload: CreateCoefficientPayload) {

@@ -2,16 +2,14 @@
 
 import { useDeleteApartment } from "@/action/hooks/apartments-hook/delete-aparment.hook";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import type { ModalDeleteApartmentsProps } from "@/types/props.types";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 
-interface ModalDeleteApartmentsProps {
-  apartmentId: string | number;
-  onSuccess?: () => void;
-}
+
 
 export function ModalDeleteApartments({ 
   apartmentId, 
