@@ -3,6 +3,7 @@ from io import BytesIO
 from fastapi import APIRouter, Depends, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm.attributes import set_committed_value
 from starlette import status
 
 import pandas as pd
@@ -92,19 +93,29 @@ async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: A
         column_names=column_names
     )
 
-    result = await db.execute(
+    building_bcts = (await db.execute(
         select(BuildingCoefficientType)
         .join(BuildingCoefficientType.building_coefficient)
         .where(BuildingCoefficient.building_id == building_id)
-    )
-    building_bcts = result.scalars().all()
-
+    )).scalars().all()
     bct_dict = {bct.name: bct for bct in building_bcts}
-    errors = []
-    for row_index, row in df.iterrows():
-        row_has_error = False
 
-        async with db.begin_nested():  # SAVEPOINT
+    errors = []
+    apartments = []
+    for row_index, row in df.iterrows():
+        bct_ids = []
+        for bc_name in column_names[4:]:
+            if not row[bc_name]:
+                errors.append(f"{row_index + 2} - qatorda bo'shliq")
+                break
+
+            bct_obj = bct_dict.get(row[bc_name])
+            if not bct_obj:
+                errors.append(f"{row_index + 2} - qatorda xatolik ({bc_name})")
+                break
+
+            bct_ids.append(bct_obj.id)
+        else:
             new_apartment = Apartment(
                 building_id=building_id,
                 number=str(row["number"]),
@@ -113,43 +124,30 @@ async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: A
                 room_count=int(row["room_count"]),
             )
 
-            new_apartment.building_coefficient_types = []
             db.add(new_apartment)
-            await db.flush()
+            apartments.append((new_apartment, bct_ids))
 
-            bct_ids = []
+    await db.flush()
 
-            for bc_name in column_names[4:]:
-                if pd.isna(row[bc_name]):
-                    errors.append(f"{row_index + 2} - qatorda bo'shliq")
-                    row_has_error = True
-                    break
+    for apartment, bct_ids in apartments:
+        set_committed_value(apartment, "building_coefficient_types", [])
+        for bct_id in bct_ids:
+            bct_obj = await db.get(BuildingCoefficientType, bct_id)
+            apartment.building_coefficient_types.append(bct_obj)
 
-                bct_obj = bct_dict.get(row[bc_name])
-                if not bct_obj:
-                    errors.append(f"{row_index + 2} - qatorda xatolik ({bc_name})")
-                    row_has_error = True
-                    break
+        apartment.final_price = await recalculate_final_price(
+            db=db,
+            building_id=building_id,
+            bct_ids=bct_ids
+        )
 
-                bct_ids.append(bct_obj.id)
-                new_apartment.building_coefficient_types.append(bct_obj)
-
-            if row_has_error:
-                await db.rollback()
-                continue
-
-            new_apartment.final_price = await recalculate_final_price(
-                db=db,
-                building_id=building_id,
-                bct_ids=bct_ids
-            )
-
-    # commit all successful rows
     await db.commit()
 
     if errors:
         return JSONResponse(status_code=207, content={"errors": errors})
 
     return {"detail": "success"}
+
+
 
 
