@@ -52,7 +52,6 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
   };
   const pages = getPages();
   const handleViewApartment = (apartmentId: number) => {
-    console.log("Navigating to:", `/apartments/${apartmentId}`);
     router.push(`/apartments/${apartmentId}`);
   };
   if (isLoading) {
