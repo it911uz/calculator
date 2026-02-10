@@ -9,8 +9,8 @@ class BuildingManager:
         self.building_repository = BuildingRepository(db)
         self.building_validator = BuildingValidator(db)
 
-    async def get_building_list(self):
-        return await self.building_repository.get_building_list()
+    async def get_building_list(self, filters):
+        return await self.building_repository.get_building_list(filters)
 
     async def create_building(self, **kwargs):
         await self.building_validator.validate_complex_fk(kwargs.get("complex_id"))

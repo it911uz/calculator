@@ -6,8 +6,8 @@ from core.repositories import BaseRepository
 
 
 class BuildingRepository(BaseRepository):
-    async def get_building_list(self):
-        return await self.get_all(Building)
+    async def get_building_list(self, filters):
+        return await self.get_all(Building, filters)
 
     async def create_building(self, **kwargs):
         return await self.create(Building, **kwargs)

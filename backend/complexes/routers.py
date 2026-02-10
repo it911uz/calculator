@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from auth.dependencies import has_permission
+from complexes.filters import ComplexFilter
 from complexes.repositories import ComplexRepository
 from complexes.schemas import AddComplexResponse, AddComplexBody, UpdateComplexBody
 from core.db.session import get_db
@@ -16,9 +17,12 @@ router = APIRouter(prefix="/complexes", tags=["Complexes"])
     response_model=list[AddComplexResponse],
     dependencies=[Depends(has_permission("view_complexes"))]
 )
-async def get_complex_list(db: AsyncSession = Depends(get_db)):
+async def get_complex_list(
+        db: AsyncSession = Depends(get_db),
+        filters: ComplexFilter = Depends(),
+):
     complex_repo = ComplexRepository(db)
-    return await complex_repo.get_complex_list()
+    return await complex_repo.get_complex_list(filters)
 
 "-------------------------------------------------------------------------------------------"
 

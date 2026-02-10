@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from auth.dependencies import has_permission
+from buildings.filters import BuildingFilter
 from buildings.managers import BuildingManager
 from buildings.schemas import AddBuildingResponse, AddBuildingBody, UpdateBuildingBody
 from core.db.session import get_db
@@ -17,9 +18,12 @@ router = APIRouter(prefix="/buildings", tags=["Buildings"])
     response_model=list[AddBuildingResponse],
     dependencies=[Depends(has_permission("view_buildings"))]
 )
-async def get_building_list(db: AsyncSession = Depends(get_db)):
+async def get_building_list(
+        db: AsyncSession = Depends(get_db),
+        filters: BuildingFilter = Depends(),
+):
     building_manager = BuildingManager(db)
-    return await building_manager.get_building_list()
+    return await building_manager.get_building_list(filters)
 
 "-------------------------------------------------------------------------------------------"
 

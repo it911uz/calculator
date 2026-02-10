@@ -22,10 +22,9 @@ class BaseRepository:
         return instance
 
     async def get_all(self, model, filters=None, page=None):
-        if filters:
-            stmt = filters.filter(select(model))
-        else:
-            stmt = select(model)
+        stmt = select(model)
+        if filters is not None:
+            stmt = filters.filter(stmt)
 
         if page:
             stmt = stmt.limit(page["limit"]).offset(page["offset"])
