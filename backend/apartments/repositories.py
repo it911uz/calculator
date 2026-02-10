@@ -17,16 +17,8 @@ class ApartmentRepository(BaseRepository):
         return response
 
     async def create_apartment(self, **kwargs):
-        building_id = kwargs.get("building_id")
         bct_ids = kwargs.pop("bct_ids")
-        new_apartment = Apartment(
-            number=kwargs.get("number"),
-            floor=kwargs.get("floor"),
-            area=kwargs.get("area"),
-            room_count=kwargs.get("room_count"),
-            final_price=kwargs.get("final_price"),
-            building_id=building_id,
-        )
+        new_apartment = Apartment(**kwargs)
 
         if bct_ids:
             stmt = (
