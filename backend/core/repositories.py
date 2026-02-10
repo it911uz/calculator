@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+from fastapi_filters.ext.sqlalchemy import apply_filters
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -20,10 +21,18 @@ class BaseRepository:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         return instance
 
-    async def get_all(self, model):
-        stmt = await self.db.execute(select(model))
-        instances = stmt.scalars().all()
-        return instances
+    async def get_all(self, model, filters=None, page=None):
+        if filters:
+            stmt = filters.filter(select(model))
+        else:
+            stmt = select(model)
+
+        if page:
+            stmt = stmt.limit(page["limit"]).offset(page["offset"])
+
+        query = await self.db.execute(stmt)
+        results = query.scalars().all()
+        return results
 
     async def create(self, model, **kwargs):
         new_instance = model(**kwargs)

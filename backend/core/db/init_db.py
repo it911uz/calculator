@@ -14,15 +14,16 @@ async def init_permissions(db: AsyncSession):
     for table in tables:
         for action in actions:
             codename = f"{action}_{table}"
+            label = f"{action.title()} {table.lower()}"
             if codename not in existing_permission_codenames:
-                permissions.append(Permission(codename=codename))
+                permissions.append(Permission(codename=codename, label=label))
 
     custom_permission_codenames = [
-        "assign_permissions"
+        ("assign_permissions", "Assign permissions"),
     ]
-    for codename in custom_permission_codenames:
+    for codename, label in custom_permission_codenames:
         if codename not in existing_permission_codenames:
-            permissions.append(Permission(codename=codename))
+            permissions.append(Permission(codename=codename, label=label))
 
     if permissions:
         db.add_all(permissions)

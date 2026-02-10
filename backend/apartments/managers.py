@@ -11,8 +11,8 @@ class ApartmentManager:
         self.apartment_repository = ApartmentRepository(db)
         self.apartment_validator = ApartmentValidator(db)
 
-    async def get_apartment_list(self):
-        return await self.apartment_repository.get_apartment_list()
+    async def get_apartment_list(self, filters, page):
+        return await self.apartment_repository.get_apartment_list(filters, page)
 
     async def create_apartment(self, **kwargs):
         # FIELDS VALIDATIONS

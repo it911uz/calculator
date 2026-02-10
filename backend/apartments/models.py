@@ -16,7 +16,7 @@ class Apartment(BaseModel):
     area = Column(Numeric(precision=20, scale=2), nullable=False)
     room_count = Column(Integer, nullable=False)
     final_price = Column(Numeric(precision=20, scale=2), nullable=False, default=Decimal("0.00"))
-    status = Column(String(100), nullable=False, default="built")  # built, upcoming, in-progress
+    status = Column(String(100), nullable=False, default="built")  # built, upcoming, in_progress
 
     building_id = Column(Integer, ForeignKey("buildings.id", ondelete="CASCADE"), nullable=False)
     building_coefficient_types = relationship("BuildingCoefficientType", secondary=apartment_coefficients, back_populates="apartments", lazy="selectin")

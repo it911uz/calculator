@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, UploadFile
+from fastapi_filters import FilterValues, create_filters
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import set_committed_value
@@ -9,15 +10,16 @@ from starlette import status
 import pandas as pd
 from starlette.responses import JSONResponse
 
+from apartments.filters import ApartmentFilter
 from apartments.managers import ApartmentManager
 from apartments.models import Apartment
-from apartments.schemas import AddApartmentResponse, AddApartmentBody, UpdateApartmentBody, BulkCreateApartmentsBody
+from apartments.schemas import AddApartmentResponse, AddApartmentBody, UpdateApartmentBody
 from apartments.services import recalculate_final_price
 from apartments.validations import ApartmentBulkCreateValidator
 from auth.dependencies import has_permission
 from coefficients.models import BuildingCoefficientType, BuildingCoefficient
 from core.db.session import get_db
-
+from core.dependencies import pagination
 
 router = APIRouter(prefix="/apartments", tags=["Apartments"])
 
@@ -28,9 +30,13 @@ router = APIRouter(prefix="/apartments", tags=["Apartments"])
     response_model=list[AddApartmentResponse],
     dependencies=[Depends(has_permission("view_apartments"))]
 )
-async def get_apartment_list(db: AsyncSession = Depends(get_db)):
+async def get_apartment_list(
+        db: AsyncSession = Depends(get_db),
+        filters: ApartmentFilter = Depends(),
+        page: dict = Depends(pagination)
+):
     apartment_manager = ApartmentManager(db)
-    return await apartment_manager.get_apartment_list()
+    return await apartment_manager.get_apartment_list(filters, page)
 
 "-------------------------------------------------------------------------------------------"
 

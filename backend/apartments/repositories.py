@@ -9,11 +9,8 @@ from core.repositories import BaseRepository
 
 
 class ApartmentRepository(BaseRepository):
-    def __init__(self, db: AsyncSession):
-        super().__init__(db)
-
-    async def get_apartment_list(self):
-        response = await super().get_all(Apartment)
+    async def get_apartment_list(self, filters, page):
+        response = await super().get_all(Apartment, filters, page)
         for apartment in response:
             apartment.bct_ids = [i.id for i in apartment.building_coefficient_types]
 
