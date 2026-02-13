@@ -9,7 +9,7 @@ import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 
 
-export function ModalDeleteComplex({buildingId}:ModalDeleteComplexProps
+export function ModalDeleteComplex({complexId}:ModalDeleteComplexProps
 
 ) {
   const [open, setOpen] = useState(false);
@@ -20,7 +20,7 @@ export function ModalDeleteComplex({buildingId}:ModalDeleteComplexProps
 
   const handleDelete = async () => {
   try {
-    await deleteMutation.mutateAsync({ id: Number(buildingId) });
+    await deleteMutation.mutateAsync({ id: Number(complexId) });
     setOpen(false);
     router.push("/complex"); 
   } catch (e) {

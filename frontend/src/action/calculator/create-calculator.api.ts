@@ -1,17 +1,23 @@
 import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
-import type { CalculatePricingPayload, CalculatePricingResponse } from "@/types/calculator.types";
+import type { 
+  CalculatePricingPayload, 
+  CalculatePricingResponse, 
+  InvestmentType 
+} from "@/types/calculator.types";
 import type { SafeObject } from "@/types/safe-response.types";
 
 export async function calculateApartmentPricing(
   apartmentId: number | string,
   payload: CalculatePricingPayload,
-  params: Record<string, number> = {}
+  investmentType: InvestmentType 
 ) {
   const result: SafeObject<CalculatePricingResponse> = { data: null };
-
-  const searchParams = createSearchParams(params).toString();
+  
+  const searchParams = createSearchParams({ 
+    first_investment_type: investmentType 
+  }).toString();
 
   try {
     const authData = await getAuthData();
@@ -19,26 +25,29 @@ export async function calculateApartmentPricing(
     if (!authData?.access) {
       result._meta = {
         status: 401,
-        error: "Ошибка авторизации: Токен не найден",
+        error: "Ошибка авторизации",
         reason: "TOKEN",
       };
       return result;
     }
 
-    const res = await fetch(`${ENV.BASE_URL}/calculator/${apartmentId}/${searchParams ? `?${searchParams}` : ""}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${authData.access}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(
+      `${ENV.BASE_URL}/calculator/${apartmentId}/?${searchParams}`, 
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${authData.access}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     if (!res.ok) {
-      const errorData = (await res.json().catch(() => ({}))) as { detail?: string };
+      const errorData = await res.json().catch(() => ({}));
       result._meta = {
         status: res.status,
-        error: errorData.detail || `Ошибка расчета: ${res.status}`,
+        error: errorData.detail || `Ошибка: ${res.status}`,
         reason: "HTTP",
       };
       return result;
@@ -46,11 +55,10 @@ export async function calculateApartmentPricing(
 
     result.data = (await res.json()) as CalculatePricingResponse;
     return result;
-
   } catch (error: unknown) {
     result._meta = {
       status: 500,
-      error: error instanceof Error ? error.message : "Непредвиденная ошибка сервера",
+      error: error instanceof Error ? error.message : "Ошибка сервера",
       reason: "UNKNOWN",
     };
     return result;

@@ -18,3 +18,6 @@ export interface CalculatePricingResponse {
   monthly_payment: number;
   payment_dates: string[];
 }
+export type InvestmentType = 
+  | "percentage"    
+  | "amount"        
