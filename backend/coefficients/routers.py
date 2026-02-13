@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from auth.dependencies import has_permission
+from auth.dependencies import has_permission, has_permissions
 from coefficients.managers import BuildingCoefficientManager, BuildingCoefficientTypeManager
 from coefficients.schemas import (AddCoefficientResponse, AddCoefficientBody, UpdateCoefficientBody,
                                   AddCoefficientTypeResponse, AddCoefficientTypeBody, UpdateCoefficientTypeBody,
@@ -140,7 +140,7 @@ coefficients_common_router = APIRouter(prefix="/coefficients-common", tags=["Coe
 @coefficients_common_router.get(
     "/bcs-with-bcts-by-building-id/{building_id}/",
     response_model=list[GetBCsWithBCTs],
-    dependencies=[Depends(has_permission("view_building_coefficient_types"))]
+    dependencies=[Depends(has_permissions(["view_building_coefficient_types", "view_building_coefficients"]))]
 )
 async def get_bcs_with_bcts_by_building(building_id: int, db: AsyncSession = Depends(get_db)):
     coefficient_type_manager = BuildingCoefficientTypeManager(db)

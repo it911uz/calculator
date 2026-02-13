@@ -9,10 +9,10 @@ class BuildingFilter(Filter):
     name__ilike: str | None = None
     floor_count: int | None = None
     floor_count__lte: int | None = None
-    floor_count_gte: int | None = None
+    floor_count__gte: int | None = None
     base_price: Decimal | None = None
-    base_price_lte: Decimal | None = None
-    base_price_gte: Decimal | None = None
+    base_price__lte: Decimal | None = None
+    base_price__gte: Decimal | None = None
 
     class Constants(Filter.Constants):
         model = Building

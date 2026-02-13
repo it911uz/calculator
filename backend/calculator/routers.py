@@ -1,4 +1,5 @@
 from decimal import Decimal, ROUND_HALF_UP
+from enum import Enum
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,9 +11,13 @@ from core.db.session import get_db
 
 router = APIRouter(prefix="/calculator", tags=["Calculator"])
 
+class InvestmentTypeEnum(str, Enum):
+    PERCENTAGE = "percentage"
+    AMOUNT = "amount"
+
 
 @router.post("/{apartment_id}/")
-async def calculate_apartment_pricing(apartment_id: int, body: CalculateApartmentBody, db: AsyncSession = Depends(get_db)):
+async def calculate_apartment_pricing(first_investment_type: InvestmentTypeEnum, apartment_id: int, body: CalculateApartmentBody, db: AsyncSession = Depends(get_db)):
     response = {}
 
     apartment_repo = ApartmentRepository(db)
@@ -24,7 +29,10 @@ async def calculate_apartment_pricing(apartment_id: int, body: CalculateApartmen
     period_count = body.period_count
     total_price = apartment_final_price * apartment_area
 
-    credit_sum = total_price * (Decimal("1.00") - first_investment_rate/Decimal("100.00"))  # Decimal
+    if first_investment_type == InvestmentTypeEnum.PERCENTAGE:
+        credit_sum = total_price * (Decimal("1.00") - first_investment_rate/Decimal("100.00"))  # Decimal
+    else:
+        credit_sum = total_price - first_investment_rate
     monthly_payment_rate = Decimal("20.00") / (period_count * Decimal("100.00"))  # Decimal
 
     payment_per_period = credit_sum * monthly_payment_rate / (1 - (1 + monthly_payment_rate) ** -period_count)  # Annual Price (formula calculations)

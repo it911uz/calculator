@@ -1,3 +1,4 @@
+from decimal import Decimal
 from io import BytesIO
 
 from fastapi import APIRouter, Depends, UploadFile
@@ -83,7 +84,7 @@ async def delete_apartment(apartment_id: int, db: AsyncSession = Depends(get_db)
     return await apartment_manager.delete_apartment(apartment_id)
 
 
-@router.post("/bulk-create/{building_id}", dependencies=[Depends(has_permission("create_apartments"))])
+@router.post("/bulk-create/", dependencies=[Depends(has_permission("create_apartments"))])
 async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: AsyncSession = Depends(get_db)):
     apartment_validator = ApartmentBulkCreateValidator(db)
     await apartment_validator.validate_file_type(excel_file)
@@ -94,7 +95,7 @@ async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: A
     df = pd.read_excel(BytesIO(content))
     column_names = df.columns.values.tolist()
 
-    await apartment_validator.http_validate_bulk_create(
+    await apartment_validator.validate_fields(
         building_id=building_id,
         column_names=column_names
     )
@@ -109,9 +110,21 @@ async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: A
     errors = []
     apartments = []
     for row_index, row in df.iterrows():
+        print(row)
+        try:
+            str(row["number"])
+            int(row["floor"])
+            Decimal(row["area"])
+            int(row["room_count"])
+        except Exception as e:
+            print(f"ERROR {e}")
+            errors.append(f"{row_index + 2} - qatorda xatolik")
+
+
         bct_ids = []
         for bc_name in column_names[4:]:
             if not row[bc_name]:
+                """ --------------------- ERROR HANDLING --------------------- """
                 errors.append(f"{row_index + 2} - qatorda bo'shliq")
                 break
 
@@ -126,7 +139,7 @@ async def bulk_create_apartments(building_id: int, excel_file: UploadFile, db: A
                 building_id=building_id,
                 number=str(row["number"]),
                 floor=int(row["floor"]),
-                area=row["area"],
+                area=Decimal(row["area"]),
                 room_count=int(row["room_count"]),
             )
 

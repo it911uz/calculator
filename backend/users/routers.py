@@ -4,6 +4,7 @@ from starlette import status
 
 from auth.dependencies import has_permission
 from core.db.session import get_db
+from users.filters import UsersFilter
 from users.managers import UserManager
 from users.schemas import UserListResponse, UserCreateResponse, UserCreateBody, UserGetResponse, UserUpdateResponse, \
     UserUpdateBody
@@ -16,9 +17,12 @@ router = APIRouter(prefix="/users", tags=["Users"])
     response_model=list[UserListResponse],
     dependencies=[Depends(has_permission("view_users"))]
 )
-async def get_user_list(db: AsyncSession = Depends(get_db)):
+async def get_user_list(
+        db: AsyncSession = Depends(get_db),
+        filters: UsersFilter = Depends(),
+):
     user_manager = UserManager(db)
-    return await user_manager.get_user_list()
+    return await user_manager.get_user_list(filters)
 
 @router.post(
     "/create/",

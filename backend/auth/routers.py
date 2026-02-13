@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.schemas import Token
+from auth.dependencies import get_current_user
+from auth.schemas import Token, GetMe
 from auth.managers import AuthManager
 from core.db.session import get_db
 
@@ -26,6 +27,9 @@ async def refresh_tokens(refresh_token: str, db: AsyncSession = Depends(get_db))
     return await auth_service.refresh_tokens(refresh_token)
 
 
+@router.get("/me", response_model=GetMe)
+async def get_me(user = Depends(get_current_user)):
+    return user
 
 
 

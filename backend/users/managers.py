@@ -7,8 +7,8 @@ class UserManager:
     def __init__(self, db: AsyncSession):
         self.user_repository = UserRepository(db)
 
-    async def get_user_list(self):
-        return await self.user_repository.get_user_list()
+    async def get_user_list(self, filters):
+        return await self.user_repository.get_user_list(filters)
 
     async def create_user(self, **kwargs):
         return await self.user_repository.create_user(**kwargs)

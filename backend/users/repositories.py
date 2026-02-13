@@ -21,8 +21,8 @@ class UserRepository(BaseRepository):
             return None
         return user
 
-    async def get_user_list(self):
-        return await self.get_all(User)
+    async def get_user_list(self, filters):
+        return await self.get_all(User, filters)
 
     async def create_user(self, **kwargs):
         kwargs["hashed_password"] = await self.password_service.hash_password(kwargs.pop('password'))

@@ -115,7 +115,7 @@ class ApartmentBulkCreateValidator(BaseValidator):
 
 
 
-    async def http_validate_bulk_create(self, building_id: int, column_names: list[str]):
+    async def validate_fields(self, building_id: int, column_names: list[str]):
         building = await self._validate_building_id(building_id)
         await self._validate_column_length(column_length=len(column_names))
         await self._validate_main_fields(main_field_column_names=column_names[:4])

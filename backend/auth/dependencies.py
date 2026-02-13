@@ -30,3 +30,19 @@ def has_permission(permission: str):
         raise Forbidden("Permission Denied")
 
     return permission_checker
+
+def has_permissions(permissions: list):
+    async def permission_checker(user: User = Depends(get_current_user)):
+        if user.is_superuser:
+            return None
+
+        permission_codenames = [perm.codename for perm in user.role.permissions]
+
+        result = all(perm.codename in permission_codenames for perm in permissions)
+        if result:
+            return None
+
+        raise Forbidden("Permission Denied")
+
+    return permission_checker
+
