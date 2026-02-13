@@ -26,7 +26,6 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // 1. Dastlab URL parametrlarni yig'amiz (Hookdan tepada bo'lishi shart!)
   const allParams = useMemo(() => {
     const entries = Object.fromEntries(searchParams.entries());
     return {
@@ -36,7 +35,6 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
     };
   }, [searchParams]);
 
-  // 2. Endi parametrlarni hookka uzatamiz
   const { data: buildingsData = [] } = useBuildings();
   const { data: apartmentsData, isLoading, refetch } = useApartments(allParams);
 
@@ -44,7 +42,6 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
     await refetch();
   }, [refetch]);
 
-  // 3. Pagination mantiqi
   const limit = allParams.limit;
   const offset = allParams.offset;
   const currentPage = Math.floor(offset / limit) + 1;
@@ -63,13 +60,24 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
 
   if (isLoading) return <div className="flex justify-center items-center min-h-80"><SpinnerDemo /></div>;
 
+  
+  if (apartments.length === 0) {
+    return (
+      <div className="text-center ">
+        <div className="flex flex-1">
+          <ModalAddedApartments onSuccess={refreshData} />
+        </div>
+        <p className="text-gray-500 mb-4">Информация не найдена</p>
+        <ImFileEmpty size={48} className="mx-auto text-gray-300" />
+      </div>
+    );
+  }
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
         <ModalAddedApartments onSuccess={refreshData} />
       </div>
       
-      {/* Filtrlarni joylashuvi */}
       <ApartmentFilters buildings={buildingsData} />
 
       <div className="rounded-[3px] overflow-hidden border border-gray-100 shadow-sm bg-white mt-4">
