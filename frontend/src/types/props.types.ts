@@ -2,6 +2,7 @@ import { IApartment } from "./apartment.types";
 import { IBuildings } from "./building.types";
 import { ICoefficientType } from "./coefficient-type.types";
 import { IComplex } from "./complex.types";
+import { IRole } from "./permissions.types";
 import { ComplexArray } from "./safe-response.types";
 
 export interface Props {
@@ -42,7 +43,7 @@ export type ModalPropsModalAddedComplex = {
   onSuccess?: () => Promise<void>; 
 };
 export interface ModalDeleteComplexProps {
-  buildingId: string | number;
+  complexId: number;
 }
 export interface TableApartmentsProps {
   initialApartments: IApartment[];
@@ -60,4 +61,17 @@ export interface TabsProps {
 export interface ModalUpdateBuildingsProps {
   building: IBuildings;
   onSuccess?: () => void;
+}
+
+export interface PropsDeletePermissionManagement {
+  permissionId: number | string;
+  codename?: string;
+}
+export interface PropsDeleteRole {
+  roleId: number | string;
+  roleName?: string;
+}
+
+export interface PropsPatchRoleManagement {
+  role: IRole;
 }

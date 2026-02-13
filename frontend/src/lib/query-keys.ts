@@ -35,4 +35,32 @@ export const QueryKeys = {
     detail: (id: string | number) => [...QueryKeys.coefficientTypes.details(), id] as const,
     byBuilding: (buildingId: number) => [...QueryKeys.coefficientTypes.all, 'building', buildingId] as const,
   },
+  permissions: {
+    all: ["permissions"] as const,
+    lists: () => [...QueryKeys.permissions.all, "list"] as const,
+    list: (filters: string | Record<string, unknown>) => 
+      [...QueryKeys.permissions.lists(), { filters }] as const,
+    details: () => [...QueryKeys.permissions.all, "detail"] as const,
+    detail: (id: string | number) => 
+      [...QueryKeys.permissions.details(), id] as const,
+  },
+  roles: {
+    all: ["roles"] as const,
+    lists: () => [...QueryKeys.roles.all, "list"] as const,
+    list: (filters: string | Record<string, unknown>) => 
+      [...QueryKeys.roles.lists(), { filters }] as const,
+    details: () => [...QueryKeys.roles.all, "detail"] as const,
+    detail: (id: string | number) => 
+      [...QueryKeys.roles.details(), id] as const,
+  },
+  users: {
+    all: ["users"] as const,
+    lists: () => [...QueryKeys.users.all, "list"] as const,
+    list: (filters: string | Record<string, unknown>) => 
+      [...QueryKeys.users.lists(), { filters }] as const,
+    details: () => [...QueryKeys.users.all, "detail"] as const,
+    detail: (id: string | number) => 
+      [...QueryKeys.users.details(), id] as const,
+  },
+  
 };

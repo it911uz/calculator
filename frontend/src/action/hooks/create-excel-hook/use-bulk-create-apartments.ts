@@ -18,11 +18,14 @@ export function useBulkCreateApartments() {
       bulkCreateApartments(buildingId, file),
     
     onSuccess: (res) => {
-      if (res.success) {
+      if (res.data) {
         toast.success("Квартиры успешно импортированы");
         queryClient.invalidateQueries({ queryKey: QueryKeys.apartments.all });
-      } else if (res._meta?.error) {
-        toast.error(res._meta.error);
+      } 
+      else if (res._meta?.error) {
+        toast.error(res._meta.error, {
+          duration: 5000, 
+        });
       }
     },
     

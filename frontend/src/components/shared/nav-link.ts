@@ -1,6 +1,6 @@
 import { Route } from "next"; 
 import { AiOutlineApartment } from "react-icons/ai";
-import { FaBuilding, FaCalculator } from "react-icons/fa";
+import { FaBuilding, FaCalculator, FaUsers } from "react-icons/fa";
 import { HiMiniBuildingOffice2 } from "react-icons/hi2";
 
 interface INavigation {
@@ -14,4 +14,5 @@ export const navigation: INavigation[] = [
     { navName: "Здания", icon: HiMiniBuildingOffice2, pathName: "/buildings" },
     { navName: "Квартиры", icon: AiOutlineApartment, pathName: "/apartments" },
     { navName: "Расчет", icon: FaCalculator, pathName: "/calculator-system" },
+    { navName: "Управление", icon: FaUsers, pathName: "/management" },
 ] as const;

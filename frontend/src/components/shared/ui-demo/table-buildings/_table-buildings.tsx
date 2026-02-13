@@ -1,5 +1,5 @@
 "use client";
-import { FC, useState, useMemo } from "react";
+import { FC, useMemo, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -11,125 +11,87 @@ import {
 import { TbExternalLink } from "react-icons/tb";
 import { ImFileEmpty } from "react-icons/im";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { ModalAddedBuilding } from "../modals/building-modals/modal-add-building/_modal-add-building";
 import { ModalDeleteBuildings } from "../modals/building-modals/modal-delete-buildings/_modal-delete-buildings";
 import ModaDataSendingForExel from "../modals/building-modals/modal-sending-for-exel/_modal-sending-for-exel";
 import type { TableBuildingsProps } from "@/types/props.types";
+import BuildingsFilter from "../filters/_buildings-filter";
+import { useComplexes } from "@/action/hooks/complex-hook/get-complexes";
+import { useBuildings } from "@/action/hooks/buildings-hook/get-buildings"; 
+import { IComplex } from "@/types/complex.types";
+import { SpinnerDemo } from "../spinner-demo/_spinner-demo";
 
-const ITEMS_PER_PAGE = 10;
-const MAX_VISIBLE_PAGES = 5;
+const DEFAULT_LIMIT = 10;
 
-
-const TableBuildings: FC<TableBuildingsProps> = ({ buildings }) => {
+const TableBuildings: FC<TableBuildingsProps> = ({ buildings: initialBuildings }) => {
   const router = useRouter();
-  const [page, setPage] = useState(1);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const totalPages = Math.ceil(buildings.length / ITEMS_PER_PAGE);
+  const allParams = useMemo(() => {
+    const entries = Object.fromEntries(searchParams.entries());
+    
+    const limit = Number(entries.limit) || DEFAULT_LIMIT;
+    const offset = Number(entries.offset) || 0;
 
-  const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const currentItems = buildings.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    return {
+      ...entries,
+      page: Math.floor(offset / limit) + 1, 
+      search: entries.name__ilike || undefined, 
+      limit: limit,
+      offset: offset
+    };
+  }, [searchParams]);
 
-  const pages = useMemo(() => {
-    let start = Math.max(1, page - Math.floor(MAX_VISIBLE_PAGES / 2));
-    let end = start + MAX_VISIBLE_PAGES - 1;
+  const { data: buildingsData, isLoading, refetch } = useBuildings(allParams);
 
-    if (end > totalPages) {
-      end = totalPages;
-      start = Math.max(1, end - MAX_VISIBLE_PAGES + 1);
-    }
+  const { data: complexesData } = useComplexes();
+  const complexesList = useMemo(() => {
+    return Array.isArray(complexesData) ? (complexesData as IComplex[]) : [];
+  }, [complexesData]);
+  const displayBuildings = useMemo(() => {
+    return Array.isArray(buildingsData) ? buildingsData : initialBuildings || [];
+  }, [buildingsData, initialBuildings]);
 
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  }, [page, totalPages]);
+  const handleRefresh = useCallback(() => {
+    refetch(); 
+  }, [refetch]);
 
-  const handleRefresh = () => {
-    router.refresh();
-  };
+  const currentPage = Math.floor(allParams.offset / allParams.limit) + 1;
 
-  if (buildings.length === 0) {
-    return (
-      <div className="">
-        <ModalAddedBuilding onSuccess={handleRefresh} />
-        <p className="text-gray-500 text-center my-4">Информация не найдена</p>
-        <ImFileEmpty size={48} className="mx-auto text-gray-300" />
-      </div>
-    );
-  }
+  const handlePageChange = useCallback((pageNumber: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("offset", String((pageNumber - 1) * allParams.limit));
+    router.push(`${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>, { scroll: false });
+  }, [pathname, router, searchParams, allParams.limit]);
 
   return (
     <section>
-      <div className="flex w-full justify-between items-center pb-4">
-        <ModalAddedBuilding onSuccess={handleRefresh} />
-
-        <div className="flex items-center gap-1">
-          <ModaDataSendingForExel />
-          <div>
-            <button
-              disabled={page === 1}
-              onClick={() => setPage((p) => p - 1)}
-              className="px-2 py-1 text-gray-400 disabled:opacity-30"
-            >
-              ‹
-            </button>
-
-            {pages[0] > 1 && (
-              <>
-                <button
-                  onClick={() => setPage(1)}
-                  className="px-3 py-1 text-sm"
-                >
-                  1
-                </button>
-                <span className="px-1 text-gray-400">…</span>
-              </>
-            )}
-
-            {pages.map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`px-3 py-1 rounded text-sm font-semibold
-                ${
-                  p === page
-                    ? "bg-[#282964] text-white"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-
-            {pages[pages.length - 1] < totalPages && (
-              <>
-                <span className="px-1 text-gray-400">…</span>
-                <button
-                  onClick={() => setPage(totalPages)}
-                  className="px-3 py-1 text-sm"
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="px-2 py-1 text-gray-400 disabled:opacity-30"
-            >
-              ›
-            </button>
+      <div className="flex flex-col gap-4">
+        <div className="flex w-full justify-between items-center">
+          <div className="flex gap-2">
+            <ModalAddedBuilding onSuccess={handleRefresh} />
+            <ModaDataSendingForExel />
           </div>
         </div>
+
+        <BuildingsFilter complexes={complexesList} />
       </div>
 
-      {/* Table */}
-      <div className="rounded-[3px] overflow-hidden shadow bg-white">
+      <div className="relative rounded-[3px] overflow-hidden border border-gray-100 shadow-sm bg-white ">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
+            <SpinnerDemo />
+          </div>
+        )}
+
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-50/50">
             <TableRow>
-              <TableHead>№</TableHead>
-              <TableHead>ИД</TableHead>
-              <TableHead>Имя</TableHead>
+              <TableHead className="w-12">№</TableHead>
+              <TableHead>ID</TableHead>
+              <TableHead>Название</TableHead>
               <TableHead>Этажи</TableHead>
               <TableHead>Базовая цена</TableHead>
               <TableHead className="text-right">Действия</TableHead>
@@ -137,31 +99,76 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings }) => {
           </TableHeader>
 
           <TableBody>
-            {currentItems.map((item, i) => (
-              <TableRow key={item.id} className="hover:bg-gray-50">
-                <TableCell>{startIndex + i + 1}</TableCell>
-                <TableCell>{item.id}</TableCell>
-                <TableCell className="font-medium">{item.name}</TableCell>
-                <TableCell>{item.floor_count}</TableCell>
-                <TableCell>{item.base_price?.toLocaleString()}</TableCell>
-                <TableCell className="flex gap-2 justify-end">
-                  <Link
-                    href={`/buildings/${item.id}`}
-                    className="p-1.5 hover:bg-gray-100 rounded"
-                  >
-                    <TbExternalLink size={18} />
-                  </Link>
-                  <ModalDeleteBuildings
-                    buildingId={item.id}
-                    onSuccess={handleRefresh}
-                  />
+            {displayBuildings.length === 0 && !isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-40 text-center text-gray-400">
+                  <ImFileEmpty size={32} className="mx-auto mb-2 opacity-20" />
+                  <p>Информация не найдена</p>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              displayBuildings.map((item, i) => (
+                <TableRow key={item.id} className="hover:bg-gray-50/50">
+                  <TableCell className="text-gray-400">{allParams.offset + i + 1}</TableCell>
+                  <TableCell className="text-[10px] text-gray-400">#{item.id}</TableCell>
+                  <TableCell className="font-bold text-[#282964]">{item.name}</TableCell>
+                  <TableCell>{item.floor_count}</TableCell>
+                  <TableCell className="font-semibold">
+                    {item.base_price?.toLocaleString()} $
+                  </TableCell>
+                  <TableCell className="flex gap-2 justify-end text-right">
+                    <Link href={`/buildings/${item.id}`} className="p-1.5 hover:bg-gray-100 rounded-sm">
+                      <TbExternalLink size={18} className="text-[#282964]" />
+                    </Link>
+                    <ModalDeleteBuildings buildingId={item.id} onSuccess={handleRefresh} />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-[13px] text-gray-500">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span>Показать по:</span>
+            <select 
+              value={allParams.limit}
+              onChange={(e) => {
+                const params = new URLSearchParams(searchParams.toString());
+                params.set("limit", e.target.value);
+                params.set("offset", "0"); 
+                router.push(`${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>);
+              }}
+              className="border border-gray-200 rounded px-1.5 py-1 bg-white"
+            >
+              {[10, 20, 50, 100].map(val => (
+                <option key={val} value={val}>{val}</option>
+              ))}
+            </select>
+          </div>
+          <p>Найдено: <span className="font-medium text-gray-800">{displayBuildings.length}</span></p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button 
+            disabled={allParams.offset === 0}
+            onClick={() => handlePageChange(currentPage - 1)}
+            className="px-3 py-1.5 border border-gray-200 rounded-sm hover:bg-gray-50 disabled:opacity-30"
+          >Назад</button>
+          
+          <span className="text-[#282964] font-medium">Страница {currentPage}</span>
+
+          <button 
+            disabled={displayBuildings.length < allParams.limit}
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="px-3 py-1.5 border border-gray-200 rounded-sm hover:bg-gray-50 disabled:opacity-30"
+          >Вперед</button>
+        </div>
       </div>
     </section>
   );
 };
+
 export default TableBuildings;
