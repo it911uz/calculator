@@ -7,7 +7,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isOpen, setIsOpen }) => {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
-    console.log("Sidebar holati:", !isOpen);
   };
   return (
     <header className="fixed top-0 left-0 right-0 py-2 px-4 shadow-sm shadow-[#d7d7f8] bg-white z-40">
