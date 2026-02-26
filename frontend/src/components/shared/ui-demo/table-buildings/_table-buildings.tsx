@@ -31,40 +31,43 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings: initialBuildings }
 
   const allParams = useMemo(() => {
     const entries = Object.fromEntries(searchParams.entries());
-    
     const limit = Number(entries.limit) || DEFAULT_LIMIT;
     const offset = Number(entries.offset) || 0;
 
     return {
       ...entries,
-      page: Math.floor(offset / limit) + 1, 
-      search: entries.name__ilike || undefined, 
-      limit: limit,
-      offset: offset
+      page: Math.floor(offset / limit) + 1,
+      limit,
+      offset,
+      search: entries.name__ilike || undefined,
     };
   }, [searchParams]);
 
   const { data: buildingsData, isLoading, refetch } = useBuildings(allParams);
-
   const { data: complexesData } = useComplexes();
+
   const complexesList = useMemo(() => {
     return Array.isArray(complexesData) ? (complexesData as IComplex[]) : [];
   }, [complexesData]);
+
   const displayBuildings = useMemo(() => {
     return Array.isArray(buildingsData) ? buildingsData : initialBuildings || [];
   }, [buildingsData, initialBuildings]);
 
   const handleRefresh = useCallback(() => {
-    refetch(); 
+    refetch();
   }, [refetch]);
 
-  const currentPage = Math.floor(allParams.offset / allParams.limit) + 1;
+  const currentPage = allParams.page;
 
-  const handlePageChange = useCallback((pageNumber: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("offset", String((pageNumber - 1) * allParams.limit));
-    router.push(`${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>, { scroll: false });
-  }, [pathname, router, searchParams, allParams.limit]);
+  const handlePageChange = useCallback(
+    (pageNumber: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("offset", String((pageNumber - 1) * allParams.limit));
+      router.push(`${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>, { scroll: false });
+    },
+    [pathname, router, searchParams, allParams.limit]
+  );
 
   return (
     <section>
@@ -79,7 +82,7 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings: initialBuildings }
         <BuildingsFilter complexes={complexesList} />
       </div>
 
-      <div className="relative rounded-[3px] overflow-hidden border border-gray-100 shadow-sm bg-white ">
+      <div className="relative rounded-[3px] overflow-hidden border border-gray-100 shadow-sm bg-white">
         {isLoading && (
           <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
             <SpinnerDemo />
@@ -90,7 +93,6 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings: initialBuildings }
           <TableHeader className="bg-gray-50/50">
             <TableRow>
               <TableHead className="w-12">№</TableHead>
-              <TableHead>ID</TableHead>
               <TableHead>Название</TableHead>
               <TableHead>Этажи</TableHead>
               <TableHead>Базовая цена</TableHead>
@@ -110,12 +112,9 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings: initialBuildings }
               displayBuildings.map((item, i) => (
                 <TableRow key={item.id} className="hover:bg-gray-50/50">
                   <TableCell className="text-gray-400">{allParams.offset + i + 1}</TableCell>
-                  <TableCell className="text-[10px] text-gray-400">#{item.id}</TableCell>
                   <TableCell className="font-bold text-[#282964]">{item.name}</TableCell>
                   <TableCell>{item.floor_count}</TableCell>
-                  <TableCell className="font-semibold">
-                    {item.base_price?.toLocaleString()} $
-                  </TableCell>
+                  <TableCell className="font-semibold">{item.base_price?.toLocaleString()}</TableCell>
                   <TableCell className="flex gap-2 justify-end text-right">
                     <Link href={`/buildings/${item.id}`} className="p-1.5 hover:bg-gray-100 rounded-sm">
                       <TbExternalLink size={18} className="text-[#282964]" />
@@ -133,38 +132,44 @@ const TableBuildings: FC<TableBuildingsProps> = ({ buildings: initialBuildings }
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span>Показать по:</span>
-            <select 
+            <select
               value={allParams.limit}
               onChange={(e) => {
                 const params = new URLSearchParams(searchParams.toString());
                 params.set("limit", e.target.value);
-                params.set("offset", "0"); 
-                router.push(`${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>);
+                params.set("offset", "0");
+                router.push(`${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>, { scroll: false });
               }}
               className="border border-gray-200 rounded px-1.5 py-1 bg-white"
             >
-              {[10, 20, 50, 100].map(val => (
+              {[10, 20, 50, 100].map((val) => (
                 <option key={val} value={val}>{val}</option>
               ))}
             </select>
           </div>
-          <p>Найдено: <span className="font-medium text-gray-800">{displayBuildings.length}</span></p>
+          <p>
+            Найдено: <span className="font-medium text-gray-800">{displayBuildings.length}</span>
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <button 
-            disabled={allParams.offset === 0}
+          <button
+            disabled={currentPage === 1}
             onClick={() => handlePageChange(currentPage - 1)}
             className="px-3 py-1.5 border border-gray-200 rounded-sm hover:bg-gray-50 disabled:opacity-30"
-          >Назад</button>
-          
+          >
+            Назад
+          </button>
+
           <span className="text-[#282964] font-medium">Страница {currentPage}</span>
 
-          <button 
+          <button
             disabled={displayBuildings.length < allParams.limit}
             onClick={() => handlePageChange(currentPage + 1)}
             className="px-3 py-1.5 border border-gray-200 rounded-sm hover:bg-gray-50 disabled:opacity-30"
-          >Вперед</button>
+          >
+            Вперед
+          </button>
         </div>
       </div>
     </section>

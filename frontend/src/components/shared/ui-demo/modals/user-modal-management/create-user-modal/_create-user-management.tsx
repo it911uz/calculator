@@ -21,33 +21,55 @@ import { PlusCircle, Loader2 } from "lucide-react";
 import { usePostUser } from "@/action/hooks/users-hook/user-post.hook";
 import { useRoles } from "@/action/hooks/roles-hook/use-roles";
 import type { IUser } from "@/types/user.types";
-
+import { Eye, EyeOff } from "lucide-react";
 interface ICreateUserPayload extends Omit<IUser, "id"> {
   password: string;
 }
 
 const CreateUserManagement: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
-  
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState<ICreateUserPayload>({
     username: "",
     password: "",
-    role_id: 0, 
+    role_id: 0,
   });
 
   // Hooklar
   const { data: roles, isLoading: rolesLoading } = useRoles();
   const { mutate: createUser, isPending: isCreating } = usePostUser();
+  const validatePassword = (value: string): string => {
+    const minLength = value.length >= 6;
+    const hasSpecialChar = /[#$%&@!^*()_+\-=[\]{};':"\\|,.<>/?]/.test(value);
 
+    if (!minLength) {
+      return "Пароль должен содержать минимум 6 символов";
+    }
+
+    if (!hasSpecialChar) {
+      return "Пароль должен содержать минимум 1 специальный символ (#, $, %, ...)";
+    }
+
+    return "";
+  };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!formData.username.trim() || !formData.password.trim()) return;
+    const error = validatePassword(formData.password);
+
+    if (error) {
+      setPasswordError(error);
+      return;
+    }
+
+    if (!formData.username.trim()) return;
 
     createUser(formData, {
       onSuccess: () => {
         setOpen(false);
         setFormData({ username: "", password: "", role_id: 0 });
+        setPasswordError("");
       },
     });
   };
@@ -62,12 +84,14 @@ const CreateUserManagement: React.FC = () => {
       </DialogTrigger>
       <DialogContent className="max-w-96">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Новый пользователь</DialogTitle>
+          <DialogTitle className="text-xl font-bold">
+            Новый пользователь
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <label >Имя пользователя</label>
+            <label>Имя пользователя</label>
             <Input
               id="username"
               required
@@ -78,20 +102,44 @@ const CreateUserManagement: React.FC = () => {
               placeholder="Введите username"
             />
           </div>
-
           <div className="space-y-2">
-            <label >Пароль</label>
-            <Input
-              id="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              placeholder="Введите пароль"
-            />
+            <label>Пароль</label>
+
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                required
+                value={formData.password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const value = e.target.value;
+
+                  setFormData({ ...formData, password: value });
+
+                  const error = validatePassword(value);
+                  setPasswordError(error);
+                }}
+                placeholder="Введите пароль"
+                className={`pr-10 ${
+                  passwordError ? "border-red-500 focus:border-red-500" : ""
+                }`}
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+
+            
           </div>
+
+          {passwordError && (
+            <p className="text-sm text-red-500">{passwordError}</p>
+          )}
 
           <div className="space-y-2">
             <label>Роль пользователя</label>
@@ -103,7 +151,11 @@ const CreateUserManagement: React.FC = () => {
               disabled={rolesLoading}
             >
               <SelectTrigger>
-                <SelectValue placeholder={rolesLoading ? "Загрузка ролей..." : "Выберите роль"} />
+                <SelectValue
+                  placeholder={
+                    rolesLoading ? "Загрузка ролей..." : "Выберите роль"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {rolesLoading && (

@@ -28,6 +28,7 @@ export function ModalUpdateApartments({ apartment }: PropsModalUpdateApartments)
     room_count: apartment.room_count ?? 0,
     area: apartment.area ?? "",
     final_price: apartment.final_price ?? "",
+    status: apartment.status ?? "built",
   });
   const handleOpenChange = (value: boolean) => {
     setOpen(value);
@@ -39,6 +40,7 @@ export function ModalUpdateApartments({ apartment }: PropsModalUpdateApartments)
         room_count: apartment.room_count ?? 0,
         area: apartment.area ?? "",
         final_price: apartment.final_price ?? "",
+        status: apartment.status ?? "built",
       });
     }
   };
