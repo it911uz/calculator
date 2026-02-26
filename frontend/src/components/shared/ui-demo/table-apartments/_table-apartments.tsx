@@ -61,17 +61,7 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
   if (isLoading) return <div className="flex justify-center items-center min-h-80"><SpinnerDemo /></div>;
 
   
-  if (apartments.length === 0) {
-    return (
-      <div className="text-center ">
-        <div className="flex flex-1">
-          <ModalAddedApartments onSuccess={refreshData} />
-        </div>
-        <p className="text-gray-500 mb-4">Информация не найдена</p>
-        <ImFileEmpty size={48} className="mx-auto text-gray-300" />
-      </div>
-    );
-  }
+ 
   return (
     <section>
       <div className="flex justify-between items-center mb-4">
@@ -96,9 +86,12 @@ const TableApartments: React.FC<TableApartmentsProps> = ({ initialApartments }) 
           <TableBody>
             {apartments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-40 text-center">
-                  <ImFileEmpty size={32} className="mx-auto mb-2 opacity-20" />
-                  <p className="text-gray-400">Информация не найдена</p>
+                <TableCell colSpan={7} className="h-60 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-3 py-10">
+                    <ImFileEmpty size={48} className="text-gray-200" />
+                    <p className="text-gray-500 font-medium">Информация не найдена</p>
+                    <p className="text-xs text-gray-400">Попробуйте изменить параметры фильтра</p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (

@@ -1,3 +1,5 @@
+export type TApartmentStatus = "built" | "upcomming" | "in_process";
+
 export interface IApartment {
   id: number;
   number: string;
@@ -6,6 +8,7 @@ export interface IApartment {
   room_count: number;
   final_price: string;  
   building_id: number;
+  status: TApartmentStatus;
   bct_ids?: number[];
   block?: string
 }
@@ -15,4 +18,5 @@ export interface ApartmentFormData {
   room_count: number;
   area: string;       
   final_price: string; 
+  status: TApartmentStatus;
 }
