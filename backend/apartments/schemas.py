@@ -40,6 +40,7 @@ class UpdateApartmentBody(ApartmentSchemaValidationMixin):
     floor: int | None = None
     area: Decimal | None = Field(default=None, max_digits=20, decimal_places=2)
     room_count: int | None = None
+    final_price: Decimal | None = Field(default=None, max_digits=20, decimal_places=2)
     status: StatusEnum | None = None
     building_id: int
     bct_ids: list[int]

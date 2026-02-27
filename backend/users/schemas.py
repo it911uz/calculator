@@ -3,11 +3,15 @@ from pydantic import BaseModel
 
 class UserListResponse(BaseModel):
     id: int
+    fullname: str
+    phone: str | None
     username: str
     role_id: int | None
 
 
 class UserCreateBody(BaseModel):
+    fullname: str
+    phone: str | None = None
     username: str
     password: str
     role_id: int | None = None
@@ -22,6 +26,8 @@ class UserGetResponse(UserListResponse):
 
 
 class UserUpdateBody(BaseModel):
+    fullname: str | None = None
+    phone: str | None = None
     username: str | None = None
     role_id: int | None = None
 

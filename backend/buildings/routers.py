@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
+from starlette.responses import Response
 
 from auth.dependencies import has_permission
 from buildings.filters import BuildingFilter
@@ -71,6 +72,16 @@ async def delete_building(building_id: int, db: AsyncSession = Depends(get_db)):
 
 "-------------------------------------------------------------------------------------------"
 
-
+@router.patch(
+    "/{building_id}/image"
+)
+async def update_image(
+    building_id: int,
+    image: UploadFile,
+    db: AsyncSession = Depends(get_db),
+):
+    building_manager = BuildingManager(db)
+    await building_manager.update_building_image(building_id, image)
+    return Response(status_code=status.HTTP_202_ACCEPTED)
 
 

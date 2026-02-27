@@ -12,7 +12,13 @@ class BuildingCoefficient(BaseModel):
 
     building_id = Column(Integer, ForeignKey("buildings.id", ondelete="CASCADE"), nullable=False)
     building = relationship("Building", back_populates="building_coefficients", lazy="selectin")
-    building_coefficient_types = relationship("BuildingCoefficientType", back_populates="building_coefficient", lazy="selectin")
+    building_coefficient_types = relationship(
+        "BuildingCoefficientType",
+        back_populates="building_coefficient",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        lazy="selectin"
+    )
 
     __table_args__ = (
         UniqueConstraint(

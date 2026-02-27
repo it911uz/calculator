@@ -8,6 +8,8 @@ class Token(BaseModel):
 
 
 class GetMe(BaseModel):
+    fullname: str
+    phone: str
     username: str
 
 

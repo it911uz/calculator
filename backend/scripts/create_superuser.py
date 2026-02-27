@@ -9,6 +9,8 @@ import core.models
 
 
 async def main():
+    fullname = input("fullname: ")
+    phone = input("phone: ")
     username = input("Username: ")
     password = getpass("Password: ")
 
@@ -19,6 +21,8 @@ async def main():
 
     async with async_session() as session:
         user = User(
+            phone=phone,
+            fullname=fullname,
             username=username,
             hashed_password=await PasswordService.hash_password(password=password),
             is_superuser=True,

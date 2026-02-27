@@ -1,10 +1,12 @@
+from starlette.staticfiles import StaticFiles
+
 import core.models
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.routers import routers
-from core.config import origins
+from core.config import origins, IMAGES_DIR
 
 from lifespan import lifespan
 
@@ -21,3 +23,6 @@ app.add_middleware(
 
 for router in routers:
     app.include_router(router)
+
+
+app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")

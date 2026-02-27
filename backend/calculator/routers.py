@@ -27,18 +27,26 @@ async def calculate_apartment_pricing(first_investment_type: InvestmentTypeEnum,
     apartment_area = apartment.area
     first_investment_rate = body.first_investment_rate
     period_count = body.period_count
+
     total_price = apartment_final_price * apartment_area
 
-    if first_investment_type == InvestmentTypeEnum.PERCENTAGE:
-        credit_sum = total_price * (Decimal("1.00") - first_investment_rate/Decimal("100.00"))  # Decimal
-    else:
-        credit_sum = total_price - first_investment_rate
-    monthly_payment_rate = Decimal("20.00") / (period_count * Decimal("100.00"))  # Decimal
+    annual_rate = Decimal("20.00")
+    monthly_payment_rate = (annual_rate / Decimal("100.00")) / Decimal("12")
 
-    payment_per_period = credit_sum * monthly_payment_rate / (1 - (1 + monthly_payment_rate) ** -period_count)  # Annual Price (formula calculations)
+    if first_investment_type == InvestmentTypeEnum.PERCENTAGE:
+        first_payment_amount = total_price * first_investment_rate / Decimal("100.00")
+    else:
+        first_payment_amount = first_investment_rate
+
+    credit_sum = total_price - first_payment_amount
+
+    payment_per_period = credit_sum * monthly_payment_rate / (
+            1 - (1 + monthly_payment_rate) ** -period_count
+    )
+
     payment_per_period = payment_per_period.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-    new_total_price = (payment_per_period * period_count) + ( total_price * first_investment_rate/Decimal("100.00"))
+    new_total_price = payment_per_period * period_count + first_payment_amount
 
     response["block"] = apartment.building.name
     response["floor"] = apartment.floor

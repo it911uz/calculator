@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytz
 from dotenv import load_dotenv
@@ -28,6 +29,13 @@ ALGORITHM = "HS256"
 ACCESS_TIME = 360
 REFRESH_TIME = 120
 
-MAX_FILE_SIZE=5 * 1024 * 1024
+MAX_FILE_SIZE = 5 * 1024 * 1024
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+IMAGES_DIR = BASE_DIR / "images"
+
+IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+
+BASE_URL = "http://172.18.0.1:8001/"
 
 

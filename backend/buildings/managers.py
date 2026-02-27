@@ -1,7 +1,10 @@
+from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from buildings.image_sevices import save_image, delete_image
 from buildings.repositories import BuildingRepository
 from buildings.validations import BuildingValidator
+from core.config import BASE_URL
 
 
 class BuildingManager:
@@ -25,6 +28,23 @@ class BuildingManager:
 
     async def delete_building(self, building_id: int):
         return await self.building_repository.delete_building(building_id)
+
+    async def update_building_image(self, building_id: int, image: UploadFile):
+        await self.building_validator.validate_image(image)
+        building = await self.building_repository.get_building(building_id)
+        if building.image_url is not None:
+            await delete_image(building.image_url)
+
+        image_url = await save_image(image)
+        image_url = BASE_URL + "images/" + image_url
+        await self.building_repository.update_building(building_id, image_url=image_url)
+
+
+
+
+
+
+
 
 
 

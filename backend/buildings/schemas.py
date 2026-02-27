@@ -13,6 +13,7 @@ class PriceUnitEnum(str, Enum):
 
 class AddBuildingResponse(BaseModel):
     id: int
+    image_url: str | None
     name: str
     floor_count: int
     base_price: Decimal = Field(max_digits=20, decimal_places=2)
