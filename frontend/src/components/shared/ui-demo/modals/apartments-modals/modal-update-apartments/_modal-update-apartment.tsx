@@ -12,14 +12,16 @@ import { MdEdit } from "react-icons/md";
 import { useUpdateApartment } from "@/action/hooks/apartments-hook/update-apartment.hook";
 import type { ApartmentFormData, IApartment } from "@/types/apartment.types";
 import type { PropsModalUpdateApartments } from "@/types/props.types";
+import { StatusUpdateCell } from "../../../patch-status/_status-pach";
 
 interface ApiError {
   message: string;
   detail?: string;
 }
 
-
-export function ModalUpdateApartments({ apartment }: PropsModalUpdateApartments) {
+export function ModalUpdateApartments({
+  apartment,
+}: PropsModalUpdateApartments) {
   const [open, setOpen] = useState(false);
   const updateMutation = useUpdateApartment();
   const [formData, setFormData] = useState<ApartmentFormData>({
@@ -151,8 +153,23 @@ export function ModalUpdateApartments({ apartment }: PropsModalUpdateApartments)
                 required
               />
             </label>
+
+            <label className="font-light text-sm">Окончательная цена
+              <input
+               type="number"
+               name="final_price"
+               value={formData.final_price}
+               onChange={handleChange}
+               placeholder="цена"
+               className="border p-2 rounded text-sm"
+               required
+              
+              />
+            </label>
+            
           </div>
-          
+          <StatusUpdateCell apartment={apartment} />
+
           <div className="flex justify-end gap-2 pt-4">
             <button
               type="button"

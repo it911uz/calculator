@@ -1,4 +1,4 @@
-export type TApartmentStatus = "built" | "upcomming" | "in_process";
+export type TApartmentStatus = "built" | "upcoming" | "in_process";
 
 export interface IApartment {
   id: number;

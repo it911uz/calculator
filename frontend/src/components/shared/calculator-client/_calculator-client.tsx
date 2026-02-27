@@ -7,7 +7,7 @@ import {
   Building as BuildingIcon,
   ChevronRight,
   CreditCard,
-  Percent,
+  
 } from "lucide-react";
 import { GrMoney } from "react-icons/gr";
 import { ReportTemplate } from "../report-pdf/_report-pdf";
@@ -62,6 +62,8 @@ export const CalculatorClientPage: React.FC = () => {
   const buildings = (buildingsData || []) as IBuildings[];
   const apartments = (apartmentsData || []) as IApartment[];
 
+  const buildingUnitPrice = buildings.find((b) => String(b.id) === String(selectedBuildingId))?.price_unit || 0;
+  const buildingImageUrl = buildings.find((b) => String(b.id) === String(selectedBuildingId))?.image_url;
   const calculateMutation = useCalculatePricing();
 
   const filteredBuildings = useMemo(() => {
@@ -234,7 +236,7 @@ export const CalculatorClientPage: React.FC = () => {
                         className="w-full p-2.5 bg-white border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#7107e7] outline-none font-medium text-sm"
                       >
                         <option value="percentage">Процент (%)</option>
-                        <option value="amount">Сумма (UZS)</option>
+                        <option value="amount">Сумма ({buildingUnitPrice} )</option>
                       </select>
                     </div>
 
@@ -258,7 +260,7 @@ export const CalculatorClientPage: React.FC = () => {
                           placeholder="0"
                         />
                         <span className="absolute right-3 top-2.5 text-gray-400 text-sm font-bold">
-                          {investmentType === "percentage" ? "%" : "UZS"}
+                          {investmentType === "percentage" ? "%" : `${buildingUnitPrice}`}
                         </span>
                       </div>
                     </div>
@@ -453,7 +455,7 @@ export const CalculatorClientPage: React.FC = () => {
           )}
 
           {displayData.new_total_price > 0 && (
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <div className="bg-white p-4 rounded-sm shadow border border-blue-50">
                 <div className="flex justify-between mb-2">
                   <span className="font-bold text-gray-700 text-sm">
@@ -482,30 +484,6 @@ export const CalculatorClientPage: React.FC = () => {
                   {formatCurrency(displayData.new_price_per_sqrm)} / м²
                 </p>
               </div>
-              <div className="bg-white p-4 rounded-sm shadow border border-blue-50">
-                <div className="flex justify-between mb-2">
-                  <span className="font-bold text-gray-700 text-sm">
-                    Наценка
-                  </span>
-                  <Percent className="text-blue-600 w-4 h-4" />
-                </div>
-                <p className="text-xl font-black text-blue-600">
-                  +
-                  {(
-                    ((displayData.new_total_price -
-                      displayData.old_total_price) /
-                      displayData.old_total_price) *
-                    100
-                  ).toFixed(1)}
-                  %
-                </p>
-                <p className="text-[10px] text-gray-400">
-                  +
-                  {formatCurrency(
-                    displayData.new_total_price - displayData.old_total_price,
-                  )}
-                </p>
-              </div>
             </div>
           )}
         </div>
@@ -525,7 +503,7 @@ export const CalculatorClientPage: React.FC = () => {
                   : "0"}
               </p>
               <p className="text-white/60 text-[10px] uppercase font-bold mt-1">
-                UZS / в месяц
+                {buildingUnitPrice} / в месяц
               </p>
             </div>
             <div className="bg-white/10 p-4 rounded-sm text-center border border-white/5">
@@ -553,7 +531,8 @@ export const CalculatorClientPage: React.FC = () => {
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Цена за м²:</span>
                 <span className="font-bold">
-                  {formatCurrency(displayData.new_price_per_sqrm)}
+                  {formatCurrency(displayData.new_price_per_sqrm)} {" "} 
+                  <span className="text-[10px] text-gray-500">{buildingUnitPrice}</span>
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -561,11 +540,10 @@ export const CalculatorClientPage: React.FC = () => {
                 <span className="font-black text-[#7107e7]">
                   {investmentType === "percentage"
                     ? formatCurrency(
-                        displayData.new_total_price *
-                          (formData.first_investment_rate / 100),
+                        displayData.new_total_price * (formData.first_investment_rate),
                       )
                     : formatCurrency(formData.first_investment_rate)}{" "}
-                  
+                     <span className="text-[10px] text-gray-500">{buildingUnitPrice}</span>
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -576,7 +554,8 @@ export const CalculatorClientPage: React.FC = () => {
                 <span className="uppercase text-sm self-center text-gray-800">
                   Итого:
                 </span>
-                <span>{formatCurrency(displayData.new_total_price)}</span>
+                <span>{formatCurrency(displayData.new_total_price)} {" "} <span className="text-[10px] text-gray-500">{buildingUnitPrice}</span></span>
+                
               </div>
             </div>
           </div>
@@ -594,6 +573,8 @@ export const CalculatorClientPage: React.FC = () => {
                   ref={componentRef}
                   data={displayData}
                   apartmentNumber={foundApartment?.number?.toString() || ""}
+                  imgUrl={buildingImageUrl}
+                  priceUnit={buildingUnitPrice}
                 />
               </div>
             </>
