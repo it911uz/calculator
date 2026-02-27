@@ -33,6 +33,8 @@ const CreateUserManagement: React.FC = () => {
   const [formData, setFormData] = useState<ICreateUserPayload>({
     username: "",
     password: "",
+    phone: "",
+    fullname: "",
     role_id: 0,
   });
 
@@ -100,6 +102,30 @@ const CreateUserManagement: React.FC = () => {
                 setFormData({ ...formData, username: e.target.value })
               }
               placeholder="Введите username"
+            />
+          </div>
+          <div className="space-y-2">
+            <label>Полное имя</label>
+            <Input
+              id="fullname"
+              required
+              value={formData.fullname}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, fullname: e.target.value })
+              }
+              placeholder="Введите полное имя"
+            />
+          </div>
+          <div className="space-y-2">
+            <label>Номер телефона</label>
+            <Input
+              id="phone"
+              required
+              value={formData.phone}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+              placeholder="Введите номер телефона"
             />
           </div>
           <div className="space-y-2">

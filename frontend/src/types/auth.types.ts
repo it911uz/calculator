@@ -19,4 +19,6 @@ export interface LoginPayload {
 }
 export interface IUserMe {
   username: string;
+  fullname: string;
+  phone: string;
 }

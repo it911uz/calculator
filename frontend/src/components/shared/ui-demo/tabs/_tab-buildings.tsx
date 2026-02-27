@@ -9,17 +9,22 @@ import { MdOutlineBarChart } from "react-icons/md";
 import { GrMoney } from "react-icons/gr";
 import { useRouter } from "next/navigation";
 import type { TabsProps } from "@/types/props.types";
+import Image from "next/image";
+import { getImageUrl } from "@/utils/get-imgUrl";
 
-
-
-export function TabsDemoBuildings({ initialBuilding, allComplexes }: TabsProps) {
+export function TabsDemoBuildings({
+  initialBuilding,
+  allComplexes,
+}: TabsProps) {
   const router = useRouter();
 
   const handleSuccess = () => {
     router.refresh();
   };
 
-  const buildingComplex = allComplexes.find((c) => c.id === initialBuilding.complex_id);
+  const buildingComplex = allComplexes.find(
+    (c) => c.id === initialBuilding.complex_id,
+  );
 
   return (
     <Tabs defaultValue="Информация о здании" className="w-full">
@@ -34,29 +39,41 @@ export function TabsDemoBuildings({ initialBuilding, allComplexes }: TabsProps) 
 
       <TabsContent value="Информация о здании">
         <div className="overflow-hidden rounded-sm bg-gradient-to-br from-indigo-200 via-indigo-100 to-indigo-100 border border-indigo-100 shadow-[0_8px_32px_rgba(99,102,241,0.08)] hover:shadow-[0_16px_48px_rgba(99,102,241,0.12)] transition-all duration-500 hover:-translate-y-1 group">
-          <div className="py-6 px-3">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 ">
-              <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-sm font-bold text-indigo-700 flex gap-2 items-center px-3 py-1 shadow-sm">
-                <h1 className="text-md ">
-                  {initialBuilding.name
-                    ? initialBuilding.name.charAt(0).toUpperCase() +
-                      initialBuilding.name.slice(1)
-                    : "—"}
-                </h1>
-                <span className="text-xs text-gray-500 font-normal">Здание</span>
+          <div className="py-6 px-3 space-y-4">
+            <div className="flex items-start gap-3 justify-start ">
+              <div className="relative w-48 h-48 ">
+                <Image
+                  fill
+                  unoptimized
+                  src={getImageUrl(initialBuilding.image_url)}
+                  alt="Изображение здания"
+                  className="object-cover rounded-lg border border-gray-300 shadow-sm"
+                />
               </div>
-
-              <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-xl shadow-sm">
-                <div className="w-2 h-2 rounded-full bg-indigo-500 mr-2 animate-pulse"></div>
-                <span className="text-sm font-medium text-gray-700">
-                  В комплексе:
-                </span>
-                <span className="ml-2 font-bold text-indigo-700">
-                  {buildingComplex?.name
-                    ? buildingComplex.name.charAt(0).toUpperCase() +
-                      buildingComplex.name.slice(1)
-                    : "—"}
-                </span>
+              <div className="flex flex-col justify-start gap-4 m ">
+                <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-sm shadow-sm">
+                  <div className="w-2 h-2 rounded-full bg-indigo-500 mr-2 animate-pulse"></div>
+                  <span className="text-sm font-medium text-gray-700">
+                    В комплексе:
+                  </span>
+                  <span className="ml-2 font-bold text-indigo-700">
+                    {buildingComplex?.name
+                      ? buildingComplex.name.charAt(0).toUpperCase() +
+                        buildingComplex.name.slice(1)
+                      : "—"}
+                  </span>
+                </div>
+                <div className="bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-sm font-bold text-indigo-700 flex gap-2 items-center px-3 py-1 shadow-sm">
+                  <h1 className="text-md ">
+                    {initialBuilding.name
+                      ? initialBuilding.name.charAt(0).toUpperCase() +
+                        initialBuilding.name.slice(1)
+                      : "—"}
+                  </h1>
+                  <span className="text-xs text-gray-500 font-normal">
+                    Здание
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -174,10 +191,8 @@ export function TabsDemoBuildings({ initialBuilding, allComplexes }: TabsProps) 
       </TabsContent>
 
       <TabsContent value="Конфигурация коэффициентов">
-        <div >
-           <ModalAddedCoefficient
-             buildingId={Number(initialBuilding.id)}
-           />
+        <div>
+          <ModalAddedCoefficient buildingId={Number(initialBuilding.id)} />
         </div>
       </TabsContent>
     </Tabs>
