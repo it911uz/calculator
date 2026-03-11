@@ -70,7 +70,7 @@ export default async function SingleComplexPage({ params }: Props) {
           </div>
 
           <div className="flex gap-2.5 items-center pt-2">
-            <ModalDeleteComplex buildingId={currentComplex.id} />
+            <ModalDeleteComplex complexId={currentComplex.id} />
             <ModalUpdateComplex complex={currentComplex} />
           </div>
         </div>
