@@ -1,13 +1,10 @@
-"use client";
-
+import { useQuery } from "@tanstack/react-query";
 import { getComplexes } from "@/action/complex/get-complexes.api";
 import { QueryKeys } from "@/lib/query-keys";
-import { useQuery } from "@tanstack/react-query";
 
-export function useComplexes(params: Record<string, number> = {}) {
+export function useComplexes(params: Record<string, unknown> = {}) {
   return useQuery({
     queryKey: [...QueryKeys.complex.lists(), params],
     queryFn: () => getComplexes(params),
-  
   });
 }

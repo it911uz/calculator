@@ -17,6 +17,9 @@ import { useCreateApartment } from "@/action/hooks/apartments-hook/create-apartm
 import { getCoefficientTypesByBuildingId } from "@/action/coefficient-types/get-coefficient-type.api";
 import type { ICoefficientTypeGroup } from "@/types/coefficient-type.types";
 import type { TModalPropsAddedApartments } from "@/types/props.types";
+import { TApartmentStatus } from "@/types/apartment.types";
+
+// Status turlari uchun literal type
 
 export const ModalAddedApartments: FC<TModalPropsAddedApartments> = ({ onSuccess }) => {
   const { data: buildings = [] } = useBuildings();
@@ -30,6 +33,7 @@ export const ModalAddedApartments: FC<TModalPropsAddedApartments> = ({ onSuccess
     room_count: "",
     building_id: "",
     area: "",
+    status: "built" as TApartmentStatus, // Status qo'shildi
     bct_ids: [] as number[],
   });
 
@@ -109,6 +113,7 @@ export const ModalAddedApartments: FC<TModalPropsAddedApartments> = ({ onSuccess
       floor: Number(formData.floor) || 0,
       room_count: Number(formData.room_count) || 0,
       area: formData.area || "0",
+      status: formData.status, 
       bct_ids: formData.bct_ids,
     };
 
@@ -125,6 +130,7 @@ export const ModalAddedApartments: FC<TModalPropsAddedApartments> = ({ onSuccess
         room_count: "",
         building_id: "",
         area: "",
+        status: "in_process",
         bct_ids: [],
       });
 
@@ -165,6 +171,22 @@ export const ModalAddedApartments: FC<TModalPropsAddedApartments> = ({ onSuccess
                   {b.name}
                 </option>
               ))}
+            </select>
+          </div>
+
+          {/* Status Select Qo'shildi */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Статус *</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              required
+              className="w-full h-10 border rounded px-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+            >
+              <option value="in_process">В процессе</option>
+              <option value="built">Построен</option>
+              <option value="upcoming">Строящийся</option>
             </select>
           </div>
 
@@ -211,6 +233,7 @@ export const ModalAddedApartments: FC<TModalPropsAddedApartments> = ({ onSuccess
               placeholder="65.5"
             />
           </div>
+
           <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
             {coefficientGroups.map((group) => (
               <div key={group.id} className="space-y-2">
@@ -241,7 +264,7 @@ export const ModalAddedApartments: FC<TModalPropsAddedApartments> = ({ onSuccess
             ))}
           </div>
 
-          <DialogFooter className=" flex gap-3">
+          <DialogFooter className="col-span-1 md:col-span-2 flex gap-3">
             <Button variant="outline" type="button" onClick={() => setOpen(false)}>
               Отмена
             </Button>

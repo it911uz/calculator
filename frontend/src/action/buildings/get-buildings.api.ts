@@ -4,7 +4,13 @@ import { getAuthData } from "@/lib/auth.util";
 import type { IBuildings } from "@/types/building.types";
 import type { SafeArray } from "@/types/safe-response.types";
 
-export async function getBuildings(params: { search?: string; page?: number; category?: string }) {
+export async function getBuildings(params: { 
+  search?: string; 
+  page?: number; 
+  category?: string;
+  limit?: number;  
+  offset?: number; 
+}) {
   const result: SafeArray<IBuildings> = [];
   const queryStr = createSearchParams(params).toString();
 
