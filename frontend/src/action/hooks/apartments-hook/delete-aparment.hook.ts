@@ -1,30 +1,37 @@
-"use client"
+"use client";
 
 import { deleteApartment } from "@/action/apartaments/delete-apartment.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function useDeleteApartment() {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ id, params }: { id: string | number; params?: Record<string, number> }) =>
-      deleteApartment(id, params || {}),
+    return useMutation({
+        mutationFn: ({
+            id,
+            params,
+        }: {
+            id: string | number;
+            params?: Record<string, number>;
+        }) => deleteApartment(id, params || {}),
 
-    onSuccess: (response, variables) => {
-      if (response.success) {
-        const { id } = variables;
+        onSuccess: (response, variables) => {
+            if (response.success) {
+                const { id } = variables;
 
-        queryClient.invalidateQueries({ queryKey: ["apartments"] });
-        queryClient.removeQueries({ queryKey: ["apartments", "detail", id] });
+                queryClient.invalidateQueries({ queryKey: ["apartments"] });
+                queryClient.removeQueries({
+                    queryKey: ["apartments", "detail", id],
+                });
 
-        toast.success("Kvartira muvaffaqiyatli o'chirildi");
-      } else {
-        toast.error(response._meta?.error || "Xatolik yuz berdi");
-      }
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "Не удалось удалить квартиру");
-    },
-  });
+                toast.success("Kvartira muvaffaqiyatli o'chirildi");
+            } else {
+                toast.error(response._meta?.error || "Xatolik yuz berdi");
+            }
+        },
+        onError: (error: Error) => {
+            toast.error(error.message || "Не удалось удалить квартиру");
+        },
+    });
 }
