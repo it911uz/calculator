@@ -1,11 +1,7 @@
-import { TabsManagement } from '@/components/shared/ui-demo/tabs/_tab-management'
+import { TabsManagement } from "@/components/shared/ui-demo/tabs/_tab-management";
 
 const UsersEmployes = () => {
-  return (
-    <>
-      <TabsManagement/>
-    </>
-  )
-}
+    return <TabsManagement />;
+};
 
-export default UsersEmployes
+export default UsersEmployes;
