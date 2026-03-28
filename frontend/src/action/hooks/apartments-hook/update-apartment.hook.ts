@@ -7,45 +7,42 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface UpdateApartmentArgs {
-    id: string | number;
-    data: Partial<IApartment>;
-    params?: Record<string, number>;
+	id: string | number;
+	data: Partial<IApartment>;
+	params?: Record<string, number>;
 }
 
 export function useUpdateApartment() {
-    const queryClient = useQueryClient();
-    const router = useRouter();
+	const queryClient = useQueryClient();
+	const router = useRouter();
 
-    return useMutation({
-        mutationFn: async ({ id, data, params }: UpdateApartmentArgs) => {
-            const res = await updateApartment(id, data, params);
+	return useMutation({
+		mutationFn: async ({ id, data, params }: UpdateApartmentArgs) => {
+			const res = await updateApartment(id, data, params);
 
-            if (res._meta?.error) throw new Error(res._meta.error);
-            if (!res.data) throw new Error("Ma'lumot yangilanmadi");
+			if (res._meta?.error) throw new Error(res._meta.error);
+			if (!res.data) throw new Error("Ma'lumot yangilanmadi");
 
-            return res.data;
-        },
+			return res.data;
+		},
 
-        onSuccess: (data, variables) => {
-            const apartmentId = String(variables.id);
+		onSuccess: (data, variables) => {
+			const apartmentId = String(variables.id);
 
-            queryClient.invalidateQueries({ queryKey: ["apartments"] });
-            queryClient.setQueryData(
-                ["apartments", "detail", apartmentId],
-                data,
-            );
+			queryClient.invalidateQueries({ queryKey: ["apartments"] });
+			queryClient.setQueryData(["apartments", "detail", apartmentId], data);
 
-            if (data.building_id) {
-                queryClient.invalidateQueries({
-                    queryKey: ["buildings", "detail", data.building_id],
-                });
-            }
+			if (data.building_id) {
+				queryClient.invalidateQueries({
+					queryKey: ["buildings", "detail", data.building_id],
+				});
+			}
 
-            toast.success("Квартира успешно обновлена");
-            router.refresh();
-        },
-        onError: (error: Error) => {
-            toast.error(error.message || "Не удалось обновить квартиру");
-        },
-    });
+			toast.success("Квартира успешно обновлена");
+			router.refresh();
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || "Не удалось обновить квартиру");
+		},
+	});
 }

@@ -4,8 +4,8 @@ import { getBuildingsByComplexId } from "@/action/buildings/get-building-by-comp
 import { useQuery } from "@tanstack/react-query";
 
 export function useBuildingsByComplex(complexId: string | number) {
-    return useQuery({
-        queryKey: ["buildings", "by-complex", complexId],
-        queryFn: () => getBuildingsByComplexId(complexId),
-    });
+	return useQuery({
+		queryKey: ["buildings", "by-complex", complexId],
+		queryFn: () => getBuildingsByComplexId(complexId),
+	});
 }

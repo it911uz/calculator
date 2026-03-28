@@ -1,22 +1,22 @@
 export type TApartmentStatus = "built" | "upcoming" | "in_process";
 
 export interface IApartment {
-  id: number;
-  number: string;
-  floor: number;
-  area: string;          
-  room_count: number;
-  final_price: string;  
-  building_id: number;
-  status: TApartmentStatus;
-  bct_ids?: number[];
-  block?: string
+    id: number;
+    number: string;
+    floor: number;
+    area: string;
+    room_count: number;
+    status: TApartmentStatus;
+    final_price: string;
+    building_id: number;
+    bct_ids: number[];
 }
+
 export interface ApartmentFormData {
-  number: string;
-  floor: number;
-  room_count: number;
-  area: string;       
-  final_price: string; 
-  status: TApartmentStatus;
+    number: string;
+    floor: number;
+    room_count: number;
+    area: string;
+    final_price: string;
+    status: TApartmentStatus;
 }
