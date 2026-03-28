@@ -5,9 +5,9 @@ import { QueryKeys } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 
 export function usePermissionById(id: number | string) {
-  return useQuery({
-    queryKey: QueryKeys.permissions.detail(id),
-    queryFn: () => getPermissionById(id),
-    enabled: !!id,
-  });
+	return useQuery({
+		queryKey: QueryKeys.permissions.detail(id),
+		queryFn: () => getPermissionById(id),
+		enabled: !!id,
+	});
 }

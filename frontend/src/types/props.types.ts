@@ -6,72 +6,72 @@ import { IRole } from "./permissions.types";
 import { ComplexArray } from "./safe-response.types";
 
 export interface Props {
-  params: Promise<{ id: string }>;
+	params: Promise<{ id: string }>;
 }
 export type TModalPropsAddedApartments = {
-  onSuccess?: () => void;
+	onSuccess?: () => void;
 };
 export interface ModalDeleteApartmentsProps {
-  apartmentId: string | number;
-  onSuccess?: () => void;
+	apartmentId: string | number;
+	onSuccess?: () => void;
 }
 export interface PropsModalUpdateApartments {
-  apartment: IApartment;
+	apartment: IApartment;
 }
 
 export interface ApiError {
-  message: string;
-  detail?: string;
+	message: string;
+	detail?: string;
 }
 export interface PropsModalaUpdateCoefficientTypeApartment {
-  coefficientType: ICoefficientType;
-  buildingId: number;
-  coefficientId: number; 
+	coefficientType: ICoefficientType;
+	buildingId: number;
+	coefficientId: number;
 }
 export interface ModalDeleteCoefficientTypeProps {
-  coefficientTypeId: number;
-  buildingId: number;
-  onSuccess?: () => void;
+	coefficientTypeId: number;
+	buildingId: number;
+	onSuccess?: () => void;
 }
 
 export interface PropsModalEditCoefficientType {
-  coefficientType: ICoefficientType;
-  coefficientId: number;
-  buildingId: number;
+	coefficientType: ICoefficientType;
+	coefficientId: number;
+	buildingId: number;
 }
 export type ModalPropsModalAddedComplex = {
-  onSuccess?: () => Promise<void>; 
+	onSuccess?: () => Promise<void>;
 };
 export interface ModalDeleteComplexProps {
-  complexId: number;
+	complexId: number;
 }
 export interface TableApartmentsProps {
-  initialApartments: IApartment[];
+	initialApartments: IApartment[];
 }
 export interface TableBuildingsProps {
-  buildings: IBuildings[];
+	buildings: IBuildings[];
 }
 export interface TableComplexProps {
-  initialComplex: IComplex[] | ComplexArray;
+	initialComplex: IComplex[] | ComplexArray;
 }
 export interface TabsProps {
-  initialBuilding: IBuildings;
-  allComplexes: IComplex[];
+	initialBuilding: IBuildings;
+	allComplexes: IComplex[];
 }
 export interface ModalUpdateBuildingsProps {
-  building: IBuildings;
-  onSuccess?: () => void;
+	building: IBuildings;
+	onSuccess?: () => void;
 }
 
 export interface PropsDeletePermissionManagement {
-  permissionId: number | string;
-  codename?: string;
+	permissionId: number | string;
+	codename?: string;
 }
 export interface PropsDeleteRole {
-  roleId: number | string;
-  roleName?: string;
+	roleId: number | string;
+	roleName?: string;
 }
 
 export interface PropsPatchRoleManagement {
-  role: IRole;
+	role: IRole;
 }

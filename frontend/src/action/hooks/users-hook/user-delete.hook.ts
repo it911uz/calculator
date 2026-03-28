@@ -6,16 +6,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function useDeleteUser() {
-  const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (id: number | string) => deleteUser(id),
-    onSuccess: () => {
-      toast.success("Пользователь удален");
-      queryClient.invalidateQueries({ queryKey: QueryKeys.users.lists() });
-    },
-    onError: () => {
-      toast.error("Не удалось удалить пользователя");
-    },
-  });
+	return useMutation({
+		mutationFn: (id: number | string) => deleteUser(id),
+		onSuccess: () => {
+			toast.success("Пользователь удален");
+			queryClient.invalidateQueries({ queryKey: QueryKeys.users.lists() });
+		},
+		onError: () => {
+			toast.error("Не удалось удалить пользователя");
+		},
+	});
 }
