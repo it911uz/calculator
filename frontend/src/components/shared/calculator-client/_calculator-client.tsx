@@ -294,7 +294,7 @@ export const CalculatorClientPage: React.FC = () => {
                                                         first_investment_rate: 0,
                                                     });
                                                 }}
-                                                className="w-full p-2.5 bg-white border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#7107e7] outline-none font-medium text-sm"
+                                                className="w-full p-2 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#7107e7] outline-none"
                                             >
                                                 <option value="percentage">
                                                     Процент (%)
@@ -335,11 +335,14 @@ export const CalculatorClientPage: React.FC = () => {
                                                     className="w-full p-2.5 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#7107e7] outline-none pr-12 font-bold"
                                                     placeholder="0"
                                                 />
-                                                <span className="absolute right-3 top-2.5 text-gray-400 text-sm font-bold">
+                                                <span
+                                                    role="none"
+                                                    className="absolute right-3 top-2.5 text-gray-400 text-sm font-bold"
+                                                >
                                                     {investmentType ===
                                                     "percentage"
                                                         ? "%"
-                                                        : `${buildingUnitPrice}`}
+                                                        : buildingUnitPrice}
                                                 </span>
                                             </div>
                                         </div>
@@ -474,6 +477,22 @@ export const CalculatorClientPage: React.FC = () => {
                                             className="w-full p-2.5 border border-gray-300 rounded-sm outline-none focus:ring-2 focus:ring-[#7107e7]"
                                         />
                                     </div>
+
+                                    <div className="space-y-2">
+                                        <div className="space-y-2">
+                                            <label
+                                                htmlFor="edit-price"
+                                                className="text-sm font-medium text-gray-700"
+                                            >
+                                                Изменить цену за м²
+                                            </label>
+                                            <input
+                                                id="edit-price"
+                                                type="number"
+                                                className="w-full p-2.5 border border-gray-300 rounded-sm outline-none focus:ring-2 focus:ring-[#7107e7]"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -493,7 +512,7 @@ export const CalculatorClientPage: React.FC = () => {
                                     )}
                                 </button>
                                 <button
-                                    type="button"
+                                    type="reset"
                                     onClick={() => {
                                         setSelectedComplexId("");
                                         setSelectedBuildingId("");
