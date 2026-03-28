@@ -1,8 +1,8 @@
 import DahboardLayout from "@/components/layouts/dashboard-layout/_dashboard-layout";
 export default function DashboardGroupLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return <DahboardLayout>{children}</DahboardLayout>;
+	return <DahboardLayout>{children}</DahboardLayout>;
 }

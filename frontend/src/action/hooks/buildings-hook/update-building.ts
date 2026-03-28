@@ -7,53 +7,46 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 interface UpdateBuildingMutationArgs {
-    id: string | number;
-    data: Partial<IBuildings>;
-    params?: Record<string, unknown>;
+	id: string | number;
+	data: Partial<IBuildings>;
+	params?: Record<string, unknown>;
 }
 
 export function useUpdateBuilding() {
-    const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
-    return useMutation<IBuildings, Error, UpdateBuildingMutationArgs>({
-        mutationFn: async ({ id, data, params }) => {
-            const res = await updateBuilding(id, data, params || {});
+	return useMutation<IBuildings, Error, UpdateBuildingMutationArgs>({
+		mutationFn: async ({ id, data, params }) => {
+			const res = await updateBuilding(id, data, params || {});
 
-            if (res._meta?.error) {
-                throw new Error(res._meta.error);
-            }
+			if (res._meta?.error) {
+				throw new Error(res._meta.error);
+			}
 
-            if (!res.data) {
-                throw new Error("Serverdan kutilmagan javob keldi");
-            }
+			if (!res.data) {
+				throw new Error("Serverdan kutilmagan javob keldi");
+			}
 
-            return res.data;
-        },
+			return res.data;
+		},
 
-        onSuccess: (data, variables) => {
-            toast.success("Здание успешно обновлено");
+		onSuccess: (data, variables) => {
+			toast.success("Здание успешно обновлено");
 
-            queryClient.invalidateQueries({
-                queryKey: QueryKeys.buildings.all,
-            });
-            queryClient.setQueryData(
-                QueryKeys.buildings.detail(variables.id),
-                data,
-            );
+			queryClient.invalidateQueries({
+				queryKey: QueryKeys.buildings.all,
+			});
+			queryClient.setQueryData(QueryKeys.buildings.detail(variables.id), data);
 
-            if (data.complex_id) {
-                queryClient.invalidateQueries({
-                    queryKey: [
-                        ...QueryKeys.buildings.all,
-                        "complex",
-                        data.complex_id,
-                    ],
-                });
-            }
-        },
+			if (data.complex_id) {
+				queryClient.invalidateQueries({
+					queryKey: [...QueryKeys.buildings.all, "complex", data.complex_id],
+				});
+			}
+		},
 
-        onError: (error) => {
-            toast.error(error.message || "Ошибка при обновлении здания");
-        },
-    });
+		onError: (error) => {
+			toast.error(error.message || "Ошибка при обновлении здания");
+		},
+	});
 }
