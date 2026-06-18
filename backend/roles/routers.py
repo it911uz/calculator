@@ -35,7 +35,7 @@ async def create_role(create_role_body: RoleCreateBody, db: AsyncSession = Depen
 "-------------------------------------------------------------------------------------------"
 
 @router.get(
-    "/{role_id}",
+    "/{role_id}/",
     response_model=RoleGetResponse,
     dependencies=[Depends(has_permission("view_roles"))]
 )
@@ -46,7 +46,7 @@ async def get_role(role_id: int, db: AsyncSession = Depends(get_db)):
 "-------------------------------------------------------------------------------------------"
 
 @router.patch(
-    "/{role_id}",
+    "/{role_id}/",
     response_model=RoleUpdateResponse,
     dependencies=[Depends(has_permission("update_roles"))]
 )
@@ -57,7 +57,7 @@ async def update_role(role_id: int, update_role_body: RoleUpdateBody, db: AsyncS
 "-------------------------------------------------------------------------------------------"
 
 @router.delete(
-    "/{role_id}",
+    "/{role_id}/",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(has_permission("delete_roles"))]
 )

@@ -35,7 +35,7 @@ async def create_permission(create_permission_body: PermissionCreateBody, db: As
 "-------------------------------------------------------------------------------------------"
 
 @router.get(
-    "/{permission_id}",
+    "/{permission_id}/",
     response_model=PermissionGetResponse,
     dependencies=[Depends(has_permission("view_permissions"))]
 )
@@ -46,7 +46,7 @@ async def get_permission(permission_id: int, db: AsyncSession = Depends(get_db))
 "-------------------------------------------------------------------------------------------"
 
 @router.patch(
-    "/{permission_id}",
+    "/{permission_id}/",
     response_model=PermissionUpdateResponse,
     dependencies=[Depends(has_permission("update_permissions"))]
 )
@@ -57,7 +57,7 @@ async def update_permission(permission_id: int, update_permission_body: Permissi
 "-------------------------------------------------------------------------------------------"
 
 @router.delete(
-    "/{permission_id}",
+    "/{permission_id}/",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(has_permission("delete_permissions"))]
 )
