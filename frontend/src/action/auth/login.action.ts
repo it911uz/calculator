@@ -18,7 +18,7 @@ export async function loginAction(formData: FormData): Promise<void> {
 		password,
 	});
 
-	const res = await fetch(`${ENV.PUBLIC_API_URL}/auth/token`, {
+	const res = await fetch(`${ENV.PUBLIC_API_URL}/auth/token/`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
