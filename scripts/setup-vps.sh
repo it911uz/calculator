@@ -30,7 +30,10 @@ step "Установка базовых утилит"
 apt-get install -y -qq \
   curl wget git unzip htop ufw \
   ca-certificates gnupg lsb-release \
-  software-properties-common apt-transport-https
+  software-properties-common apt-transport-https \
+  cron
+systemctl enable cron 2>/dev/null || systemctl enable crond 2>/dev/null || true
+systemctl start cron 2>/dev/null || systemctl start crond 2>/dev/null || true
 success "Базовые утилиты установлены"
 
 step "Установка Docker"
