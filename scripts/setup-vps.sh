@@ -76,6 +76,9 @@ else
   success "Пользователь deploy создан (группы: docker, sudo)"
   info "Установите пароль: passwd deploy"
 fi
+echo "deploy ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/deploy
+chmod 440 /etc/sudoers.d/deploy
+success "NOPASSWD sudo настроен для deploy"
 
 step "Настройка UFW (файрвол)"
 ufw --force reset
