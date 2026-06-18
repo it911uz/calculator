@@ -20,7 +20,7 @@
 ssh root@ВАШ_IP
 
 # Скачать и запустить скрипт подготовки
-curl -sSL https://raw.githubusercontent.com/shukhratbekovb/calculator/main/scripts/setup-vps.sh | bash
+curl -sSL https://raw.githubusercontent.com/it911uz/calculator/main/scripts/setup-vps.sh | sudo bash
 ```
 
 Скрипт установит: Docker, Docker Compose, Certbot, UFW (файрвол), создаст пользователя `deploy`, настроит swap 2GB и cron для бэкапов.
@@ -32,7 +32,7 @@ curl -sSL https://raw.githubusercontent.com/shukhratbekovb/calculator/main/scrip
 su - deploy
 
 # Скопировать репозиторий
-git clone https://github.com/shukhratbekovb/calculator.git /opt/calculator
+git clone https://github.com/it911uz/calculator.git /opt/calculator
 cd /opt/calculator
 
 # ЗАПУСТИТЬ ДЕПЛОЙ (одна команда — делает всё)
