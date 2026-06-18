@@ -69,10 +69,11 @@ fi
 
 step "Создание системного пользователя deploy"
 if id "deploy" &>/dev/null; then
-  success "Пользователь deploy уже существует"
+  usermod -aG docker,sudo deploy
+  success "Пользователь deploy уже существует (добавлен в docker,sudo)"
 else
-  useradd -m -s /bin/bash -G docker deploy
-  success "Пользователь deploy создан"
+  useradd -m -s /bin/bash -G docker,sudo deploy
+  success "Пользователь deploy создан (группы: docker, sudo)"
   info "Установите пароль: passwd deploy"
 fi
 
