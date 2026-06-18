@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 import pytz
 from dotenv import load_dotenv

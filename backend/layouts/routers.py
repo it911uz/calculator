@@ -4,7 +4,6 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query, UploadFile, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-from starlette.responses import Response
 
 from buildings.image_sevices import save_image, delete_image
 from core.db.session import get_db

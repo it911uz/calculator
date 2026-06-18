@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import jwt
-from jose import JWTError
 from jwt import ExpiredSignatureError
 
 from core.config import TIMEZONE, REFRESH_TIME, ACCESS_TIME, SECRET_KEY, ALGORITHM

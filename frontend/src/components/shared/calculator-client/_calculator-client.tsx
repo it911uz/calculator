@@ -609,7 +609,7 @@ export const CalculatorClientPage: React.FC = () => {
                                     apartmentNumber={
                                         foundApartment?.number?.toString() || ""
                                     }
-                                    imgUrl={complexLogoUrl}
+                                    imgUrl={complexLogoUrl ?? undefined}
                                     priceUnit={buildingUnitPrice}
                                     layoutImageUrl={layoutImageUrl}
                                 />

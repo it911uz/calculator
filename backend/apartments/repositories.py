@@ -1,9 +1,7 @@
 from fastapi import UploadFile
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from apartments.models import Apartment
-from apartments.validations import ApartmentValidator
 from coefficients.models import BuildingCoefficientType
 from core.repositories import BaseRepository
 

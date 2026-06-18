@@ -1,4 +1,3 @@
-from buildings.models import Building
 from coefficients.models import BuildingCoefficient
 from core.validations import BaseValidator
 

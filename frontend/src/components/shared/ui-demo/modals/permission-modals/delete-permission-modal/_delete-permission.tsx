@@ -51,7 +51,7 @@ const DeletePermissionManagement: React.FC<PropsDeletePermissionManagement> = ({
 
 				<div className="py-4">
 					<p className="text-sm text-gray-600">
-						{t("delete_permission_confirm", { codename })}
+						{t("delete_permission_confirm", { codename: codename ?? "" })}
 					</p>
 				</div>
 

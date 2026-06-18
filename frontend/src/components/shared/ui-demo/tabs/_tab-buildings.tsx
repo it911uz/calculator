@@ -54,7 +54,7 @@ export function TabsDemoBuildings({ initialBuilding, allComplexes }: TabsProps) 
 					/>
 					<ModalDeleteBuildings
 						buildingId={initialBuilding.id}
-						complexId={initialBuilding.complex_id}
+						complexId={Number(initialBuilding.complex_id)}
 					/>
 				</div>
 			</div>

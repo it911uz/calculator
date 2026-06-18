@@ -152,7 +152,7 @@ class ApartmentBulkCreateValidator(BaseValidator):
         if sorted(building_coefficient_names) != sorted(bc_column_names):
             raise HTTPException(
                 status_code=404,
-                detail=f"Неправильные коэффиценты. Проверьте коэффиценты и попробуйте снова."
+                detail="Неправильные коэффиценты. Проверьте коэффиценты и попробуйте снова."
             )
 
 

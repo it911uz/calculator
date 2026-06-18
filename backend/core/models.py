@@ -1,20 +1,13 @@
-# core/model_registry.py
 from core.db.base_model import BaseModel
 
-# RBAC
+# Side-effect imports: регистрируют таблицы в SQLAlchemy metadata для Alembic
+from complexes.models import Complex  # noqa: F401
+from buildings.models import Building  # noqa: F401
+from apartments.models import Apartment  # noqa: F401
+from coefficients.models import BuildingCoefficient, BuildingCoefficientType, apartment_coefficients  # noqa: F401
+from layouts.models import ApartmentLayout  # noqa: F401
+from users.models import User  # noqa: F401
+from roles.models import Role  # noqa: F401
+from permissions.models import Permission  # noqa: F401
 
-from users.models import User
-from roles.models import Role
-from permissions.models import Permission
-from role_permissions.models import role_permission
-
-from complexes.models import Complex
-from buildings.models import Building
-from apartments.models import Apartment
-from coefficients.models import BuildingCoefficient, BuildingCoefficientType, apartment_coefficients
-from layouts.models import ApartmentLayout
-
-# Domain
-
-# This is what Alembic uses
 target_metadata = BaseModel.metadata

@@ -5,7 +5,6 @@ from core.db.session import async_session
 from users.models import User
 from auth.services.password_service import PasswordService
 
-import core.models
 
 
 async def main():

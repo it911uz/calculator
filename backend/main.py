@@ -1,4 +1,5 @@
-import core.models
+
+import core.models  # noqa: F401  — регистрирует все модели в SQLAlchemy metadata
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 
 from buildings.models import Building
 from coefficients.models import BuildingCoefficient, BuildingCoefficientType

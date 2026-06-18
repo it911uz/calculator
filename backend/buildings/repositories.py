@@ -1,7 +1,5 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from buildings.models import Building
-from buildings.validations import BuildingValidator
 from core.repositories import BaseRepository
 
 

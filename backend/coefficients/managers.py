@@ -1,4 +1,3 @@
-from keyword import kwlist
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
