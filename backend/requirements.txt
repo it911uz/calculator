@@ -50,7 +50,6 @@ openpyxl==3.1.5
 packaging==25.0
 pandas==3.0.0
 passlib==1.7.4
-prometheus-fastapi-instrumentator==8.0.0
 prometheus_client==0.24.1
 prompt_toolkit==3.0.52
 psutil==5.9.8
