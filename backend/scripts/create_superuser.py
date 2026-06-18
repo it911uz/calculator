@@ -1,6 +1,7 @@
 import asyncio
 from getpass import getpass
 
+import core.models  # noqa: F401 — registers all SQLAlchemy mappers
 from core.db.session import async_session
 from users.models import User
 from auth.services.password_service import PasswordService
