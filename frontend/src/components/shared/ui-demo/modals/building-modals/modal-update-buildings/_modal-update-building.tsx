@@ -7,14 +7,13 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { useUpdateBuilding } from "@/action/hooks/buildings-hook/update-building";
 import type { ModalUpdateBuildingsProps } from "@/types/props.types";
 import { Button } from "@/components/ui/button";
-import { Loader2, UploadCloud } from "lucide-react";
-import Image from "next/image";
-import { useUpdateBuildingImage } from "@/action/hooks/buildings-hook/building-img";
+import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function ModalUpdateBuildings({
 	building,
@@ -30,20 +29,9 @@ export function ModalUpdateBuildings({
 	);
 	const [basePrice, setBasePrice] = useState(Number(building.base_price) || 0);
 
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
-	const [previewUrl, setPreviewUrl] = useState<string>(
-		building.image_url || "",
-	);
-
 	const updateMutation = useUpdateBuilding();
-	const imageMutation = useUpdateBuildingImage();
-	const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (file) {
-			setSelectedFile(file);
-			setPreviewUrl(URL.createObjectURL(file));
-		}
-	};
+	const t = useTranslations("building");
+	const tc = useTranslations("common");
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -62,13 +50,6 @@ export function ModalUpdateBuildings({
 				},
 			});
 
-			if (selectedFile) {
-				await imageMutation.mutateAsync({
-					id: building.id,
-					file: selectedFile,
-				});
-			}
-
 			setOpen(false);
 			onSuccess?.();
 		} catch (error) {
@@ -80,51 +61,19 @@ export function ModalUpdateBuildings({
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<button className="bg-gradient-to-br from-indigo-100 to-white px-2 py-1 rounded-[3px] leading-5 text-indigo-900 border border-indigo-200 hover:shadow-sm">
-					Изменять
+					{tc("change")}
 				</button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md overflow-y-auto max-h-[90vh]">
 				<DialogHeader>
 					<DialogTitle className="text-lg font-semibold text-center">
-						Обновить здание
+						{t("update_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">
-					{/* Rasm yuklash qismi */}
-					<div className="flex flex-col gap-2">
-						<span className="text-sm font-medium">Фотография здания</span>
-						<div className="flex items-center gap-4">
-							{previewUrl && (
-								<div className="relative w-16 h-16 rounded-lg overflow-hidden border">
-									<Image
-										src={previewUrl}
-										alt="Preview"
-										fill
-										className="object-cover"
-										unoptimized
-									/>
-								</div>
-							)}
-							<label className="flex-1 cursor-pointer">
-								<div className="flex items-center justify-center gap-2 border-2 border-dashed rounded-lg p-4 hover:bg-slate-50 transition-colors">
-									<UploadCloud size={20} className="text-gray-400" />
-									<span className="text-xs text-gray-500">
-										Нажмите для загрузки
-									</span>
-								</div>
-								<Input
-									type="file"
-									className="hidden"
-									accept="image/*"
-									onChange={handleFileChange}
-								/>
-							</label>
-						</div>
-					</div>
-
 					<label className="text-sm font-medium">
-						Название
+						{t("name_field")}
 						<Input
 							value={name}
 							onChange={(e) => setName(e.target.value)}
@@ -134,7 +83,7 @@ export function ModalUpdateBuildings({
 
 					<div className="grid grid-cols-2 gap-4">
 						<label className="text-sm font-medium">
-							Этажи
+							{t("floors_field")}
 							<Input
 								type="number"
 								value={floorCount}
@@ -143,7 +92,7 @@ export function ModalUpdateBuildings({
 							/>
 						</label>
 						<label className="text-sm font-medium">
-							Макс. коэффициент
+							{t("max_coef_field")}
 							<Input
 								type="number"
 								value={maxCoefficient}
@@ -159,7 +108,7 @@ export function ModalUpdateBuildings({
 					</div>
 
 					<label className="text-sm font-medium">
-						Базовая цена ({building.price_unit})
+						{t("base_price_field")} ({building.price_unit})
 						<Input
 							type="number"
 							value={basePrice}
@@ -176,7 +125,7 @@ export function ModalUpdateBuildings({
 							onClick={() => setOpen(false)}
 							className="min-w-24"
 						>
-							Отмена
+							{tc("cancel")}
 						</Button>
 						<Button
 							type="submit"
@@ -186,7 +135,7 @@ export function ModalUpdateBuildings({
 							{updateMutation.isPending ? (
 								<Loader2 className="animate-spin h-4 w-4" />
 							) : (
-								"Сохранить"
+								tc("save")
 							)}
 						</Button>
 					</div>

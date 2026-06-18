@@ -10,6 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
+
 interface ModalAddedCoefficientTypeProps {
 	buildingId: number;
 	coefficientId: number;
@@ -24,10 +26,12 @@ export const ModalAddedCoefficientType = ({
 	const createCoefficientType = useCreateCoefficientType();
 	const [typeName, setTypeName] = useState("");
 	const [rate, setRate] = useState<number | "">("");
+	const t = useTranslations("coefficient");
+	const tc = useTranslations("common");
 
 	const handleCreateCoefficientType = async () => {
 		if (!typeName || rate === "") {
-			toast.error("Заполните все поля");
+			toast.error(t("fill_fields_error"));
 			return;
 		}
 		await createCoefficientType.mutateAsync({
@@ -36,29 +40,30 @@ export const ModalAddedCoefficientType = ({
 			coefficient_id: coefficientId,
 			building_id: buildingId,
 		});
-		toast.success("Тип коэффициента создан");
+		toast.success(t("type_created_success"));
 		setTypeName("");
 		setRate("");
 		setOpen(false);
 		onSuccess?.();
 	};
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<button className="bg-[#46479f] px-3 py-1 rounded text-white text-sm">
-					Создать тип +
+					{t("type_create_btn")}
 				</button>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Создать тип</DialogTitle>
+					<DialogTitle>{t("type_create_title")}</DialogTitle>
 				</DialogHeader>
 
 				<div className="space-y-4">
 					<Input
 						value={typeName}
 						onChange={(e) => setTypeName(e.target.value)}
-						placeholder="Имя типа"
+						placeholder={t("type_name_placeholder")}
 					/>
 					<Input
 						type="number"
@@ -66,7 +71,7 @@ export const ModalAddedCoefficientType = ({
 						min={0}
 						max={100}
 						step={1}
-						placeholder="Ставка"
+						placeholder={t("type_rate_placeholder")}
 						className="bg-white"
 						onChange={(e) => {
 							const raw = e.target.value;
@@ -83,7 +88,7 @@ export const ModalAddedCoefficientType = ({
 						className="bg-[#46479f] text-white px-4 py-1 rounded"
 						onClick={handleCreateCoefficientType}
 					>
-						Создать
+						{tc("create")}
 					</button>
 				</div>
 			</DialogContent>

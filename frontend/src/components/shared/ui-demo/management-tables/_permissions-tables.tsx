@@ -9,7 +9,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Key, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { usePermissions } from "@/action/hooks/permissions-hook/use-permissions-hook";
 import CreatePermissionsManagement from "../modals/permission-modals/create-permission-modal/_create-permission";
 import DeletePermissionManagement from "../modals/permission-modals/delete-permission-modal/_delete-permission";
@@ -18,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 
 const PermissionsTableOfManagement: React.FC = () => {
 	const { data: permissions, isLoading } = usePermissions();
+	const t = useTranslations("management");
 
 	if (isLoading) return <Loader2 className="animate-spin m-10" />;
 
@@ -25,8 +27,8 @@ const PermissionsTableOfManagement: React.FC = () => {
 		<Table>
 			<TableHeader>
 				<TableRow>
-					<TableHead>Кодовое имя (Codename)</TableHead>
-					<TableHead>Тип доступа</TableHead>
+					<TableHead>{t("codename_col")}</TableHead>
+					<TableHead>{t("access_type_col")}</TableHead>
 					<TableHead className="flex justify-end py-2">
 						<CreatePermissionsManagement />
 					</TableHead>
@@ -43,7 +45,7 @@ const PermissionsTableOfManagement: React.FC = () => {
 						<TableCell>
 							<Badge variant="outline">
 								<span className="text-xs capitalize">
-									{perm.codename.split("_")[0]} доступ
+									{perm.codename.split("_")[0]} {t("access_suffix")}
 								</span>
 							</Badge>
 						</TableCell>

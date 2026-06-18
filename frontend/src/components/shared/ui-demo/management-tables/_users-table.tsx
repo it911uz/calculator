@@ -17,6 +17,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useUsers } from "@/action/hooks/users-hook/users-get.hook";
 import { useRoles } from "@/action/hooks/roles-hook/use-roles";
 import { usePatchUser } from "@/action/hooks/users-hook/user-patch.hook";
@@ -31,6 +32,7 @@ const UsersTableOfManagement: React.FC = () => {
 	const { data: roles } = useRoles();
 	const { mutate: updateUser, isPending: isUpdating } = usePatchUser();
 	const { data: currentUserData } = useAuthMe();
+	const t = useTranslations("management");
 
 	const currentUsername = currentUserData?.data?.username;
 	if (usersLoading) return <Loader2 className="animate-spin m-10" />;
@@ -39,10 +41,10 @@ const UsersTableOfManagement: React.FC = () => {
 		<Table>
 			<TableHeader>
 				<TableRow>
-					<TableHead className="w-20">№</TableHead>
-					<TableHead>Имя пользователя</TableHead>
-					<TableHead>Текущая роль</TableHead>
-					<TableHead className="text-right">Назначить роль</TableHead>
+					<TableHead className="w-20">{t("number_col")}</TableHead>
+					<TableHead>{t("username_col")}</TableHead>
+					<TableHead>{t("current_role_col")}</TableHead>
+					<TableHead className="text-right">{t("assign_role_col")}</TableHead>
 					<TableHead className="flex justify-end py-2">
 						<CreateUserManagement />
 					</TableHead>
@@ -63,7 +65,7 @@ const UsersTableOfManagement: React.FC = () => {
 								{user.username}{" "}
 								{isMe && (
 									<span className="text-[10px] ml-1 font-normal text-gray-400">
-										(Вы)
+										({t("you_label")})
 									</span>
 								)}
 							</TableCell>
@@ -71,10 +73,10 @@ const UsersTableOfManagement: React.FC = () => {
 								{user.role_id ? (
 									<Badge variant="outline">
 										{roles?.find((r) => r.id === user.role_id)?.name ||
-											"Роль найдена"}
+											t("role_placeholder")}
 									</Badge>
 								) : (
-									<Badge variant="destructive">Нет роли</Badge>
+									<Badge variant="destructive">{t("no_role")}</Badge>
 								)}
 							</TableCell>
 							<TableCell className="text-right">
@@ -91,7 +93,7 @@ const UsersTableOfManagement: React.FC = () => {
 									<SelectTrigger
 										className={`w-48 ml-auto ${isMe ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
 									>
-										<SelectValue placeholder="Выберите роль" />
+										<SelectValue placeholder={t("select_role")} />
 									</SelectTrigger>
 									<SelectContent>
 										{roles?.map((role) => (
@@ -109,11 +111,7 @@ const UsersTableOfManagement: React.FC = () => {
 											? "opacity-40 grayscale pointer-events-none cursor-not-allowed"
 											: ""
 									}`}
-									title={
-										isMe
-											? "Вы не можете редактировать или удалять самого себя"
-											: ""
-									}
+									title={isMe ? t("self_edit_warning") : ""}
 								>
 									<PatchUserManagement user={user} />
 									<DeleteUserManagement

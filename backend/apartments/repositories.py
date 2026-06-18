@@ -13,6 +13,7 @@ class ApartmentRepository(BaseRepository):
         response = await super().get_all(Apartment, filters, page)
         for apartment in response:
             apartment.bct_ids = [i.id for i in apartment.building_coefficient_types]
+            apartment.price_unit = apartment.building.price_unit
 
         return response
 
@@ -35,11 +36,13 @@ class ApartmentRepository(BaseRepository):
         await self.db.refresh(new_apartment)
 
         new_apartment.bct_ids = bct_ids
+        new_apartment.price_unit = new_apartment.building.price_unit
         return new_apartment
 
     async def get_apartment(self, apartment_id: int):
         response = await super().get(Apartment, apartment_id)
         response.bct_ids = [i.id for i in response.building_coefficient_types]
+        response.price_unit = response.building.price_unit
         return response
 
     async def update_apartment(self, instance_id, **kwargs):

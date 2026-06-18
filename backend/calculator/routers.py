@@ -23,12 +23,12 @@ async def calculate_apartment_pricing(first_investment_type: InvestmentTypeEnum,
     apartment_repo = ApartmentRepository(db)
     apartment = await apartment_repo.get_apartment(apartment_id)
 
-    apartment_final_price = apartment.final_price
     apartment_area = apartment.area
     first_investment_rate = body.first_investment_rate
     period_count = body.period_count
 
-    total_price = apartment_final_price * apartment_area
+    price_per_sqm = body.price_per_sqrm if body.price_per_sqrm is not None else apartment.final_price
+    total_price = price_per_sqm * apartment_area
 
     annual_rate = Decimal("20.00")
     monthly_payment_rate = (annual_rate / Decimal("100.00")) / Decimal("12")
@@ -54,7 +54,7 @@ async def calculate_apartment_pricing(first_investment_type: InvestmentTypeEnum,
     response["first_investment_rate"] = first_investment_rate
     response["first_payment_date"] = body.first_payment_date
     response["period_count"] = period_count
-    response["old_price_per_sqrm"] = apartment_final_price
+    response["old_price_per_sqrm"] = price_per_sqm
     response["new_price_per_sqrm"] = (new_total_price / apartment_area).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     response["old_total_price"] = total_price
     response["new_total_price"] = new_total_price

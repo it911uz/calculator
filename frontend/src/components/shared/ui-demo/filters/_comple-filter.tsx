@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { DebouncedInput } from "../debounce-input/_debounce_input";
 
 interface ComplexFiltersProps {
@@ -9,9 +10,11 @@ interface ComplexFiltersProps {
 }
 
 const ComplexFilters: React.FC<ComplexFiltersProps> = ({
-	placeholder = "Поиск комплекса...",
+	placeholder,
 	queryKey = "name__ilike",
 }) => {
+	const t = useTranslations("filter");
+	const resolvedPlaceholder = placeholder ?? t("search_complexes");
 	const searchParams = useSearchParams();
 	const pathname = usePathname();
 	const router = useRouter();
@@ -39,7 +42,7 @@ const ComplexFilters: React.FC<ComplexFiltersProps> = ({
 	return (
 		<div className="relative w-full max-w-sm">
 			<DebouncedInput
-				placeholder={placeholder}
+				placeholder={resolvedPlaceholder}
 				value={searchParams.get(queryKey) || ""}
 				onChange={updateQuery}
 				className="pl-10 h-10 text-[13px] bg-white border-gray-300 focus:ring-indigo-500 rounded-sm"

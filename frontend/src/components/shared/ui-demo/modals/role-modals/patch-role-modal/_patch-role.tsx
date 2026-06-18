@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { usePatchRole } from "@/action/hooks/roles-hook/use-patch-role";
 import { usePermissions } from "@/action/hooks/permissions-hook/use-permissions-hook";
 import type { IPatchRolePayload } from "@/types/permissions.types";
@@ -27,6 +28,8 @@ const PatchRoleManagement: React.FC<PropsPatchRoleManagement> = ({ role }) => {
 
 	const { data: allPermissions, isLoading: permsLoading } = usePermissions();
 	const { mutate: updateRole, isPending } = usePatchRole();
+	const t = useTranslations("management");
+	const tc = useTranslations("common");
 
 	useEffect(() => {
 		if (open && role.permissions) {
@@ -83,25 +86,25 @@ const PatchRoleManagement: React.FC<PropsPatchRoleManagement> = ({ role }) => {
 			<DialogContent className="max-w-96">
 				<DialogHeader>
 					<DialogTitle className="text-xl font-bold">
-						Редактировать роль
+						{t("edit_role_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<div className="space-y-4 py-4">
 					<div className="space-y-2">
-						<label className="text-sm font-medium">Название</label>
+						<label className="text-sm font-medium">{t("role_name_label")}</label>
 						<Input
 							value={name}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setName(e.target.value)
 							}
-							placeholder="Введите название роли"
+							placeholder={t("role_name_placeholder")}
 						/>
 					</div>
 
 					<div className="space-y-3">
 						<div className="flex items-center justify-between">
-							<label className="text-sm font-medium">Разрешения</label>
+							<label className="text-sm font-medium">{t("permissions_label")}</label>
 
 							{!permsLoading && allPermissions && allPermissions.length > 0 && (
 								<div className="flex items-center space-x-2 bg-indigo-50 px-2 py-1 rounded">
@@ -116,7 +119,7 @@ const PatchRoleManagement: React.FC<PropsPatchRoleManagement> = ({ role }) => {
 										htmlFor="edit-select-all"
 										className="text-[10px] font-bold cursor-pointer uppercase text-indigo-900 select-none"
 									>
-										Выбрать все
+										{t("select_all")}
 									</label>
 								</div>
 							)}
@@ -153,9 +156,7 @@ const PatchRoleManagement: React.FC<PropsPatchRoleManagement> = ({ role }) => {
 							)}
 						</ScrollArea>
 						<p className="text-[11px] text-muted-foreground font-medium">
-							Выбрано:{" "}
-							<span className="text-indigo-900">{selectedIds.length}</span> из{" "}
-							{allPermissions?.length || 0}
+							{t("selected_of_total", { count: selectedIds.length, total: allPermissions?.length || 0 })}
 						</p>
 					</div>
 				</div>
@@ -166,7 +167,7 @@ const PatchRoleManagement: React.FC<PropsPatchRoleManagement> = ({ role }) => {
 						onClick={() => setOpen(false)}
 						disabled={isPending}
 					>
-						Отмена
+						{tc("cancel")}
 					</Button>
 					<Button
 						onClick={handleSave}
@@ -176,7 +177,7 @@ const PatchRoleManagement: React.FC<PropsPatchRoleManagement> = ({ role }) => {
 						{isPending ? (
 							<Loader2 className="animate-spin h-4 w-4" />
 						) : (
-							"Сохранить"
+							tc("save")
 						)}
 					</Button>
 				</DialogFooter>

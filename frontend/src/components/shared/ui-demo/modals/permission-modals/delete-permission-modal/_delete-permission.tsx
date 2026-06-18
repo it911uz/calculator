@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useDeletePermission } from "@/action/hooks/permissions-hook/use-delete-permission-hook";
 import type { PropsDeletePermissionManagement } from "@/types/props.types";
 import { MdOutlineDeleteForever } from "react-icons/md";
@@ -21,6 +22,8 @@ const DeletePermissionManagement: React.FC<PropsDeletePermissionManagement> = ({
 }) => {
 	const [open, setOpen] = useState<boolean>(false);
 	const { mutate: removePermission, isPending } = useDeletePermission();
+	const t = useTranslations("management");
+	const tc = useTranslations("common");
 
 	const handleDelete = () => {
 		removePermission(permissionId, {
@@ -42,14 +45,13 @@ const DeletePermissionManagement: React.FC<PropsDeletePermissionManagement> = ({
 			<DialogContent className="max-w-96">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2 text-red-600">
-						Удалить разрешение
+						{t("delete_permission_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<div className="py-4">
 					<p className="text-sm text-gray-600">
-						Вы уверены, что хотите удалить разрешение{" "}
-						<strong>{codename}</strong>?
+						{t("delete_permission_confirm", { codename })}
 					</p>
 				</div>
 
@@ -60,7 +62,7 @@ const DeletePermissionManagement: React.FC<PropsDeletePermissionManagement> = ({
 						disabled={isPending}
 						className="flex-1 text-[13px]"
 					>
-						Отмена
+						{tc("cancel")}
 					</Button>
 					<Button
 						onClick={handleDelete}
@@ -70,7 +72,7 @@ const DeletePermissionManagement: React.FC<PropsDeletePermissionManagement> = ({
 						{isPending ? (
 							<Loader2 className="h-4 w-4 animate-spin" />
 						) : (
-							"Удалить"
+							tc("delete")
 						)}
 					</Button>
 				</DialogFooter>

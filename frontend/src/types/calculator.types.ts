@@ -2,6 +2,7 @@ export interface CalculatePricingPayload {
 	first_investment_rate: number;
 	first_payment_date: string;
 	period_count: number;
+	price_per_sqrm?: number;
 }
 
 export interface CalculatePricingResponse {

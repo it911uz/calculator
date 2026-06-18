@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { useUpdateCoefficientType } from "@/action/hooks/coefficient-type-hook/update-coefficient-type";
 import type { PropsModalEditCoefficientType } from "@/types/props.types";
 
@@ -23,6 +24,9 @@ export function ModalEditCoefficientType({
 	const [rate, setRate] = useState<string>("");
 	const [open, setOpen] = useState(false);
 	const { mutate, isPending } = useUpdateCoefficientType(buildingId);
+	const t = useTranslations("coefficient");
+	const tc = useTranslations("common");
+
 	useEffect(() => {
 		if (open) {
 			setName(coefficientType.name);
@@ -32,7 +36,7 @@ export function ModalEditCoefficientType({
 
 	const handleSubmit = () => {
 		if (!name.trim() || !rate.trim()) {
-			toast.error("Заполните поля.");
+			toast.error(t("fill_fields_error2"));
 			return;
 		}
 		mutate(
@@ -66,7 +70,7 @@ export function ModalEditCoefficientType({
 			<DialogTrigger asChild>
 				<button
 					className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-					title="Редактировать"
+					title={tc("edit")}
 				>
 					<MdOutlineModeEditOutline size={22} />
 				</button>
@@ -75,18 +79,18 @@ export function ModalEditCoefficientType({
 			<DialogContent className="sm:max-w-96" onKeyDown={handleKeyDown}>
 				<DialogHeader>
 					<DialogTitle className="text-lg font-semibold">
-						Редактировать тип коэффициента
+						{t("edit_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<div className="space-y-4 pt-4">
 					<div className="space-y-2">
 						<label htmlFor="coefficient-name" className="text-sm font-medium">
-							Название *
+							{t("edit_name_label")}
 						</label>
 						<Input
 							id="coefficient-name"
-							placeholder="Введите название"
+							placeholder={t("edit_name_placeholder")}
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							disabled={isPending}
@@ -96,18 +100,18 @@ export function ModalEditCoefficientType({
 
 					<div className="space-y-2">
 						<label htmlFor="coefficient-rate" className="text-sm font-medium">
-							Значение *
+							{t("edit_rate_label")}
 						</label>
 						<Input
 							id="coefficient-rate"
 							type="text"
-							placeholder="Например: 1.5"
+							placeholder={t("edit_rate_placeholder")}
 							value={rate}
 							onChange={handleRateChange}
 							disabled={isPending}
 							className="w-full"
 						/>
-						<p className="text-xs text-gray-500">Введите числовое значение</p>
+						<p className="text-xs text-gray-500">{t("edit_rate_hint")}</p>
 					</div>
 
 					<div className="flex justify-end gap-2 pt-4">
@@ -118,7 +122,7 @@ export function ModalEditCoefficientType({
 							disabled={isPending}
 							className="min-w-20"
 						>
-							Отмена
+							{tc("cancel")}
 						</Button>
 
 						<Button
@@ -129,10 +133,10 @@ export function ModalEditCoefficientType({
 							{isPending ? (
 								<span className="flex items-center gap-2">
 									<span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-									Сохранение...
+									{tc("saving")}
 								</span>
 							) : (
-								"Сохранить"
+								tc("save")
 							)}
 						</Button>
 					</div>

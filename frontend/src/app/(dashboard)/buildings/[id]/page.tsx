@@ -1,4 +1,3 @@
-import { IoIosArrowBack } from "react-icons/io";
 import { ImFileEmpty } from "react-icons/im";
 import { TabsDemoBuildings } from "@/components/shared/ui-demo/tabs/_tab-buildings";
 import Link from "next/link";
@@ -7,6 +6,7 @@ import { getComplexes } from "@/action/complex/get-complexes.api";
 import type { IComplex } from "@/types/complex.types";
 import { getAuthData } from "@/lib/auth.util";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import type { Props } from "@/types/props.types";
 
 export default async function SingleBuildingPage({ params }: Props) {
@@ -17,8 +17,9 @@ export default async function SingleBuildingPage({ params }: Props) {
 	}
 	const { id } = await params;
 	if (!id) {
-		redirect("/buildings");
+		redirect("/");
 	}
+	const tc = await getTranslations("common");
 	const [buildingSafe, complexes] = await Promise.all([
 		getBuildingById(id),
 		getComplexes(),
@@ -31,13 +32,13 @@ export default async function SingleBuildingPage({ params }: Props) {
 			<div className="flex items-center justify-center flex-col h-screen text-gray-500">
 				<ImFileEmpty size={40} className="mb-2 text-gray-300" />
 				<p className="text-center font-medium font-sans">
-					Информация не найдена
+					{tc("not_found")}
 				</p>
 				<Link
 					href="/buildings"
 					className="mt-4 px-6 py-2 bg-[#282964] text-white rounded-[3px] text-sm"
 				>
-					Назад к списку
+					{tc("back_to_list")}
 				</Link>
 			</div>
 		);
@@ -45,12 +46,6 @@ export default async function SingleBuildingPage({ params }: Props) {
 
 	return (
 		<div>
-			<Link href="/buildings">
-				<button className="text-gray-200 hover:text-white bg-[#282964] px-3 py-1.5 rounded-[3px] transition-all active:scale-95 shadow-sm mb-4">
-					<IoIosArrowBack size={18} />
-				</button>
-			</Link>
-
 			<TabsDemoBuildings
 				initialBuilding={building}
 				allComplexes={complexes as IComplex[]}

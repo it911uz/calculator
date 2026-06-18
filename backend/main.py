@@ -1,12 +1,12 @@
-from starlette.staticfiles import StaticFiles
-
 import core.models
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from core.routers import routers
-from core.config import origins, IMAGES_DIR
+from core.config import origins
 
 from lifespan import lifespan
 
@@ -20,9 +20,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
+
+
+@app.get("/health", include_in_schema=False)
+async def health():
+    return JSONResponse({"status": "ok"})
+
 
 for router in routers:
     app.include_router(router)
-
-
-app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")

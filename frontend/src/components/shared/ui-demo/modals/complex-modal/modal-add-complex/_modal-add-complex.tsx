@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { ModalPropsModalAddedComplex } from "@/types/props.types";
 import { FC, useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export const ModalAddedComplex: FC<ModalPropsModalAddedComplex> = ({
 	onSuccess,
@@ -21,6 +22,8 @@ export const ModalAddedComplex: FC<ModalPropsModalAddedComplex> = ({
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [formData, setFormData] = useState({ name: "", description: "" });
+	const t = useTranslations("complex");
+	const tc = useTranslations("common");
 
 	const { mutateAsync: createComplex } = useCreateComplex();
 
@@ -33,7 +36,7 @@ export const ModalAddedComplex: FC<ModalPropsModalAddedComplex> = ({
 		e.preventDefault();
 
 		if (!formData.name.trim()) {
-			toast.error("Войдите в комплекс псевдонимов");
+			toast.error(t("name_error"));
 			return;
 		}
 
@@ -47,12 +50,12 @@ export const ModalAddedComplex: FC<ModalPropsModalAddedComplex> = ({
 			setFormData({ name: "", description: "" });
 			setOpen(false);
 
-			toast.success("Добавлено успешно");
+			toast.success(t("added_success"));
 
 			if (onSuccess) await onSuccess();
 		} catch (error) {
-			console.error("Ошибка добавления комплекса:", error);
-			toast.error(error instanceof Error ? error.message : "Ошибка");
+			console.error("complex add error:", error);
+			toast.error(error instanceof Error ? error.message : t("add_error"));
 		} finally {
 			setLoading(false);
 		}
@@ -62,25 +65,25 @@ export const ModalAddedComplex: FC<ModalPropsModalAddedComplex> = ({
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<button className="bg-[#282964] px-2 py-1 rounded-[3px] leading-5 text-white text-sm hover:bg-[#1f2050] transition-colors">
-					Добавлять комплекс +
+					{t("add_btn")}
 				</button>
 			</DialogTrigger>
 
 			<DialogContent className="max-w-96">
 				<DialogHeader>
-					<DialogTitle>Добавлять комплекс</DialogTitle>
+					<DialogTitle>{t("add_title")}</DialogTitle>
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit} className="space-y-4 py-4">
 					<div className="space-y-2">
 						<label htmlFor="name" className="text-sm font-medium">
-							Имя комплекс *
+							{t("name_label")} *
 						</label>
 						<Input
 							id="name"
 							name="name"
 							type="text"
-							placeholder="Имя комплекс"
+							placeholder={t("name_placeholder")}
 							value={formData.name}
 							onChange={handleChange}
 							required
@@ -91,13 +94,13 @@ export const ModalAddedComplex: FC<ModalPropsModalAddedComplex> = ({
 
 					<div className="space-y-2">
 						<label htmlFor="description" className="text-sm font-medium">
-							Описание
+							{tc("description")}
 						</label>
 						<Input
 							id="description"
 							name="description"
 							type="text"
-							placeholder="Описание"
+							placeholder={tc("description")}
 							value={formData.description}
 							onChange={handleChange}
 							disabled={loading}
@@ -113,14 +116,14 @@ export const ModalAddedComplex: FC<ModalPropsModalAddedComplex> = ({
 							disabled={loading}
 							className="mr-2"
 						>
-							Отмена
+							{tc("cancel")}
 						</Button>
 						<Button
 							type="submit"
 							disabled={loading || !formData.name.trim()}
 							className="bg-[#282964] hover:bg-[#1f2050]"
 						>
-							{loading ? "Добавляется..." : "Добавлять"}
+							{loading ? tc("adding") : tc("add")}
 						</Button>
 					</DialogFooter>
 				</form>

@@ -12,6 +12,7 @@ from complexes.models import Complex
 from buildings.models import Building
 from apartments.models import Apartment
 from coefficients.models import BuildingCoefficient, BuildingCoefficientType, apartment_coefficients
+from layouts.models import ApartmentLayout
 
 # Domain
 

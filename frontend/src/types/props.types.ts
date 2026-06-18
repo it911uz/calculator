@@ -10,9 +10,11 @@ export interface Props {
 }
 export type TModalPropsAddedApartments = {
 	onSuccess?: () => void;
+	defaultBuildingId?: number | string;
 };
 export interface ModalDeleteApartmentsProps {
 	apartmentId: string | number;
+	buildingId?: number;
 	onSuccess?: () => void;
 }
 export interface PropsModalUpdateApartments {
@@ -44,6 +46,7 @@ export type ModalPropsModalAddedComplex = {
 };
 export interface ModalDeleteComplexProps {
 	complexId: number;
+	onSuccess?: () => void;
 }
 export interface TableApartmentsProps {
 	initialApartments: IApartment[];

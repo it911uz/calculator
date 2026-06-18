@@ -17,11 +17,12 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, Loader2 } from "lucide-react";
+import { PlusCircle, Loader2, Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { usePostUser } from "@/action/hooks/users-hook/user-post.hook";
 import { useRoles } from "@/action/hooks/roles-hook/use-roles";
 import type { IUser } from "@/types/user.types";
-import { Eye, EyeOff } from "lucide-react";
+
 interface ICreateUserPayload extends Omit<IUser, "id"> {
 	password: string;
 }
@@ -37,29 +38,25 @@ const CreateUserManagement: React.FC = () => {
 		fullname: "",
 		role_id: 0,
 	});
+	const t = useTranslations("management");
+	const tc = useTranslations("common");
 
-	// Hooklar
 	const { data: roles, isLoading: rolesLoading } = useRoles();
 	const { mutate: createUser, isPending: isCreating } = usePostUser();
+
 	const validatePassword = (value: string): string => {
 		const minLength = value.length >= 6;
 		const hasSpecialChar = /[#$%&@!^*()_+\-=[\]{};':"\\|,.<>/?]/.test(value);
 
-		if (!minLength) {
-			return "Пароль должен содержать минимум 6 символов";
-		}
-
-		if (!hasSpecialChar) {
-			return "Пароль должен содержать минимум 1 специальный символ (#, $, %, ...)";
-		}
-
+		if (!minLength) return t("password_min_length");
+		if (!hasSpecialChar) return t("password_special_char");
 		return "";
 	};
+
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		const error = validatePassword(formData.password);
-
 		if (error) {
 			setPasswordError(error);
 			return;
@@ -81,19 +78,19 @@ const CreateUserManagement: React.FC = () => {
 			<DialogTrigger asChild>
 				<Button className="bg-indigo-900 hover:bg-indigo-800 text-white gap-2">
 					<PlusCircle size={18} />
-					<span>Добавить пользователя</span>
+					<span>{t("add_user_btn")}</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="max-w-96">
 				<DialogHeader>
 					<DialogTitle className="text-xl font-bold">
-						Новый пользователь
+						{t("new_user_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit} className="space-y-4 py-4">
 					<div className="space-y-2">
-						<label>Имя пользователя</label>
+						<label>{t("username_label")}</label>
 						<Input
 							id="username"
 							required
@@ -101,11 +98,11 @@ const CreateUserManagement: React.FC = () => {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setFormData({ ...formData, username: e.target.value })
 							}
-							placeholder="Введите username"
+							placeholder={t("enter_username")}
 						/>
 					</div>
 					<div className="space-y-2">
-						<label>Полное имя</label>
+						<label>{t("fullname_label")}</label>
 						<Input
 							id="fullname"
 							required
@@ -113,11 +110,11 @@ const CreateUserManagement: React.FC = () => {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setFormData({ ...formData, fullname: e.target.value })
 							}
-							placeholder="Введите полное имя"
+							placeholder={t("enter_fullname")}
 						/>
 					</div>
 					<div className="space-y-2">
-						<label>Номер телефона</label>
+						<label>{t("phone_label")}</label>
 						<Input
 							id="phone"
 							required
@@ -125,12 +122,11 @@ const CreateUserManagement: React.FC = () => {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setFormData({ ...formData, phone: e.target.value })
 							}
-							placeholder="Введите номер телефона"
+							placeholder={t("enter_phone")}
 						/>
 					</div>
 					<div className="space-y-2">
-						<label>Пароль</label>
-
+						<label>{t("password_label")}</label>
 						<div className="relative">
 							<Input
 								id="password"
@@ -139,18 +135,12 @@ const CreateUserManagement: React.FC = () => {
 								value={formData.password}
 								onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 									const value = e.target.value;
-
 									setFormData({ ...formData, password: value });
-
-									const error = validatePassword(value);
-									setPasswordError(error);
+									setPasswordError(validatePassword(value));
 								}}
-								placeholder="Введите пароль"
-								className={`pr-10 ${
-									passwordError ? "border-red-500 focus:border-red-500" : ""
-								}`}
+								placeholder={t("enter_password")}
+								className={`pr-10 ${passwordError ? "border-red-500 focus:border-red-500" : ""}`}
 							/>
-
 							<button
 								type="button"
 								onClick={() => setShowPassword((prev) => !prev)}
@@ -166,7 +156,7 @@ const CreateUserManagement: React.FC = () => {
 					)}
 
 					<div className="space-y-2">
-						<label>Роль пользователя</label>
+						<label>{t("role_label")}</label>
 						<Select
 							value={formData.role_id?.toString()}
 							onValueChange={(value: string) =>
@@ -176,9 +166,7 @@ const CreateUserManagement: React.FC = () => {
 						>
 							<SelectTrigger>
 								<SelectValue
-									placeholder={
-										rolesLoading ? "Загрузка ролей..." : "Выберите роль"
-									}
+									placeholder={rolesLoading ? t("loading_roles") : t("select_role")}
 								/>
 							</SelectTrigger>
 							<SelectContent>
@@ -203,14 +191,14 @@ const CreateUserManagement: React.FC = () => {
 							onClick={() => setOpen(false)}
 							disabled={isCreating}
 						>
-							Отмена
+							{tc("cancel")}
 						</Button>
 						<Button
 							type="submit"
 							className="bg-indigo-900 hover:bg-indigo-800 text-white"
 							disabled={isCreating || rolesLoading}
 						>
-							{isCreating ? "Создание..." : "Создать"}
+							{isCreating ? tc("creating") : tc("create")}
 						</Button>
 					</div>
 				</form>

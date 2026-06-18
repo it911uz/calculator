@@ -8,24 +8,35 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export function ModalDeleteApartments({
 	apartmentId,
+	buildingId,
 	onSuccess,
 }: ModalDeleteApartmentsProps) {
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
 	const deleteMutation = useDeleteApartment();
+	const t = useTranslations("apartment");
+	const tc = useTranslations("common");
 
 	const handleDelete = async () => {
 		try {
-			await deleteMutation.mutateAsync({ id: Number(apartmentId) });
+			const result = await deleteMutation.mutateAsync({ id: Number(apartmentId) });
+			if (!result.success) return;
 			setOpen(false);
 
-			router.push("/apartments");
-			router.refresh();
+			if (onSuccess) {
+				onSuccess();
+				router.refresh();
+			} else if (buildingId) {
+				router.push(`/buildings/${buildingId}`);
+			} else {
+				router.back();
+			}
 		} catch (e) {
-			toast.error("Ошибка при удалении квартиры");
+			toast.error(t("delete_error"));
 		}
 	};
 
@@ -38,25 +49,24 @@ export function ModalDeleteApartments({
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">
 				<DialogTitle className="text-lg font-semibold text-center mb-4">
-					Удалить квартиру?
+					{t("delete_title")}
 				</DialogTitle>
 				<div className="space-y-4">
 					<p className="text-center text-gray-600">
-						Вы уверены, что хотите удалить эту квартиру? Это действие нельзя
-						отменить.
+						{t("delete_confirm")}
 					</p>
 					<div className="flex justify-center gap-3">
 						<button
 							onClick={() => setOpen(false)}
 							className="px-6 bg-gray-400 text-white  py-0.5 rounded-sm"
 						>
-							Отмена
+							{tc("cancel")}
 						</button>
 						<button
 							onClick={handleDelete}
 							className="px-6 bg-red-400 text-white  py-0.5 rounded-sm"
 						>
-							Удалить
+							{tc("delete")}
 						</button>
 					</div>
 				</div>

@@ -10,6 +10,8 @@ class AddComplexResponse(BaseModel):
     id: int
     name: str
     description: str | None
+    logo_url: str | None = None
+    buildings_count: int = 0
 
 
 class UpdateComplexBody(BaseModel):

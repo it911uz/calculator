@@ -8,4 +8,5 @@ class Complex(BaseModel):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(256), nullable=False)
     description = Column(String(512), nullable=True)
+    logo_url = Column(String(512), nullable=True)
 

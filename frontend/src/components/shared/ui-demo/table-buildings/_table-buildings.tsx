@@ -1,28 +1,19 @@
 "use client";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type FC, useCallback, useMemo } from "react";
 import { ImFileEmpty } from "react-icons/im";
-import { TbExternalLink } from "react-icons/tb";
+import { useTranslations } from "next-intl";
 import { useBuildings } from "@/action/hooks/buildings-hook/get-buildings";
 import { useComplexes } from "@/action/hooks/complex-hook/get-complexes";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
 import type { IComplex } from "@/types/complex.types";
 import type { TableBuildingsProps } from "@/types/props.types";
 import BuildingsFilter from "../filters/_buildings-filter";
 import { ModalAddedBuilding } from "../modals/building-modals/modal-add-building/_modal-add-building";
-import { ModalDeleteBuildings } from "../modals/building-modals/modal-delete-buildings/_modal-delete-buildings";
 import ModaDataSendingForExel from "../modals/building-modals/modal-sending-for-exel/_modal-sending-for-exel";
 import { SpinnerDemo } from "../spinner-demo/_spinner-demo";
+import { BuildingCard } from "../cards/_building-card";
 
-const DEFAULT_LIMIT = 10;
+const DEFAULT_LIMIT = 12;
 
 const TableBuildings: FC<TableBuildingsProps> = ({
     buildings: initialBuildings,
@@ -30,6 +21,8 @@ const TableBuildings: FC<TableBuildingsProps> = ({
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const t = useTranslations("building");
+    const tc = useTranslations("common");
 
     const allParams = useMemo(() => {
         const entries = Object.fromEntries(searchParams.entries());
@@ -53,6 +46,12 @@ const TableBuildings: FC<TableBuildingsProps> = ({
             ? (complexesData as IComplex[])
             : [];
     }, [complexesData]);
+
+    const complexNameById = useMemo(() => {
+        const map = new Map<string, string>();
+        for (const c of complexesList) map.set(String(c.id), c.name);
+        return map;
+    }, [complexesList]);
 
     const displayBuildings = useMemo(() => {
         return Array.isArray(buildingsData)
@@ -80,93 +79,53 @@ const TableBuildings: FC<TableBuildingsProps> = ({
 
     return (
         <section>
-            <div className="flex flex-col gap-4">
-                <div className="flex w-full justify-between items-center">
-                    <div className="flex gap-2">
-                        <ModalAddedBuilding onSuccess={handleRefresh} />
-                        <ModaDataSendingForExel />
-                    </div>
+            <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 className="text-2xl font-black text-gray-900">{t("buildings_title")}</h1>
+                    <p className="mt-1 text-sm text-gray-400">
+                        {t("buildings_subtitle")}
+                    </p>
                 </div>
-
-                <BuildingsFilter complexes={complexesList} />
+                <div className="flex gap-2">
+                    <ModalAddedBuilding onSuccess={handleRefresh} />
+                    <ModaDataSendingForExel />
+                </div>
             </div>
 
-            <div className="relative rounded-[3px] overflow-hidden border border-gray-100 shadow-sm bg-white">
+            <BuildingsFilter complexes={complexesList} />
+
+            <div className="relative">
                 {isLoading && (
                     <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
                         <SpinnerDemo />
                     </div>
                 )}
 
-                <Table>
-                    <TableHeader className="bg-gray-50/50">
-                        <TableRow>
-                            <TableHead className="w-12">№</TableHead>
-                            <TableHead>Название</TableHead>
-                            <TableHead>Этажи</TableHead>
-                            <TableHead>Базовая цена</TableHead>
-                            <TableHead className="text-right">
-                                Действия
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                        {displayBuildings.length === 0 && !isLoading ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={6}
-                                    className="h-40 text-center text-gray-400"
-                                >
-                                    <ImFileEmpty
-                                        size={32}
-                                        className="mx-auto mb-2 opacity-20"
-                                    />
-                                    <p>Информация не найдена</p>
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            displayBuildings.map((item, i) => (
-                                <TableRow
-                                    key={item.id}
-                                    className="hover:bg-gray-50/50"
-                                >
-                                    <TableCell className="text-gray-400">
-                                        {allParams.offset + i + 1}
-                                    </TableCell>
-                                    <TableCell className="font-bold text-[#282964]">
-                                        {item.name}
-                                    </TableCell>
-                                    <TableCell>{item.floor_count}</TableCell>
-                                    <TableCell className="font-semibold">
-                                        {item.base_price?.toLocaleString()}
-                                    </TableCell>
-                                    <TableCell className="flex gap-2 justify-end text-right">
-                                        <Link
-                                            href={`/buildings/${item.id}`}
-                                            className="p-1.5 hover:bg-gray-100 rounded-sm"
-                                        >
-                                            <TbExternalLink
-                                                size={18}
-                                                className="text-[#282964]"
-                                            />
-                                        </Link>
-                                        <ModalDeleteBuildings
-                                            buildingId={item.id}
-                                            onSuccess={handleRefresh}
-                                        />
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                {displayBuildings.length === 0 && !isLoading ? (
+                    <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                        <ImFileEmpty size={40} className="mx-auto text-gray-300 mb-3" />
+                        <p className="text-gray-500 text-sm font-medium">
+                            {tc("not_found")}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {displayBuildings.map((item) => (
+                            <BuildingCard
+                                key={item.id}
+                                building={item}
+                                complexName={complexNameById.get(String(item.complex_id))}
+                                onSuccess={handleRefresh}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
-            <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-[13px] text-gray-500">
+            <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[13px] text-gray-500">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <span>Показать по:</span>
+                        <span>{tc("show_per_page")}</span>
                         <select
                             value={allParams.limit}
                             onChange={(e) => {
@@ -180,9 +139,9 @@ const TableBuildings: FC<TableBuildingsProps> = ({
                                     { scroll: false },
                                 );
                             }}
-                            className="border border-gray-200 rounded px-1.5 py-1 bg-white"
+                            className="border border-gray-200 rounded-lg px-1.5 py-1 bg-white"
                         >
-                            {[10, 20, 50, 100].map((val) => (
+                            {[12, 20, 50, 100].map((val) => (
                                 <option key={val} value={val}>
                                     {val}
                                 </option>
@@ -190,7 +149,7 @@ const TableBuildings: FC<TableBuildingsProps> = ({
                         </select>
                     </div>
                     <p>
-                        Найдено:{" "}
+                        {tc("found")}{" "}
                         <span className="font-medium text-gray-800">
                             {displayBuildings.length}
                         </span>
@@ -202,22 +161,22 @@ const TableBuildings: FC<TableBuildingsProps> = ({
                         type="button"
                         disabled={currentPage === 1}
                         onClick={() => handlePageChange(currentPage - 1)}
-                        className="px-3 py-1.5 border border-gray-200 rounded-sm hover:bg-gray-50 disabled:opacity-30"
+                        className="px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-30"
                     >
-                        Назад
+                        {tc("prev")}
                     </button>
 
-                    <span className="text-[#282964] font-medium">
-                        Страница {currentPage}
+                    <span className="text-indigo-700 font-medium">
+                        {tc("page")} {currentPage}
                     </span>
 
                     <button
                         type="button"
                         disabled={displayBuildings.length < allParams.limit}
                         onClick={() => handlePageChange(currentPage + 1)}
-                        className="px-3 py-1.5 border border-gray-200 rounded-sm hover:bg-gray-50 disabled:opacity-30"
+                        className="px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-30"
                     >
-                        Вперед
+                        {tc("next")}
                     </button>
                 </div>
             </div>

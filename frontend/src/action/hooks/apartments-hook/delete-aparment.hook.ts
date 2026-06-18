@@ -25,9 +25,9 @@ export function useDeleteApartment() {
 					queryKey: ["apartments", "detail", id],
 				});
 
-				toast.success("Kvartira muvaffaqiyatli o'chirildi");
+				toast.success("Квартира успешно удалена");
 			} else {
-				toast.error(response._meta?.error || "Xatolik yuz berdi");
+				toast.error(response._meta?.error || "Ошибка при удалении");
 			}
 		},
 		onError: (error: Error) => {

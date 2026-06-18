@@ -16,22 +16,27 @@ import { getCoefficientTypesByBuildingId } from "@/action/coefficient-types/get-
 import { ModalaUpdateCoefficientTypeApartment } from "@/components/shared/ui-demo/modals/apartments-modals/modal-update-coefficient-type-apartment/_modala-update-coefficient-type-apartment";
 import { getAuthData } from "@/lib/auth.util";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import type { Props } from "@/types/props.types";
 
 export default async function SingleApartmentsPage({ params }: Props) {
 	const { access } = await getAuthData();
 	if (!access) redirect("/login");
 	const { id } = await params;
-	if (!id) redirect("/apartments");
+	if (!id) redirect("/");
+
+	const t = await getTranslations("apartment");
+	const tc = await getTranslations("common");
+	const tf = await getTranslations("filter");
 
 	const apartment = await getApartmentById(Number(id));
 
 	if (!apartment || !apartment.data) {
 		return (
 			<div className="container mx-auto p-10 text-center">
-				<h1 className="text-xl font-bold text-gray-600">Квартира не найдена</h1>
-				<Link href="/apartments" className="text-indigo-600 underline">
-					Вернуться к списку
+				<h1 className="text-xl font-bold text-gray-600">{t("not_found_page")}</h1>
+				<Link href="/" className="text-indigo-600 underline">
+					{tc("back_to_list")}
 				</Link>
 			</div>
 		);
@@ -50,12 +55,15 @@ export default async function SingleApartmentsPage({ params }: Props) {
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
-				<Link href={"/apartments"}>
+				<Link href={`/buildings/${apartmentData.building_id}`}>
 					<button className="text-gray-200 hover:text-white bg-indigo-900 px-3 py-1 rounded-[3px]">
 						<FaAngleLeft />
 					</button>
 				</Link>
-				<ModalDeleteApartments apartmentId={Number(apartmentData.id)} />
+				<ModalDeleteApartments
+					apartmentId={Number(apartmentData.id)}
+					buildingId={Number(apartmentData.building_id)}
+				/>
 			</div>
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 ">
@@ -64,10 +72,10 @@ export default async function SingleApartmentsPage({ params }: Props) {
 						<div className="p-4">
 							<div className="flex items-center justify-between mb-4">
 								<h2 className="text-xl font-bold text-indigo-600">
-									Основная информация
+									{t("main_info")}
 								</h2>
 								<div className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-white border border-indigo-200 rounded-sm text-sm font-medium text-indigo-700">
-									{apartmentData.room_count} комн.
+									{apartmentData.room_count} {t("rooms_suffix")}
 								</div>
 							</div>
 
@@ -80,7 +88,7 @@ export default async function SingleApartmentsPage({ params }: Props) {
 											</span>
 										</div>
 										<span className="text-sm font-medium text-gray-500">
-											Здание ID
+											{t("building_id_label")}
 										</span>
 									</div>
 									<div className="text-lg font-semibold text-gray-900">
@@ -95,7 +103,7 @@ export default async function SingleApartmentsPage({ params }: Props) {
 												</span>
 											</div>
 											<span className="text-sm font-medium text-gray-500">
-												Номер
+												{t("number_label")}
 											</span>
 										</div>
 										<div className="text-lg font-semibold text-gray-900">
@@ -111,12 +119,12 @@ export default async function SingleApartmentsPage({ params }: Props) {
 												</span>
 											</div>
 											<span className="text-sm font-medium text-gray-500">
-												Этаж
+												{tf("floor_label")}
 											</span>
 										</div>
 										<div className="text-lg font-semibold text-gray-900">
 											{apartmentData.floor}
-											<span className="text-sm text-gray-500 ml-1">этаж</span>
+											<span className="text-sm text-gray-500 ml-1">{t("floor_suffix")}</span>
 										</div>
 									</div>
 								</div>
@@ -130,7 +138,7 @@ export default async function SingleApartmentsPage({ params }: Props) {
 												</span>
 											</div>
 											<span className="text-sm font-medium text-gray-500">
-												Площадь
+												{tf("area_label")}
 											</span>
 										</div>
 										<div className="text-lg font-semibold text-gray-900">
@@ -146,7 +154,7 @@ export default async function SingleApartmentsPage({ params }: Props) {
 												</span>
 											</div>
 											<span className="text-sm font-medium text-gray-500">
-												Комнат
+												{tf("rooms_label")}
 											</span>
 										</div>
 										<div className="text-lg font-semibold text-gray-900">
@@ -161,13 +169,15 @@ export default async function SingleApartmentsPage({ params }: Props) {
 												</span>
 											</div>
 											<span className="text-sm font-medium text-gray-500">
-												Цена
+												{tf("price")}
 											</span>
 										</div>
 										<div className="text-lg font-semibold text-gray-900">
-											{parseFloat(apartmentData.final_price).toLocaleString(
-												"ru-RU",
-											)}{" "}
+											{parseFloat(apartmentData.total_price).toLocaleString()}{" "}
+											<span className="text-sm font-medium text-gray-500">{apartmentData.price_unit}</span>
+										</div>
+										<div className="text-xs text-gray-400">
+											{parseFloat(apartmentData.final_price).toLocaleString()} {apartmentData.price_unit} / м²
 										</div>
 									</div>
 								</div>
@@ -184,10 +194,10 @@ export default async function SingleApartmentsPage({ params }: Props) {
 							<div className="flex items-center justify-between mb-4">
 								<h2 className="text-md text-indigo-600 flex items-center gap-2 font-bold">
 									<LuChartNoAxesCombined />
-									Активные коэффициенты
+									{t("active_coefficients")}
 								</h2>
 								<span className="px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-sm text-sm font-medium text-indigo-700">
-									{apartmentCoefficients.length} применены
+									{t("applied_count", { count: apartmentCoefficients.length })}
 								</span>
 							</div>
 
@@ -209,7 +219,7 @@ export default async function SingleApartmentsPage({ params }: Props) {
 												</div>
 
 												<span className="text-[10px] bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 px-2 py-1 rounded-full border border-green-100 font-medium">
-													Активен
+													{t("active_badge")}
 												</span>
 											</div>
 										</div>
@@ -233,28 +243,29 @@ export default async function SingleApartmentsPage({ params }: Props) {
 							<MdHomeWork size={30} />
 						</span>
 						<h1 className="text-md font-bold ">
-							Номер дома: {apartmentData.number}
+							{t("apartment_number_label")}: {apartmentData.number}
 						</h1>
 					</div>
 
 					<div className="overflow-hidden text-indigo-600 rounded-sm bg-gradient-to-br from-indigo-100 to-white border border-indigo-100 p-4">
-						<h3 className="text-sm font-medium mb-3">Быстрые метрики</h3>
+						<h3 className="text-sm font-medium mb-3">{t("quick_metrics")}</h3>
 						<div className="grid grid-cols-2 gap-3">
 							<div className="text-center p-2 bg-white border border-indigo-100 rounded-lg">
-								<div className="text-xs text-gray-500">Цена</div>
+								<div className="text-xs text-gray-500">{t("total_label_short")}</div>
 								<div className="text-sm font-bold text-indigo-700">
-									{apartmentData.final_price}
+									{parseFloat(apartmentData.total_price).toLocaleString()}
 								</div>
+								<div className="text-[10px] text-gray-400">{apartmentData.price_unit}</div>
 							</div>
 							<div className="text-center p-2 bg-white border border-indigo-100 rounded-lg">
-								<div className="text-xs text-gray-500">М²/</div>
+								<div className="text-xs text-gray-500">{t("price_per_sqm_short")}</div>
 								<div className="text-sm font-bold text-indigo-700">
-									{apartmentData.area}
+									{parseFloat(apartmentData.final_price).toLocaleString()}
 								</div>
+								<div className="text-[10px] text-gray-400">{apartmentData.price_unit}</div>
 							</div>
 						</div>
 					</div>
-					<div className="flex items-center gap-3 py-3"></div>
 				</div>
 			</div>
 		</div>

@@ -3,6 +3,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { ImFileEmpty } from "react-icons/im";
 import { TbExternalLink } from "react-icons/tb";
+import { useTranslations } from "next-intl";
 import { useApartments } from "@/action/hooks/apartments-hook/get-apartments.hook";
 import { useBuildings } from "@/action/hooks/buildings-hook/get-buildings";
 import {
@@ -28,6 +29,9 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
+	const ta = useTranslations("apartment");
+	const tf = useTranslations("filter");
+	const tc = useTranslations("common");
 
 	const allParams = useMemo(() => {
 		const entries = Object.fromEntries(searchParams.entries());
@@ -89,13 +93,13 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
 					<TableHeader className="bg-gray-50/50">
 						<TableRow>
 							<TableHead className="w-12">№</TableHead>
-							<TableHead>Номер</TableHead>
-							<TableHead>Этаж</TableHead>
-							<TableHead>Площадь</TableHead>
-							<TableHead>Комнат</TableHead>
-							<TableHead>Цена</TableHead>
-							<TableHead>Cтатус</TableHead>
-							<TableHead className="text-right">Действия</TableHead>
+							<TableHead>{ta("number_label")}</TableHead>
+							<TableHead>{tf("floor_label")}</TableHead>
+							<TableHead>{tf("area_label")}</TableHead>
+							<TableHead>{tf("rooms_label")}</TableHead>
+							<TableHead>{tf("price")}</TableHead>
+							<TableHead>{ta("status_label")}</TableHead>
+							<TableHead className="text-right">{tc("edit")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -105,10 +109,10 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
 									<div className="flex flex-col items-center justify-center space-y-3 py-10">
 										<ImFileEmpty size={48} className="text-gray-200" />
 										<p className="text-gray-500 font-medium">
-											Информация не найдена
+											{tc("not_found")}
 										</p>
 										<p className="text-xs text-gray-400">
-											Попробуйте изменить параметры фильтра
+											{tc("try_change_filters")}
 										</p>
 									</div>
 								</TableCell>
@@ -154,11 +158,10 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
 				</Table>
 			</div>
 
-			{/* Pagination qismi */}
 			<div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-[13px] text-gray-500">
 				<div className="flex items-center gap-3">
 					<div className="flex items-center gap-2">
-						<span>Показать по:</span>
+						<span>{tc("show_per_page")}</span>
 						<select
 							value={limit}
 							onChange={(e) => {
@@ -180,7 +183,7 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
 					</div>
 					<span>|</span>
 					<p>
-						Показано{" "}
+						{tc("shown")}{" "}
 						<span className="font-semibold text-gray-700">
 							{offset + 1} - {offset + apartments.length}
 						</span>
@@ -194,10 +197,10 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
 						onClick={() => handlePageChange(currentPage - 1)}
 						className="px-3 py-1 border border-gray-200 rounded-sm hover:bg-gray-50 disabled:opacity-30 transition-all"
 					>
-						Назад
+						{tc("prev")}
 					</button>
 					<span className="font-medium text-[#282964] px-2">
-						Страница {currentPage}
+						{tc("page")} {currentPage}
 					</span>
 					<button
 						type="button"
@@ -205,7 +208,7 @@ const TableApartments: React.FC<TableApartmentsProps> = ({
 						onClick={() => handlePageChange(currentPage + 1)}
 						className="px-3 py-1 border border-gray-200 rounded-sm hover:bg-gray-50 disabled:opacity-30 transition-all"
 					>
-						Вперед
+						{tc("next")}
 					</button>
 				</div>
 			</div>

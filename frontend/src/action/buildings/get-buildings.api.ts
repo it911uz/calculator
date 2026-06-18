@@ -10,6 +10,7 @@ export async function getBuildings(params: {
 	category?: string;
 	limit?: number;
 	offset?: number;
+	complex_id?: string | number;
 }) {
 	const result: SafeArray<IBuildings> = [];
 	const queryStr = createSearchParams(params).toString();

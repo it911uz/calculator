@@ -2,6 +2,7 @@
 
 import React, { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
 	Select,
 	SelectContent,
@@ -20,6 +21,7 @@ const BuildingsFilter: React.FC<FilterProps> = React.memo(({ complexes }) => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
+	const t = useTranslations("filter");
 
 	const updateQuery = useCallback(
 		(name: string, value: string) => {
@@ -50,10 +52,10 @@ const BuildingsFilter: React.FC<FilterProps> = React.memo(({ complexes }) => {
 					onValueChange={(v) => updateQuery("complex_id", v)}
 				>
 					<SelectTrigger className="h-10 text-xs">
-						<SelectValue placeholder="Выберите комплекс" />
+						<SelectValue placeholder={t("all_complexes")} />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">Все комплексы</SelectItem>
+						<SelectItem value="all">{t("all_complexes")}</SelectItem>
 						{complexes.map((c) => (
 							<SelectItem key={c.id} value={String(c.id)}>
 								{c.name}
@@ -63,14 +65,14 @@ const BuildingsFilter: React.FC<FilterProps> = React.memo(({ complexes }) => {
 				</Select>
 
 				<DebouncedInput
-					placeholder="Поиск по названию..."
+					placeholder={t("search_buildings")}
 					className="h-10 text-xs "
 					value={searchParams.get("name__ilike") || ""}
 					onChange={(val) => updateQuery("name__ilike", val)}
 				/>
 
 				<DebouncedInput
-					placeholder="Точное кол-во этажей"
+					placeholder={t("exact_floors")}
 					type="number"
 					className="h-10 text-xs"
 					value={searchParams.get("floor_count") || ""}
@@ -78,35 +80,35 @@ const BuildingsFilter: React.FC<FilterProps> = React.memo(({ complexes }) => {
 				/>
 
 				<DebouncedInput
-					placeholder="Этажей от"
+					placeholder={t("floors_from")}
 					type="number"
 					className="h-10 text-xs"
 					value={searchParams.get("floor_count__gte") || ""}
 					onChange={(val) => updateQuery("floor_count__gte", val)}
 				/>
 				<DebouncedInput
-					placeholder="Этажей до"
+					placeholder={t("floors_to")}
 					type="number"
 					className="h-10 text-xs"
 					value={searchParams.get("floor_count__lte") || ""}
 					onChange={(val) => updateQuery("floor_count__lte", val)}
 				/>
 				<DebouncedInput
-					placeholder="Цена"
+					placeholder={t("price")}
 					type="number"
 					className="h-10 text-xs"
 					value={searchParams.get("base_price") || ""}
 					onChange={(val) => updateQuery("base_price", val)}
 				/>
 				<DebouncedInput
-					placeholder="Цена от"
+					placeholder={t("price_from")}
 					type="number"
 					className="h-10 text-xs"
 					value={searchParams.get("base_price__gte") || ""}
 					onChange={(val) => updateQuery("base_price__gte", val)}
 				/>
 				<DebouncedInput
-					placeholder="Цена до"
+					placeholder={t("price_to")}
 					type="number"
 					className="h-10 text-xs"
 					value={searchParams.get("base_price__lte") || ""}

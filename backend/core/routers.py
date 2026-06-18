@@ -8,9 +8,11 @@ from users.routers import router as users_router
 from roles.routers import router as roles_router
 from permissions.routers import router as permissions_router
 from calculator.routers import router as calculator_router
+from layouts.routers import router as layout_router
 
 
 routers = [
+    layout_router,
     calculator_router,
     coefficients_common_router,
     auth_router,

@@ -15,17 +15,24 @@ import { Input } from "@/components/ui/input";
 import type { IComplex } from "@/types/complex.types";
 import { FC, useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 type PriceUnit = "UZS" | "USD";
 type ModalProps = {
 	onSuccess?: () => void;
+	defaultComplexId?: number | string;
 };
 
-export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
+export const ModalAddedBuilding: FC<ModalProps> = ({
+	onSuccess,
+	defaultComplexId,
+}) => {
 	const { data: complexesRaw = [] } = useComplexes();
 	const complexes = (complexesRaw || []) as IComplex[];
 
 	const createMutation = useCreateBuilding();
+	const t = useTranslations("building");
+	const tc = useTranslations("common");
 
 	const [open, setOpen] = useState(false);
 	const [formData, setFormData] = useState({
@@ -34,7 +41,7 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 		base_price: "",
 		price_unit: "UZS" as PriceUnit,
 		max_coefficient: "",
-		complex_id: "",
+		complex_id: defaultComplexId ? String(defaultComplexId) : "",
 	});
 
 	const handleChange = (
@@ -71,8 +78,8 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!formData.name.trim()) return toast.error("Введите имя здания");
-		if (!formData.complex_id) return toast.error("Выберите комплекс");
+		if (!formData.name.trim()) return toast.error(t("enter_name"));
+		if (!formData.complex_id) return toast.error(t("select_complex_error"));
 
 		const buildingData = {
 			name: formData.name,
@@ -86,7 +93,7 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 		try {
 			await createMutation.mutateAsync(buildingData);
 
-			toast.success("Здание успешно добавлено");
+			toast.success(t("added_success"));
 			setOpen(false);
 			setFormData({
 				name: "",
@@ -94,74 +101,76 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 				base_price: "",
 				price_unit: "UZS",
 				max_coefficient: "",
-				complex_id: "",
+				complex_id: defaultComplexId ? String(defaultComplexId) : "",
 			});
 
 			if (onSuccess) onSuccess();
 		} catch (error) {
-			toast.error("Ошибка при добавлении здания");
+			toast.error(t("add_error"));
 		}
 	};
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<button className="bg-[#282964] px-3 py-1 rounded text-white text-sm hover:bg-[#1f2050] transition-colors">
-					Добавить здание +
+				<button className="bg-indigo-600 px-4 py-2 rounded-xl text-white text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+					{t("add_btn")}
 				</button>
 			</DialogTrigger>
 			<DialogContent className="max-w-4xl">
 				<DialogHeader>
-					<DialogTitle>Добавить здание</DialogTitle>
+					<DialogTitle>{t("add_title")}</DialogTitle>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 py-4">
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Комплекс *</label>
-						<select
-							name="complex_id"
-							value={formData.complex_id}
-							onChange={handleChange}
-							required
-							disabled={createMutation.isPending}
-							className="w-full h-10 border rounded px-3 bg-white"
-						>
-							<option value="">Выберите комплекс</option>
-							{complexes.map((item) => (
-								<option key={item.id} value={item.id}>
-									{item.name}
-								</option>
-							))}
-						</select>
-					</div>
+					{!defaultComplexId && (
+						<div className="space-y-2">
+							<label className="text-sm font-medium">{t("complex_label")}</label>
+							<select
+								name="complex_id"
+								value={formData.complex_id}
+								onChange={handleChange}
+								required
+								disabled={createMutation.isPending}
+								className="w-full h-10 border rounded px-3 bg-white"
+							>
+								<option value="">{t("select_complex")}</option>
+								{complexes.map((item) => (
+									<option key={item.id} value={item.id}>
+										{item.name}
+									</option>
+								))}
+							</select>
+						</div>
+					)}
 
 					<div className="space-y-2">
-						<label className="text-sm font-medium">Название здания *</label>
+						<label className="text-sm font-medium">{t("name_label")}</label>
 						<Input
 							name="name"
 							value={formData.name}
 							onChange={handleChange}
-							placeholder="Введите название"
+							placeholder={t("enter_name")}
 							required
 							disabled={createMutation.isPending}
 						/>
 					</div>
 
 					<div className="space-y-2">
-						<label className="text-sm font-medium">Количество этажей *</label>
+						<label className="text-sm font-medium">{t("floors_label")}</label>
 						<Input
 							name="floor_count"
 							type="text"
 							inputMode="numeric"
 							value={formData.floor_count}
 							onChange={handleChange}
-							placeholder="Например: 5"
+							placeholder="5"
 							required
 							disabled={createMutation.isPending}
 						/>
 					</div>
 
 					<div className="space-y-2">
-						<label className="text-sm font-medium">Базовая цена *</label>
+						<label className="text-sm font-medium">{t("base_price_label")}</label>
 						<Input
 							name="base_price"
 							type="number"
@@ -169,14 +178,14 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 							step="0.01"
 							value={formData.base_price}
 							onChange={handleChange}
-							placeholder="Например: 1000000"
+							placeholder="1000000"
 							required
 							disabled={createMutation.isPending}
 						/>
 					</div>
 					<div className="space-y-2">
 						<label className="text-sm font-medium">
-							Максимальный коэффициент *
+							{t("max_coef_label")}
 						</label>
 						<Input
 							name="max_coefficient"
@@ -184,14 +193,14 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 							inputMode="decimal"
 							value={formData.max_coefficient}
 							onChange={handleChange}
-							placeholder="Например: 1.5"
+							placeholder="1.5"
 							required
 							disabled={createMutation.isPending}
 						/>
 					</div>
 
 					<div className="space-y-2">
-						<label className="text-sm font-medium">Валюта</label>
+						<label className="text-sm font-medium">{t("currency_label")}</label>
 						<select
 							name="price_unit"
 							value={formData.price_unit}
@@ -199,8 +208,8 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 							className="w-full h-10 border rounded px-3 bg-white"
 							disabled={createMutation.isPending}
 						>
-							<option value="UZS">UZS (Сум)</option>
-							<option value="USD">USD (Доллар)</option>
+							<option value="UZS">UZS</option>
+							<option value="USD">USD</option>
 						</select>
 					</div>
 
@@ -212,14 +221,14 @@ export const ModalAddedBuilding: FC<ModalProps> = ({ onSuccess }) => {
 								onClick={() => setOpen(false)}
 								disabled={createMutation.isPending}
 							>
-								Отмена
+								{tc("cancel")}
 							</Button>
 							<Button
 								type="submit"
 								disabled={createMutation.isPending}
 								className="bg-[#282964] hover:bg-[#1f2050] text-white"
 							>
-								{createMutation.isPending ? "Добавление..." : "Добавить"}
+								{createMutation.isPending ? tc("adding") : tc("add")}
 							</Button>
 						</DialogFooter>
 					</div>

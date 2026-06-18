@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface ModalAddedCoefficientNameProps {
 	onSuccess?: () => void;
@@ -24,10 +25,13 @@ export const ModalAddedCoefficientName = ({
 	const [coefficientName, setCoefficientName] = useState("");
 	const [open, setOpen] = useState(false);
 	const { mutate: createMutation, isPending } = useCreateCoefficient();
+	const t = useTranslations("coefficient");
+	const tc = useTranslations("common");
+
 	const handleCreateCoefficient = () => {
 		const trimmedName = coefficientName.trim();
 		if (!trimmedName) {
-			toast.error("Введите имя коэффициента");
+			toast.error(t("enter_name_error"));
 			return;
 		}
 		createMutation(
@@ -37,23 +41,24 @@ export const ModalAddedCoefficientName = ({
 			},
 			{
 				onSuccess: () => {
-					toast.success("Коэффициент создан");
+					toast.success(t("created_success"));
 					setCoefficientName("");
 					setOpen(false);
 					if (onSuccess) onSuccess();
 				},
 				onError: (error) => {
-					toast.error("Ошибка при создании коэффициента");
+					toast.error(t("create_error"));
 					console.error(error);
 				},
 			},
 		);
 	};
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<button className="bg-[#46479f] px-3 py-1 rounded text-white text-sm hover:bg-[#1f2050] transition-colors">
-					Добавить коэффициента +
+					{t("add_name_btn")}
 				</button>
 			</DialogTrigger>
 			<DialogContent className="w-md">
@@ -62,11 +67,11 @@ export const ModalAddedCoefficientName = ({
 				</DialogHeader>
 
 				<div className="space-y-6">
-					<label className="text-sm font-medium">Имя коэффициента:</label>
+					<label className="text-sm font-medium">{t("name_label")}</label>
 					<Input
 						value={coefficientName}
 						onChange={(e) => setCoefficientName(e.target.value)}
-						placeholder="Имя коэффициента"
+						placeholder={t("name_placeholder")}
 						className="bg-white w-full"
 						onKeyDown={(e) => {
 							if (e.key === "Enter" && !isPending) {
@@ -81,7 +86,7 @@ export const ModalAddedCoefficientName = ({
 							onClick={handleCreateCoefficient}
 							disabled={isPending || !coefficientName.trim()}
 						>
-							{isPending ? "Создание..." : "Создать коэффициент"}
+							{isPending ? tc("creating") : t("create_btn")}
 						</button>
 					</div>
 				</div>

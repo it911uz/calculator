@@ -1,4 +1,4 @@
-export type TApartmentStatus = "built" | "upcoming" | "in_process";
+export type TApartmentStatus = "free" | "sold" | "booked" | "withdrawn";
 
 export interface IApartment {
     id: number;
@@ -8,6 +8,8 @@ export interface IApartment {
     room_count: number;
     status: TApartmentStatus;
     final_price: string;
+    total_price: string;
+    price_unit: string;
     building_id: number;
     bct_ids: number[];
 }

@@ -1,21 +1,28 @@
-import React, { useTransition } from "react";
+"use client";
+
+import React, { memo, useCallback, useTransition } from "react";
 import { navigation } from "../shared/nav-link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { CiLogout } from "react-icons/ci";
-
 import Link from "next/link";
 import { logoutAction } from "@/action/auth/logout.action";
+
 interface IasideProps {
 	isOpen: boolean;
 }
+
 const Aside: React.FC<IasideProps> = ({ isOpen }) => {
 	const pathname = usePathname();
 	const [isPending, startTransition] = useTransition();
-	const handleLogout = () => {
+	const t = useTranslations("nav");
+
+	const handleLogout = useCallback(() => {
 		startTransition(async () => {
 			await logoutAction();
 		});
-	};
+	}, []);
+
 	return (
 		<aside
 			className={`
@@ -26,12 +33,12 @@ const Aside: React.FC<IasideProps> = ({ isOpen }) => {
       `}
 		>
 			<ul className="space-y-1 py-2">
-				{navigation.map((item, i) => {
+				{navigation.map((item) => {
 					const Icon = item.icon;
 					const isActive = pathname === item.pathName;
 
 					return (
-						<li key={i}>
+						<li key={item.navKey}>
 							<Link
 								href={item.pathName}
 								className={`flex items-start gap-2 px-4 py-3 transition-all rounded-[3px]
@@ -44,7 +51,7 @@ const Aside: React.FC<IasideProps> = ({ isOpen }) => {
 								}}
 							>
 								<Icon size={18} />
-								<span className="font-medium">{item.navName}</span>
+								<span className="font-medium">{t(item.navKey)}</span>
 							</Link>
 						</li>
 					);
@@ -61,10 +68,11 @@ const Aside: React.FC<IasideProps> = ({ isOpen }) => {
 					}}
 				>
 					<CiLogout />
-					<span className="text-sm">Выход</span>
+					<span className="text-sm">{t("logout")}</span>
 				</button>
 			</div>
 		</aside>
 	);
 };
-export default Aside;
+
+export default memo(Aside);

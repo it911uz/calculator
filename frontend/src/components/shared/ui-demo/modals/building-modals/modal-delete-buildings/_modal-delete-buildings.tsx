@@ -10,40 +10,44 @@ import { useState } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useDeleteBuilding } from "@/action/hooks/buildings-hook/delete-building";
 
 interface ModalDeleteBuildingsProps {
 	buildingId: string | number;
+	complexId?: number;
 	onSuccess?: () => void;
 }
 
 export function ModalDeleteBuildings({
 	buildingId,
+	complexId,
 	onSuccess,
 }: ModalDeleteBuildingsProps) {
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
+	const t = useTranslations("building");
+	const tc = useTranslations("common");
 
 	const deleteMutation = useDeleteBuilding();
 
 	const handleDelete = async () => {
 		try {
-			await deleteMutation.mutateAsync({ id: Number(buildingId) });
+			const result = await deleteMutation.mutateAsync({ id: Number(buildingId) });
+			if (!result.success) return;
 			setOpen(false);
-			toast.success("Здание успешно удалено");
+			toast.success(t("deleted_success"));
 
 			if (onSuccess) {
 				onSuccess();
-			}
-
-			if (window.location.pathname.includes("/buildings")) {
 				router.refresh();
+			} else if (complexId) {
+				router.push(`/complex/${complexId}`);
 			} else {
-				router.push("/buildings");
+				router.push("/");
 			}
 		} catch (error) {
-			console.error("Delete error:", error);
-			toast.error("Ошибка при удалении здания");
+			toast.error(t("delete_error"));
 		}
 	};
 
@@ -62,13 +66,12 @@ export function ModalDeleteBuildings({
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">
 				<DialogTitle className="text-lg font-semibold text-center">
-					Удалить здание?
+					{t("delete_title")}
 				</DialogTitle>
 
 				<div className="py-4">
 					<p className="text-center text-gray-600 mb-6">
-						Вы уверены, что хотите удалить это здание? Это действие нельзя
-						отменить.
+						{t("delete_confirm")}
 					</p>
 
 					<div className="flex justify-center gap-4">
@@ -77,14 +80,14 @@ export function ModalDeleteBuildings({
 							className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition-colors min-w-[80px]"
 							disabled={deleteMutation.isPending}
 						>
-							Нет
+							{tc("no")}
 						</button>
 						<button
 							onClick={handleDelete}
 							disabled={deleteMutation.isPending}
 							className="px-4 py-2 bg-red-300 text-white rounded hover:bg-red-400 transition-colors disabled:opacity-50 min-w-[80px]"
 						>
-							{deleteMutation.isPending ? "Удаление..." : "Да"}
+							{deleteMutation.isPending ? tc("deleting") : tc("yes")}
 						</button>
 					</div>
 				</div>

@@ -3,7 +3,7 @@ import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
 import type { IApartment } from "@/types/apartment.types";
 import type { SafeArray } from "@/types/safe-response.types";
-export async function getApartments(params: Record<string, number> = {}) {
+export async function getApartments(params: Record<string, number | string> = {}) {
     const result: SafeArray<IApartment> = [];
     const searchParams = createSearchParams(params).toString();
     try {
@@ -27,7 +27,6 @@ export async function getApartments(params: Record<string, number> = {}) {
                     "Content-Type": "application/json",
                     Accept: "application/json",
                 },
-                next: { revalidate: 3600 },
             },
         );
 

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from auth.dependencies import has_permission
+from buildings.image_sevices import save_image, delete_image
 from complexes.filters import ComplexFilter
 from complexes.repositories import ComplexRepository
 from complexes.schemas import AddComplexResponse, AddComplexBody, UpdateComplexBody
@@ -67,6 +68,26 @@ async def edit_complex(complex_id: int, update_complex: UpdateComplexBody, db: A
 async def delete_complex(complex_id: int, db: AsyncSession = Depends(get_db)):
     complex_repo = ComplexRepository(db)
     return await complex_repo.delete_complex(complex_id)
+
+"-------------------------------------------------------------------------------------------"
+
+@router.patch(
+    "/{complex_id}/logo",
+    response_model=AddComplexResponse,
+    dependencies=[Depends(has_permission("update_complexes"))]
+)
+async def upload_complex_logo(
+    complex_id: int,
+    image: UploadFile,
+    db: AsyncSession = Depends(get_db),
+):
+    complex_repo = ComplexRepository(db)
+    current = await complex_repo.get_complex(complex_id)
+    if current.logo_url:
+        await delete_image(current.logo_url)
+    logo_url = await save_image(image, path="complexes")
+    updated = await complex_repo.update_complex(complex_id, logo_url=logo_url)
+    return updated
 
 
 

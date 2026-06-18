@@ -8,7 +8,8 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { MdOutlineDeleteForever } from "react-icons/md";
-import { useDeleteUser } from "@/action/hooks/users-hook/user-delete.hook"; // Yo'lni tekshiring
+import { useTranslations } from "next-intl";
+import { useDeleteUser } from "@/action/hooks/users-hook/user-delete.hook";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -19,6 +20,8 @@ interface Props {
 const DeleteUserManagement: React.FC<Props> = ({ userId, username }) => {
 	const [open, setOpen] = useState(false);
 	const deleteMutation = useDeleteUser();
+	const t = useTranslations("management");
+	const tc = useTranslations("common");
 
 	const handleDelete = () => {
 		deleteMutation.mutate(userId, {
@@ -37,13 +40,12 @@ const DeleteUserManagement: React.FC<Props> = ({ userId, username }) => {
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">
 				<DialogTitle className="text-lg font-semibold text-center">
-					Удалить пользователя?
+					{t("delete_user_title")}
 				</DialogTitle>
 
 				<div className="py-4">
 					<p className="text-center text-gray-600 mb-6">
-						Вы уверены, что хотите удалить пользователя{" "}
-						<strong>{username}</strong>? Это действие нельзя отменить.
+						{t("delete_user_confirm", { username })}
 					</p>
 
 					<div className="flex justify-center gap-4">
@@ -53,7 +55,7 @@ const DeleteUserManagement: React.FC<Props> = ({ userId, username }) => {
 							disabled={deleteMutation.isPending}
 							className="min-w-20"
 						>
-							Нет
+							{tc("no")}
 						</Button>
 						<Button
 							variant="destructive"
@@ -61,7 +63,7 @@ const DeleteUserManagement: React.FC<Props> = ({ userId, username }) => {
 							disabled={deleteMutation.isPending}
 							className="min-w-20 bg-red-600 hover:bg-red-700 text-white"
 						>
-							{deleteMutation.isPending ? "Удаление..." : "Да"}
+							{deleteMutation.isPending ? tc("deleting") : tc("yes")}
 						</Button>
 					</div>
 				</div>

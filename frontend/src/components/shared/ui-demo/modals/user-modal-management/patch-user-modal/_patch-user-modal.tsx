@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FiEdit3 } from "react-icons/fi";
+import { useTranslations } from "next-intl";
 import { usePatchUser } from "@/action/hooks/users-hook/user-patch.hook";
 import type { IUser } from "@/types/user.types";
 
@@ -28,6 +29,8 @@ const PatchUserManagement: React.FC<Props> = ({ user }) => {
 		username: user.username,
 		password: "",
 	});
+	const t = useTranslations("management");
+	const tc = useTranslations("common");
 
 	const { mutate: updateUser, isPending } = usePatchUser();
 
@@ -73,13 +76,13 @@ const PatchUserManagement: React.FC<Props> = ({ user }) => {
 			<DialogContent className="max-w-96">
 				<DialogHeader>
 					<DialogTitle className="text-center text-xl">
-						Редактировать профиль
+						{t("edit_profile_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit} className="space-y-4 py-4">
 					<div className="space-y-2">
-						<label>Имя пользователя</label>
+						<label>{t("new_username_label")}</label>
 						<Input
 							id="edit-username"
 							type="text"
@@ -87,13 +90,13 @@ const PatchUserManagement: React.FC<Props> = ({ user }) => {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setFormData({ ...formData, username: e.target.value })
 							}
-							placeholder="Введите новое имя"
+							placeholder={t("new_username_placeholder")}
 							autoComplete="username"
 						/>
 					</div>
 
 					<div className="space-y-2">
-						<label>Новый пароль</label>
+						<label>{t("new_password_label")}</label>
 						<Input
 							id="edit-password"
 							type="password"
@@ -101,7 +104,7 @@ const PatchUserManagement: React.FC<Props> = ({ user }) => {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setFormData({ ...formData, password: e.target.value })
 							}
-							placeholder="Оставьте пустым, если не хотите менять"
+							placeholder={t("new_password_placeholder")}
 							autoComplete="new-password"
 						/>
 					</div>
@@ -113,14 +116,14 @@ const PatchUserManagement: React.FC<Props> = ({ user }) => {
 							onClick={() => setOpen(false)}
 							disabled={isPending}
 						>
-							Отмена
+							{tc("cancel")}
 						</Button>
 						<Button
 							type="submit"
 							className="bg-indigo-900 hover:bg-indigo-800 text-white"
 							disabled={isPending}
 						>
-							{isPending ? "Сохранение..." : "Сохранить изменения"}
+							{isPending ? tc("saving") : t("save_changes_btn")}
 						</Button>
 					</div>
 				</form>

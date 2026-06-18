@@ -2,11 +2,14 @@ import { ENV } from "@/configs/env.config";
 import { createSearchParams } from "@/lib/api.util";
 import { getAuthData } from "@/lib/auth.util";
 import { SafeObject } from "@/types/safe-response.types";
-interface BulkCreateResponseData {
+
+export interface BulkCreateResponseData {
 	message?: string;
 	count?: number;
 	detail?: string | string[];
+	errors?: string[];
 }
+
 export async function bulkCreateApartments(
 	buildingId: number | string,
 	file: File,
@@ -44,6 +47,7 @@ export async function bulkCreateApartments(
 		);
 
 		const responseData: BulkCreateResponseData = await res.json();
+
 		if (!res.ok) {
 			result._meta = {
 				status: res.status,
@@ -57,12 +61,9 @@ export async function bulkCreateApartments(
 			};
 			return result;
 		}
-		result.data = responseData;
-		result._meta = {
-			status: res.status,
-			reason: "HTTP",
-		};
 
+		result.data = responseData;
+		result._meta = { status: res.status, reason: "HTTP" };
 		return result;
 	} catch (error: unknown) {
 		const errorMessage =

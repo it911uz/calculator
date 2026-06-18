@@ -8,7 +8,6 @@ class Building(BaseModel):
     __tablename__ = "buildings"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    image_url = Column(String(255), nullable=True)
     name = Column(String(256), nullable=False)
     floor_count = Column(Integer, nullable=False)
     base_price = Column(Numeric(precision=20, scale=2), nullable=False)  # price per square meter
@@ -19,6 +18,7 @@ class Building(BaseModel):
 
     building_coefficients = relationship("BuildingCoefficient", back_populates="building", lazy="selectin")
     apartments = relationship("Apartment", back_populates="building", lazy="selectin")
+    layouts = relationship("ApartmentLayout", back_populates="building", lazy="selectin", cascade="all, delete-orphan")
 
 
     __table_args__ = (

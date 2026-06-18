@@ -23,6 +23,9 @@ def has_permission(permission: str):
         if user.is_superuser:
             return None
 
+        if not user.role:
+            raise Forbidden("Permission Denied")
+
         for perm in user.role.permissions:
             if perm.codename == permission:
                 return None
@@ -36,9 +39,11 @@ def has_permissions(permissions: list):
         if user.is_superuser:
             return None
 
-        permission_codenames = [perm.codename for perm in user.role.permissions]
+        if not user.role:
+            raise Forbidden("Permission Denied")
 
-        result = all(perm.codename in permission_codenames for perm in permissions)
+        permission_codenames = [perm.codename for perm in user.role.permissions]
+        result = all(perm in permission_codenames for perm in permissions)
         if result:
             return None
 

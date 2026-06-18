@@ -41,10 +41,12 @@ export async function loginAction(formData: FormData): Promise<void> {
 
 	const cookieStore = await cookies();
 
+	const secureCookie = process.env.SECURE_COOKIES === "true";
+
 	cookieStore.set("access_token", data.access_token, {
 		httpOnly: true,
 		sameSite: "lax",
-		secure: process.env.NODE_ENV === "production",
+		secure: secureCookie,
 		maxAge: 60 * 60 * 24,
 		path: "/",
 	});
@@ -53,7 +55,7 @@ export async function loginAction(formData: FormData): Promise<void> {
 		cookieStore.set("refresh_token", data.refresh_token, {
 			httpOnly: true,
 			sameSite: "lax",
-			secure: process.env.NODE_ENV === "production",
+			secure: secureCookie,
 			maxAge: 60 * 60 * 24 * 7,
 			path: "/",
 		});

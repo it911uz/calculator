@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { useUpdateCoefficientType } from "@/action/hooks/coefficient-type-hook/update-coefficient-type";
 import { useRouter } from "next/navigation";
 import { QueryKeys } from "@/lib/query-keys";
@@ -30,23 +31,26 @@ export function ModalaUpdateCoefficientTypeApartment({
 		buildingId,
 		apartmentKey,
 	);
+	const t = useTranslations("coefficient");
+	const tc = useTranslations("common");
+
 	useEffect(() => {
 		if (open) {
 			setName(coefficientType.name);
 			setRate(String(coefficientType.rate));
 		}
 	}, [open, coefficientType]);
+
 	const router = useRouter();
 	const handleSubmit = () => {
 		if (!name.trim() || !rate.trim()) {
-			toast.error("Заполните поля");
+			toast.error(t("fill_fields_error2"));
 			return;
 		}
 
 		mutate(
 			{
 				id: coefficientType.id,
-
 				data: {
 					name: name.trim(),
 					rate: Number(rate),
@@ -72,30 +76,30 @@ export function ModalaUpdateCoefficientTypeApartment({
 
 			<DialogContent className="max-w-sm">
 				<DialogHeader>
-					<DialogTitle>Редактировать коэффициент тип</DialogTitle>
+					<DialogTitle>{t("edit_title")}</DialogTitle>
 				</DialogHeader>
 
 				<div className="space-y-4">
 					<Input
 						value={name}
 						onChange={(e) => setName(e.target.value)}
-						placeholder="Название"
+						placeholder={t("field_name")}
 						disabled={isPending}
 					/>
 
 					<Input
 						value={rate}
 						onChange={(e) => setRate(e.target.value)}
-						placeholder="Значение"
+						placeholder={t("field_value")}
 						disabled={isPending}
 					/>
 
 					<div className="flex justify-end gap-2">
 						<Button variant="outline" onClick={() => setOpen(false)}>
-							Отмена
+							{tc("cancel")}
 						</Button>
 						<Button onClick={handleSubmit} disabled={isPending}>
-							Сохранить
+							{tc("save")}
 						</Button>
 					</div>
 				</div>

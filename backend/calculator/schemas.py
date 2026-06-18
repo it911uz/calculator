@@ -1,5 +1,6 @@
 from datetime import date
 from decimal import Decimal
+from typing import Optional
 
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, field_validator
@@ -10,6 +11,7 @@ class CalculateApartmentBody(BaseModel):
     first_investment_rate: Decimal = Field(max_digits=20, decimal_places=2)
     first_payment_date: date
     period_count: int
+    price_per_sqrm: Optional[Decimal] = Field(default=None, max_digits=20, decimal_places=2)
 
     @field_validator("first_investment_rate")
     @classmethod

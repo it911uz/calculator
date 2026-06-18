@@ -18,13 +18,23 @@ export function useBulkCreateApartments() {
 			bulkCreateApartments(buildingId, file),
 
 		onSuccess: (res) => {
+			if (res._meta?.error) {
+				toast.error(res._meta.error, { duration: 5000 });
+				return;
+			}
+
 			if (res.data) {
-				toast.success("Квартиры успешно импортированы");
 				queryClient.invalidateQueries({ queryKey: QueryKeys.apartments.all });
-			} else if (res._meta?.error) {
-				toast.error(res._meta.error, {
-					duration: 5000,
-				});
+
+				const errors = res.data.errors;
+				if (errors && errors.length > 0) {
+					toast.warning(
+						`Импорт завершён с ошибками: ${errors.length} строк не загружено`,
+						{ duration: 5000 },
+					);
+				} else {
+					toast.success("Квартиры успешно импортированы");
+				}
 			}
 		},
 

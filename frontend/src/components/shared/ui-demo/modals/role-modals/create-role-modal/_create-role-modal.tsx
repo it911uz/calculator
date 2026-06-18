@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { usePostRole } from "@/action/hooks/roles-hook/use-post-role";
 import { usePermissions } from "@/action/hooks/permissions-hook/use-permissions-hook";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,11 +21,10 @@ import type { ICreateRolePayload } from "@/types/role.types";
 const CreateRole: React.FC = () => {
 	const [open, setOpen] = useState<boolean>(false);
 	const [name, setName] = useState<string>("");
-	const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>(
-		[],
-	);
+	const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([]);
+	const t = useTranslations("management");
+	const tc = useTranslations("common");
 
-	// Hooklar
 	const { data: permissions, isLoading: permsLoading } = usePermissions();
 	const { mutate: createRole, isPending } = usePostRole();
 
@@ -52,11 +52,10 @@ const CreateRole: React.FC = () => {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
 		if (!name.trim()) return;
 
 		const payload: ICreateRolePayload = {
-			name: name,
+			name,
 			permission_ids: selectedPermissionIds,
 		};
 
@@ -76,19 +75,19 @@ const CreateRole: React.FC = () => {
 			<DialogTrigger asChild>
 				<Button className="bg-indigo-900 hover:bg-indigo-800 text-white gap-2">
 					<PlusCircle size={15} />
-					<span>Создать роль</span>
+					<span>{t("create_role_btn")}</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="max-w-96">
 				<DialogHeader>
 					<DialogTitle className="text-xl font-bold text-center">
-						Новая роль
+						{t("new_role_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit} className="space-y-6 py-4">
 					<div className="space-y-2">
-						<label className="text-sm font-medium">Название роли</label>
+						<label className="text-sm font-medium">{t("role_name_label")}</label>
 						<Input
 							id="role-name"
 							required
@@ -96,12 +95,12 @@ const CreateRole: React.FC = () => {
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setName(e.target.value)
 							}
-							placeholder="Напр: Менеджер"
+							placeholder={t("role_name_placeholder")}
 						/>
 					</div>
 
 					<div className="space-y-3">
-						<label className="text-sm font-medium">Доступные разрешения</label>
+						<label className="text-sm font-medium">{t("permissions_label")}</label>
 						<div className="flex items-center justify-between">
 							{!permsLoading && permissions && permissions.length > 0 && (
 								<div className="flex items-center space-x-2 pt-2">
@@ -116,7 +115,7 @@ const CreateRole: React.FC = () => {
 										htmlFor="select-all"
 										className="text-[11px] font-bold cursor-pointer uppercase text-indigo-900 select-none"
 									>
-										Выбрать все
+										{t("select_all")}
 									</label>
 								</div>
 							)}
@@ -149,7 +148,7 @@ const CreateRole: React.FC = () => {
 							)}
 						</ScrollArea>
 						<p className="text-[12px] text-muted-foreground">
-							Выбрано: {selectedPermissionIds.length}
+							{t("selected_count", { count: selectedPermissionIds.length })}
 						</p>
 					</div>
 
@@ -160,7 +159,7 @@ const CreateRole: React.FC = () => {
 							onClick={() => setOpen(false)}
 							disabled={isPending}
 						>
-							Отмена
+							{tc("cancel")}
 						</Button>
 						<Button
 							type="submit"
@@ -170,7 +169,7 @@ const CreateRole: React.FC = () => {
 							{isPending ? (
 								<Loader2 className="animate-spin h-4 w-4" />
 							) : (
-								"Создать"
+								tc("create")
 							)}
 						</Button>
 					</div>

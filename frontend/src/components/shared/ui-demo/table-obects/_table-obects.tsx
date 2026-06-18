@@ -1,215 +1,238 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
-import { TbExternalLink } from "react-icons/tb";
-import { SpinnerDemo } from "../spinner-demo/_spinner-demo";
+import React, { useCallback, useMemo, useState } from "react";
 import { ImFileEmpty } from "react-icons/im";
+import { SpinnerDemo } from "../spinner-demo/_spinner-demo";
 import { ModalAddedComplex } from "../modals/complex-modal/modal-add-complex/_modal-add-complex";
-import { ModalDeleteComplex } from "../modals/complex-modal/modal-delete-complex/_modal-delete-complex";
-import Link from "next/link";
 import { useComplexes } from "@/action/hooks/complex-hook/get-complexes";
 import type { TableComplexProps } from "@/types/props.types";
 import { IComplex } from "@/types/complex.types";
-import ComplexFilters from "../filters/_comple-filter";
+import { ComplexCard } from "../cards/_complex-card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+    ComplexFiltersBar,
+    type ComplexSortBy,
+    type ComplexLogoFilter,
+} from "../filters/_complex-filters-bar";
+import { useTranslations } from "next-intl";
 
 const ITEMS_PER_PAGE = 12;
 const MAX_VISIBLE_PAGES = 5;
 
+const DEFAULT_SORT: ComplexSortBy = "name_asc";
+const DEFAULT_LOGO: ComplexLogoFilter = "all";
+
 const TableObjects: React.FC<TableComplexProps> = ({ initialComplex }) => {
-	const router = useRouter();
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const t = useTranslations("complex");
+    const tc = useTranslations("common");
 
-	const currentPage = Number(searchParams.get("page")) || 1;
-	const searchTerm = searchParams.get("name__ilike") || "";
+    const currentPage = Number(searchParams.get("page")) || 1;
+    const searchTerm = searchParams.get("name__ilike") || "";
 
-	const {
-		data: complexData,
-		isLoading,
-		error,
-		refetch,
-	} = useComplexes({ name__ilike: searchTerm });
+    const [sortBy, setSortBy] = useState<ComplexSortBy>(DEFAULT_SORT);
+    const [logoFilter, setLogoFilter] = useState<ComplexLogoFilter>(DEFAULT_LOGO);
+    const [minBuildings, setMinBuildings] = useState("");
+    const [maxBuildings, setMaxBuildings] = useState("");
 
-	const handleRefresh = useCallback(async () => {
-		await refetch();
-	}, [refetch]);
+    const {
+        data: complexData,
+        isLoading,
+        error,
+        refetch,
+    } = useComplexes({ name__ilike: searchTerm });
 
-	const complexList = useMemo(() => {
-		if (Array.isArray(complexData)) {
-			return complexData as IComplex[];
-		}
-		return (initialComplex as IComplex[]) || [];
-	}, [complexData, initialComplex]);
+    const handleRefresh = useCallback(async () => {
+        await refetch();
+    }, [refetch]);
 
-	const totalPages = Math.ceil(complexList.length / ITEMS_PER_PAGE);
-	const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-	const currentItems = complexList.slice(
-		startIndex,
-		startIndex + ITEMS_PER_PAGE,
-	);
+    const complexList = useMemo(() => {
+        if (Array.isArray(complexData)) return complexData as IComplex[];
+        return (initialComplex as IComplex[]) || [];
+    }, [complexData, initialComplex]);
 
-	const handlePageChange = useCallback(
-		(newPage: number) => {
-			const params = new URLSearchParams(searchParams.toString());
-			params.set("page", String(newPage));
-			router.push(
-				`${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>,
-				{ scroll: false },
-			);
-		},
-		[pathname, router, searchParams],
-	);
+    const filteredAndSorted = useMemo(() => {
+        let list = [...complexList];
 
-	const paginationPages = useMemo(() => {
-		let start = Math.max(1, currentPage - Math.floor(MAX_VISIBLE_PAGES / 2));
-		let end = start + MAX_VISIBLE_PAGES - 1;
+        // Фильтр по лого
+        if (logoFilter === "with") list = list.filter((c) => !!c.logo_url);
+        if (logoFilter === "without") list = list.filter((c) => !c.logo_url);
 
-		if (end > totalPages) {
-			end = totalPages;
-			start = Math.max(1, end - MAX_VISIBLE_PAGES + 1);
-		}
-		return Array.from(
-			{ length: Math.max(0, end - start + 1) },
-			(_, i) => start + i,
-		);
-	}, [currentPage, totalPages]);
+        // Фильтр по кол-ву зданий
+        const min = minBuildings !== "" ? Number(minBuildings) : null;
+        const max = maxBuildings !== "" ? Number(maxBuildings) : null;
+        if (min !== null) list = list.filter((c) => (c.buildings_count ?? 0) >= min);
+        if (max !== null) list = list.filter((c) => (c.buildings_count ?? 0) <= max);
 
-	if (isLoading)
-		return (
-			<div className="flex justify-center items-center min-h-96">
-				<SpinnerDemo />
-			</div>
-		);
+        // Сортировка
+        list.sort((a, b) => {
+            switch (sortBy) {
+                case "name_asc":
+                    return a.name.localeCompare(b.name, "ru");
+                case "name_desc":
+                    return b.name.localeCompare(a.name, "ru");
+                case "buildings_desc":
+                    return (b.buildings_count ?? 0) - (a.buildings_count ?? 0);
+                case "buildings_asc":
+                    return (a.buildings_count ?? 0) - (b.buildings_count ?? 0);
+                default:
+                    return 0;
+            }
+        });
 
-	if (error)
-		return (
-			<div className="text-center p-8 border rounded-md">
-				<p className="text-red-500 mb-4">Ошибка загрузки данных</p>
-				<button
-					onClick={() => refetch()}
-					className="px-4 py-2 bg-[#282964] text-white rounded-sm text-sm"
-				>
-					Попробовать снова
-				</button>
-			</div>
-		);
+        return list;
+    }, [complexList, sortBy, logoFilter, minBuildings, maxBuildings]);
 
-	return (
-		<section>
-			<div className="flex w-full justify-between items-center pb-4 gap-4">
-				<ModalAddedComplex onSuccess={handleRefresh} />
+    const hasActiveFilters =
+        sortBy !== DEFAULT_SORT ||
+        logoFilter !== DEFAULT_LOGO ||
+        minBuildings !== "" ||
+        maxBuildings !== "";
 
-				<ComplexFilters />
+    const handleReset = useCallback(() => {
+        setSortBy(DEFAULT_SORT);
+        setLogoFilter(DEFAULT_LOGO);
+        setMinBuildings("");
+        setMaxBuildings("");
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("name__ilike");
+        params.set("page", "1");
+        router.push(
+            `${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>,
+            { scroll: false },
+        );
+    }, [pathname, router, searchParams]);
 
-				{/* Pagination UI */}
-				<div className="flex items-center gap-1">
-					<button
-						disabled={currentPage === 1}
-						onClick={() => handlePageChange(currentPage - 1)}
-						className="px-2 py-1 text-gray-400 disabled:opacity-30 hover:text-[#282964] transition-colors"
-					>
-						‹
-					</button>
+    const totalPages = Math.ceil(filteredAndSorted.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const currentItems = filteredAndSorted.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-					{paginationPages.map((p) => (
-						<button
-							key={p}
-							onClick={() => handlePageChange(p)}
-							className={`px-3 py-1 rounded-sm text-[12px] font-semibold transition-all
-                ${p === currentPage ? "bg-[#282964] text-white" : "text-gray-600 hover:bg-gray-100"}`}
-						>
-							{p}
-						</button>
-					))}
+    const handlePageChange = useCallback(
+        (newPage: number) => {
+            const params = new URLSearchParams(searchParams.toString());
+            params.set("page", String(newPage));
+            router.push(
+                `${pathname}?${params.toString()}` as __next_route_internal_types__.RouteImpl<string>,
+                { scroll: false },
+            );
+        },
+        [pathname, router, searchParams],
+    );
 
-					<button
-						disabled={currentPage === totalPages || totalPages === 0}
-						onClick={() => handlePageChange(currentPage + 1)}
-						className="px-2 py-1 text-gray-400 disabled:opacity-30 hover:text-[#282964] transition-colors"
-					>
-						›
-					</button>
-				</div>
-			</div>
+    const paginationPages = useMemo(() => {
+        let start = Math.max(1, currentPage - Math.floor(MAX_VISIBLE_PAGES / 2));
+        let end = start + MAX_VISIBLE_PAGES - 1;
+        if (end > totalPages) {
+            end = totalPages;
+            start = Math.max(1, end - MAX_VISIBLE_PAGES + 1);
+        }
+        return Array.from({ length: Math.max(0, end - start + 1) }, (_, i) => start + i);
+    }, [currentPage, totalPages]);
 
-			{complexList.length === 0 ? (
-				<div className="text-center py-20 bg-gray-50/50 rounded-sm border border-dashed border-gray-200">
-					<ImFileEmpty size={40} className="mx-auto text-gray-300 mb-3" />
-					<p className="text-gray-500 text-sm font-medium">
-						Информация не найдена
-					</p>
-					{searchTerm && (
-						<p className="text-xs text-gray-400 mt-1">
-							По запросу: {searchTerm}
-						</p>
-					)}
-				</div>
-			) : (
-				<div className="rounded-[3px] overflow-hidden shadow-sm border border-gray-100">
-					<Table>
-						<TableHeader className="bg-gray-50/50">
-							<TableRow>
-								<TableHead className="w-16">№</TableHead>
-								<TableHead>Имя</TableHead>
-								<TableHead>Описание</TableHead>
-								<TableHead className="text-right">Действия</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{currentItems.map((item, i) => (
-								<TableRow
-									key={item.id}
-									className="hover:bg-gray-50/80 transition-colors"
-								>
-									<TableCell className="text-gray-500">
-										{startIndex + i + 1}
-									</TableCell>
-									<TableCell className="font-bold text-[#282964]">
-										{item.name}
-									</TableCell>
-									<TableCell className="max-w-72 truncate text-gray-600">
-										{item.description}
-									</TableCell>
-									<TableCell className="flex items-center space-x-2 justify-end">
-										<Link
-											href={`/complex/${item.id}`}
-											className="p-1.5 hover:bg-white border border-transparent hover:border-gray-200 rounded-sm transition-all"
-										>
-											<TbExternalLink size={18} className="text-[#282964]" />
-										</Link>
-										<ModalDeleteComplex complexId={Number(item.id)} />
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</div>
-			)}
+    if (isLoading)
+        return (
+            <div className="flex justify-center items-center min-h-96">
+                <SpinnerDemo />
+            </div>
+        );
 
-			<div className="mt-4 text-[13px] text-gray-500 flex justify-between items-center">
-				<p>
-					Показано {complexList.length > 0 ? startIndex + 1 : 0}-
-					{Math.min(startIndex + ITEMS_PER_PAGE, complexList.length)} из{" "}
-					{complexList.length} комплексов
-				</p>
-				<button
-					onClick={() => refetch()}
-					className="px-4 py-1.5 border border-gray-200 hover:bg-gray-50 rounded-sm transition-colors font-medium"
-				>
-					Обновить данные
-				</button>
-			</div>
-		</section>
-	);
+    if (error)
+        return (
+            <div className="text-center p-8 border rounded-2xl">
+                <p className="text-red-500 mb-4">{t("load_error")}</p>
+                <button
+                    onClick={() => refetch()}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm hover:bg-indigo-700 transition-colors"
+                >
+                    {t("retry_btn")}
+                </button>
+            </div>
+        );
+
+    return (
+        <section>
+            <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 className="text-2xl font-black text-gray-900">{t("title")}</h1>
+                    <p className="mt-1 text-sm text-gray-400">
+                        {t("subtitle")}
+                    </p>
+                </div>
+                <ModalAddedComplex onSuccess={handleRefresh} />
+            </div>
+
+            <ComplexFiltersBar
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+                logoFilter={logoFilter}
+                onLogoFilterChange={setLogoFilter}
+                minBuildings={minBuildings}
+                onMinBuildingsChange={setMinBuildings}
+                maxBuildings={maxBuildings}
+                onMaxBuildingsChange={setMaxBuildings}
+                hasActiveFilters={hasActiveFilters || !!searchTerm}
+                onReset={handleReset}
+            />
+
+            {filteredAndSorted.length === 0 ? (
+                <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                    <ImFileEmpty size={40} className="mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500 text-sm font-medium">{t("nothing_found")}</p>
+                    <p className="text-xs text-gray-400 mt-1">{tc("try_change_filters")}</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    {currentItems.map((item) => (
+                        <ComplexCard key={item.id} complex={item} />
+                    ))}
+                </div>
+            )}
+
+            <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[13px] text-gray-500">
+                <p>
+                    {t("shown_of", {
+                        from: filteredAndSorted.length > 0 ? startIndex + 1 : 0,
+                        to: Math.min(startIndex + ITEMS_PER_PAGE, filteredAndSorted.length),
+                        total: filteredAndSorted.length,
+                    })}
+                </p>
+
+                {totalPages > 1 && (
+                    <div className="flex items-center gap-1">
+                        <button
+                            disabled={currentPage === 1}
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            className="px-2 py-1 text-gray-400 disabled:opacity-30 hover:text-indigo-600 transition-colors"
+                        >
+                            ‹
+                        </button>
+                        {paginationPages.map((p) => (
+                            <button
+                                key={p}
+                                onClick={() => handlePageChange(p)}
+                                className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all ${
+                                    p === currentPage
+                                        ? "bg-indigo-600 text-white"
+                                        : "text-gray-600 hover:bg-gray-100"
+                                }`}
+                            >
+                                {p}
+                            </button>
+                        ))}
+                        <button
+                            disabled={currentPage === totalPages || totalPages === 0}
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            className="px-2 py-1 text-gray-400 disabled:opacity-30 hover:text-indigo-600 transition-colors"
+                        >
+                            ›
+                        </button>
+                    </div>
+                )}
+            </div>
+        </section>
+    );
 };
 
 export default TableObjects;

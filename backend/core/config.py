@@ -8,16 +8,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://192.168.1.101:3000",
-    "http://192.168.1.103:3000",
-    "http://192.168.1.100:3000",
-    "https://lqwk2vh0-3000.euw.devtunnels.ms"
-]
+_raw_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost,http://localhost:3000,http://localhost:3001,http://localhost:8000"
+)
+origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
 
 
 TIMEZONE = pytz.timezone('Asia/Tashkent')
@@ -26,16 +21,16 @@ ASYNC_DATABASE_URL = os.getenv('ASYNC_DATABASE_URL')
 # Auth
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = "HS256"
-ACCESS_TIME = 360
-REFRESH_TIME = 120
+ACCESS_TIME = 60        # 1 hour
+REFRESH_TIME = 10080    # 7 days
 
 MAX_FILE_SIZE = 5 * 1024 * 1024
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-IMAGES_DIR = BASE_DIR / "images"
-
-IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-
-BASE_URL = "http://172.18.0.1:8001/"
+# MinIO / S3
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://minio:9000")
+MINIO_PUBLIC_URL = os.getenv("MINIO_PUBLIC_URL", "http://localhost:9000")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "minioadmin")
+MINIO_BUCKET = os.getenv("MINIO_BUCKET", "calculator-media")
 
 

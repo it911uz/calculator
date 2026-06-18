@@ -2,6 +2,7 @@
 
 import React, { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
 	Select,
 	SelectContent,
@@ -21,6 +22,8 @@ export const ApartmentFilters: React.FC<FilterProps> = React.memo(
 		const router = useRouter();
 		const pathname = usePathname();
 		const searchParams = useSearchParams();
+		const t = useTranslations("filter");
+		const ts = useTranslations("status");
 
 		const updateQuery = useCallback(
 			(name: string, value: string) => {
@@ -50,10 +53,10 @@ export const ApartmentFilters: React.FC<FilterProps> = React.memo(
 					onValueChange={(v) => updateQuery("building_id", v)}
 				>
 					<SelectTrigger className="h-9 text-xs">
-						<SelectValue placeholder="Здание" />
+						<SelectValue placeholder={t("all_buildings")} />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">Все здания</SelectItem>
+						<SelectItem value="all">{t("all_buildings")}</SelectItem>
 						{buildings.map((b) => (
 							<SelectItem key={b.id} value={String(b.id)}>
 								{b.name}
@@ -67,18 +70,19 @@ export const ApartmentFilters: React.FC<FilterProps> = React.memo(
 					onValueChange={(v) => updateQuery("status", v)}
 				>
 					<SelectTrigger className="h-9 text-xs">
-						<SelectValue placeholder="Статус" />
+						<SelectValue placeholder={t("all_statuses")} />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="all">Все статусы</SelectItem>
-						<SelectItem value="built">Построен</SelectItem>
-						<SelectItem value="in_process">В процессе</SelectItem>
-						<SelectItem value="upcoming">Предстоящие</SelectItem>
+						<SelectItem value="all">{t("all_statuses")}</SelectItem>
+						<SelectItem value="free">{ts("free")}</SelectItem>
+						<SelectItem value="sold">{ts("sold")}</SelectItem>
+						<SelectItem value="booked">{ts("booked")}</SelectItem>
+						<SelectItem value="withdrawn">{ts("withdrawn")}</SelectItem>
 					</SelectContent>
 				</Select>
 
 				<DebouncedInput
-					placeholder="Комнат"
+					placeholder={t("rooms_placeholder")}
 					type="number"
 					className="h-9 text-xs"
 					value={searchParams.get("room_count") || ""}
@@ -86,7 +90,7 @@ export const ApartmentFilters: React.FC<FilterProps> = React.memo(
 				/>
 
 				<DebouncedInput
-					placeholder="Этаж"
+					placeholder={t("floor_placeholder")}
 					type="number"
 					className="h-9 text-xs"
 					value={searchParams.get("floor") || ""}
@@ -94,14 +98,14 @@ export const ApartmentFilters: React.FC<FilterProps> = React.memo(
 				/>
 
 				<DebouncedInput
-					placeholder="Площадь от"
+					placeholder={t("area_from")}
 					className="h-9 text-xs"
 					value={searchParams.get("area__gte") || ""}
 					onChange={(val) => updateQuery("area__gte", val)}
 				/>
 
 				<DebouncedInput
-					placeholder="Площадь до"
+					placeholder={t("area_to")}
 					className="h-9 text-xs"
 					value={searchParams.get("area__lte") || ""}
 					onChange={(val) => updateQuery("area__lte", val)}

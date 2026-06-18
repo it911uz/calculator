@@ -1,24 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PROTECTED_ROUTES = ["/complex"];
+const PROTECTED_ROUTES = ["/complex", "/buildings", "/apartments", "/calculator-system", "/management"];
 const AUTH_ROUTES = ["/login"];
 
+function isTokenExpired(token: string): boolean {
+    try {
+        const payload = JSON.parse(
+            atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")),
+        );
+        return !payload.exp || Date.now() / 1000 > payload.exp;
+    } catch {
+        return true;
+    }
+}
+
 export function middleware(req: NextRequest) {
-	const token = req.cookies.get("access_token")?.value;
-	const { pathname } = req.nextUrl;
+    const accessToken = req.cookies.get("access_token")?.value;
+    const refreshToken = req.cookies.get("refresh_token")?.value;
+    const { pathname } = req.nextUrl;
 
-	if (PROTECTED_ROUTES.some((p) => pathname.startsWith(p)) && !token) {
-		return NextResponse.redirect(new URL("/login", req.url));
-	}
+    const isProtected = PROTECTED_ROUTES.some((p) => pathname.startsWith(p));
+    const isAuthPage = AUTH_ROUTES.includes(pathname);
 
-	// login page + token bor → comple
-	if (AUTH_ROUTES.includes(pathname) && token) {
-		return NextResponse.redirect(new URL("/complex", req.url));
-	}
+    if (isProtected) {
+        const accessValid = accessToken && !isTokenExpired(accessToken);
 
-	return NextResponse.next();
+        if (!accessValid) {
+            if (refreshToken && !isTokenExpired(refreshToken)) {
+                const refreshUrl = new URL("/api/auth/refresh", req.url);
+                refreshUrl.searchParams.set("from", pathname);
+                return NextResponse.redirect(refreshUrl);
+            }
+            return NextResponse.redirect(new URL("/login", req.url));
+        }
+    }
+
+    if (isAuthPage && accessToken && !isTokenExpired(accessToken)) {
+        return NextResponse.redirect(new URL("/complex", req.url));
+    }
+
+    return NextResponse.next();
 }
 
 export const config = {
-	matcher: ["/complex/:path*", "/login"],
+	matcher: ["/complex/:path*", "/buildings/:path*", "/apartments/:path*", "/calculator-system/:path*", "/management/:path*", "/login"],
 };

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
 import { Loader2, Shield, Lock, Unlock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRoles } from "@/action/hooks/roles-hook/use-roles";
 import CreateRole from "../modals/role-modals/create-role-modal/_create-role-modal";
 import { IPermission } from "@/types/permissions.types";
@@ -17,6 +18,7 @@ import PatchRoleManagement from "../modals/role-modals/patch-role-modal/_patch-r
 
 const RolesTableOfManagement: React.FC = () => {
 	const { data: roles, isLoading } = useRoles();
+	const t = useTranslations("management");
 
 	if (isLoading)
 		return (
@@ -54,14 +56,11 @@ const RolesTableOfManagement: React.FC = () => {
 										<AccordionTrigger className="flex-1 hover:no-underline py-4">
 											<div className="flex items-center gap-4">
 												<div
-													className={`
-                          p-2 rounded-md transition-all duration-300
-                          ${
+													className={`p-2 rounded-md transition-all duration-300 ${
 														hasPermissions
 															? "bg-gradient-to-br from-[#400189]/5 to-[#46479f]/5 group-hover:from-[#400189]/10 group-hover:to-[#46479f]/10"
 															: "bg-gray-50 group-hover:bg-gray-100"
-													}
-                        `}
+													}`}
 												>
 													{hasPermissions ? (
 														<Unlock className="h-4 w-4 text-[#46479f]/70" />
@@ -72,17 +71,16 @@ const RolesTableOfManagement: React.FC = () => {
 
 												<div className="text-left flex gap-3">
 													<span
-														className={`
-                            font-medium text-sm transition-colors
-                            ${hasPermissions ? "text-gray-900" : "text-gray-400"}
-                          `}
+														className={`font-medium text-sm transition-colors ${
+															hasPermissions ? "text-gray-900" : "text-gray-400"
+														}`}
 													>
 														{role.name}
 													</span>
 
 													{permissionsCount > 0 && (
-														<span className=" text-[10px] px-2 py-0.5 rounded-sm bg-[#d4ddff]/30 text-[#46479f]">
-															Возможности: {permissionsCount}
+														<span className="text-[10px] px-2 py-0.5 rounded-sm bg-[#d4ddff]/30 text-[#46479f]">
+															{t("capabilities", { count: permissionsCount })}
 														</span>
 													)}
 												</div>
@@ -97,20 +95,13 @@ const RolesTableOfManagement: React.FC = () => {
 													<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 pt-2">
 														{role.permissions?.map((perm: IPermission) => {
 															const permName = perm.codename || "Unnamed";
-
 															const formattedName = permName
 																.replace(/_/g, " ")
-																.replace(/\b\w/g, (l: string) =>
-																	l.toUpperCase(),
-																);
+																.replace(/\b\w/g, (l: string) => l.toUpperCase());
 
 															return (
-																<div
-																	key={perm.id}
-																	className="group/permission relative"
-																>
+																<div key={perm.id} className="group/permission relative">
 																	<div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-[#46479f]/30 opacity-0 group-hover/permission:opacity-100 transition-opacity" />
-
 																	<span className="block pl-3 text-[11px] text-gray-500 hover:text-[#46479f] transition-colors truncate">
 																		{formattedName}
 																	</span>
@@ -120,7 +111,7 @@ const RolesTableOfManagement: React.FC = () => {
 													</div>
 
 													<div className="text-[10px] text-gray-300 pt-1">
-														{permissionsCount} разрешений
+														{t("permissions_count", { count: permissionsCount })}
 													</div>
 												</div>
 											) : (
@@ -129,7 +120,7 @@ const RolesTableOfManagement: React.FC = () => {
 													<div className="flex items-center gap-2 pt-3">
 														<Lock size={12} className="text-gray-300" />
 														<span className="text-xs text-gray-300 font-light italic">
-															Нет разрешений
+															{t("no_permissions")}
 														</span>
 													</div>
 												</div>
@@ -138,7 +129,7 @@ const RolesTableOfManagement: React.FC = () => {
 									</AccordionContent>
 								</AccordionItem>
 							</Accordion>
-							<div className="flex justify-end  gap-1">
+							<div className="flex justify-end gap-1">
 								<PatchRoleManagement role={role} />
 								<DeleteRole roleId={role.id} roleName={role.name} />
 							</div>
@@ -152,7 +143,7 @@ const RolesTableOfManagement: React.FC = () => {
 							<Shield className="h-6 w-6 text-[#46479f]/30" />
 						</div>
 						<p className="text-sm text-gray-400 font-light">
-							Нет созданных ролей
+							{t("no_roles")}
 						</p>
 					</div>
 				)}

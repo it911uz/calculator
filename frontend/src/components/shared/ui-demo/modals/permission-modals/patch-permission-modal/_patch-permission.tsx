@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { IPermission } from "@/types/permissions.types";
 import { usePatchPermission } from "@/action/hooks/permissions-hook/use-patch-permission-hook";
 import { FiEdit3 } from "react-icons/fi";
@@ -25,6 +26,8 @@ const PatchPermissionManagement: React.FC<Props> = ({ permission }) => {
 	const [codename, setCodename] = useState<string>(permission.codename);
 
 	const { mutate: updatePermission, isPending } = usePatchPermission();
+	const t = useTranslations("management");
+	const tc = useTranslations("common");
 
 	useEffect(() => {
 		if (open) {
@@ -54,21 +57,21 @@ const PatchPermissionManagement: React.FC<Props> = ({ permission }) => {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<button className="text-gray-200 hover:text-white bg-indigo-900 px-3  rounded-[3px] ">
+				<button className="text-gray-200 hover:text-white bg-indigo-900 px-3 rounded-[3px]">
 					<FiEdit3 />
 				</button>
 			</DialogTrigger>
 			<DialogContent className="max-w-sm">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
-						Изменить разрешение
+						{t("patch_permission_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<form onSubmit={handleUpdate} className="space-y-4 py-2">
 					<div className="space-y-2">
 						<label className="text-[11px] font-semibold text-gray-400 uppercase">
-							Особенный имя
+							{t("patch_codename_label")}
 						</label>
 						<Input
 							required
@@ -77,7 +80,7 @@ const PatchPermissionManagement: React.FC<Props> = ({ permission }) => {
 								setCodename(e.target.value)
 							}
 							disabled={isPending}
-							placeholder="Напр: delete_orders"
+							placeholder={t("patch_permission_placeholder")}
 							className="lowercase"
 						/>
 					</div>
@@ -90,7 +93,7 @@ const PatchPermissionManagement: React.FC<Props> = ({ permission }) => {
 							disabled={isPending}
 							className="flex-1 text-xs"
 						>
-							Отмена
+							{tc("cancel")}
 						</Button>
 						<Button
 							type="submit"
@@ -104,7 +107,7 @@ const PatchPermissionManagement: React.FC<Props> = ({ permission }) => {
 							{isPending ? (
 								<Loader2 className="h-4 w-4 animate-spin" />
 							) : (
-								"Обновить"
+								tc("update")
 							)}
 						</Button>
 					</DialogFooter>

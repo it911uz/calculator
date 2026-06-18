@@ -12,11 +12,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Loader2, ShieldCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { usePostPermission } from "@/action/hooks/permissions-hook/use-post-permission-hook";
 
 const CreatePermissionsManagement: React.FC = () => {
 	const [open, setOpen] = useState<boolean>(false);
 	const [codename, setCodename] = useState<string>("");
+	const t = useTranslations("management");
+	const tc = useTranslations("common");
 
 	const { mutate: createPermission, isPending } = usePostPermission();
 
@@ -40,27 +43,27 @@ const CreatePermissionsManagement: React.FC = () => {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button className="bg-indigo-900 hover:bg-indigo-800 text-white gap-2 ">
+				<Button className="bg-indigo-900 hover:bg-indigo-800 text-white gap-2">
 					<PlusCircle size={14} />
-					<span>Создать разрешение</span>
+					<span>{t("create_permission_btn")}</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="max-w-sm">
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
 						<ShieldCheck className="text-indigo-900" size={20} />
-						Новое разрешение
+						{t("new_permission_title")}
 					</DialogTitle>
 				</DialogHeader>
 
 				<form onSubmit={handleSubmit} className="space-y-4 py-2">
 					<div className="space-y-2">
 						<label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-							Cистемное имя
+							{t("system_name_label")}
 						</label>
 						<Input
 							required
-							placeholder="Напр: create_users"
+							placeholder={t("system_name_placeholder")}
 							value={codename}
 							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 								setCodename(e.target.value)
@@ -69,7 +72,7 @@ const CreatePermissionsManagement: React.FC = () => {
 							className="lowercase"
 						/>
 						<p className="text-[10px] text-muted-foreground italic">
-							* Используйте нижнее подчеркивание вместо пробелов
+							{t("system_name_hint")}
 						</p>
 					</div>
 
@@ -81,7 +84,7 @@ const CreatePermissionsManagement: React.FC = () => {
 							disabled={isPending}
 							className="flex-1"
 						>
-							Отмена
+							{tc("cancel")}
 						</Button>
 						<Button
 							type="submit"
@@ -91,7 +94,7 @@ const CreatePermissionsManagement: React.FC = () => {
 							{isPending ? (
 								<Loader2 className="h-4 w-4 animate-spin" />
 							) : (
-								"Создать"
+								tc("create")
 							)}
 						</Button>
 					</DialogFooter>

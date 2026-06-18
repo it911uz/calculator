@@ -8,7 +8,6 @@ export interface IBuildings {
 	max_coefficient: number;
 	base_price: string | number;
 	complex_id: number | string;
-	image_url?: string;
 }
 export interface UpdateArgs {
 	id: number | string;

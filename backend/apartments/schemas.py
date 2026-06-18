@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 from enum import Enum
 
 from apartments.schema_validation_mixins import ApartmentSchemaValidationMixin
@@ -15,14 +15,20 @@ class AddApartmentResponse(BaseModel):
     status: str
     final_price: Decimal = Field(max_digits=20, decimal_places=2)
     building_id: int
-
     bct_ids: list[int]
+    price_unit: str = "UZS"
+
+    @computed_field
+    @property
+    def total_price(self) -> Decimal:
+        return (self.final_price * self.area).quantize(Decimal("0.01"))
 
 
 class StatusEnum(str, Enum):
-    BUILT = "built"
-    UPCOMING = "upcoming"
-    IN_PROCESS = "in_process"
+    FREE = "free"
+    SOLD = "sold"
+    BOOKED = "booked"
+    WITHDRAWN = "withdrawn"
 
 
 class AddApartmentBody(ApartmentSchemaValidationMixin):

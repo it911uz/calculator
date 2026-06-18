@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN corepack enable pnpm && pnpm i
+RUN corepack enable pnpm && pnpm i --ignore-scripts
 
 FROM base AS builder
 
@@ -19,6 +19,9 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 RUN corepack enable pnpm && pnpm run build
 
