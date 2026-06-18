@@ -38,3 +38,20 @@ log.txt # Example log file
 .Trash-* # Linux
 *~ # Linux/macOS temporary files
 
+# Frontend — никогда не коммитить
+frontend/node_modules/
+frontend/.pnpm-store/
+frontend/.next/
+frontend/.turbo/
+node_modules/
+
+# Excel временные файлы
+~$*.xlsx
+~$*.xls
+
+# Nginx логи
+nginx/logs/
+
+# Флаг суперпользователя (локальный)
+.superuser_created
+
