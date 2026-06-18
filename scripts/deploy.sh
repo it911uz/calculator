@@ -155,7 +155,7 @@ setup_ssl() {
   # Останавливаем nginx если запущен (занимает порт 80)
   docker compose -f "$COMPOSE_PROD" stop nginx 2>/dev/null || true
 
-  certbot certonly \
+  sudo certbot certonly \
     --standalone \
     --non-interactive \
     --agree-tos \
@@ -163,7 +163,7 @@ setup_ssl() {
     -d "$domain" \
     -d "www.${domain}" || {
       warn "Не удалось получить сертификат для www.${domain}, пробую только ${domain}..."
-      certbot certonly \
+      sudo certbot certonly \
         --standalone \
         --non-interactive \
         --agree-tos \
