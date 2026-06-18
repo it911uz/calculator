@@ -93,14 +93,22 @@ chown -R deploy:deploy /opt/calculator /opt/backups
 success "Директории созданы: /opt/calculator, /opt/backups/postgres"
 
 step "Настройка автоматического обновления SSL (cron)"
-CRON_LINE="0 3 * * * certbot renew --quiet --post-hook 'docker exec calc-nginx nginx -s reload'"
-(crontab -l 2>/dev/null | grep -v certbot; echo "$CRON_LINE") | crontab -
-success "Cron для обновления SSL настроен"
+if command -v crontab &>/dev/null; then
+  CRON_LINE="0 3 * * * certbot renew --quiet --post-hook 'docker exec calc-nginx nginx -s reload'"
+  (crontab -l 2>/dev/null | grep -v certbot; echo "$CRON_LINE") | crontab -
+  success "Cron для обновления SSL настроен"
+else
+  warn "crontab не найден — пропускаем (добавьте вручную после установки cron)"
+fi
 
 step "Настройка cron для бэкапов БД"
-BACKUP_CRON="0 2 * * * /opt/calculator/scripts/backup.sh >> /var/log/calculator-backup.log 2>&1"
-(crontab -l 2>/dev/null | grep -v backup.sh; echo "$BACKUP_CRON") | crontab -
-success "Cron для бэкапов настроен (ежедневно в 02:00)"
+if command -v crontab &>/dev/null; then
+  BACKUP_CRON="0 2 * * * /opt/calculator/scripts/backup.sh >> /var/log/calculator-backup.log 2>&1"
+  (crontab -l 2>/dev/null | grep -v backup.sh; echo "$BACKUP_CRON") | crontab -
+  success "Cron для бэкапов настроен (ежедневно в 02:00)"
+else
+  warn "crontab не найден — пропускаем"
+fi
 
 step "Настройка swap (2GB)"
 if swapon --show | grep -q swap; then
